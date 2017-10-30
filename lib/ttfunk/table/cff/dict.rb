@@ -2,9 +2,17 @@ module TTFunk
   class Table
     class Cff < TTFunk::Table
       class Dict < TTFunk::Table::Cff::CffTable
+        include Enumerable
+
         def [](operator)
           @dict[operator]
         end
+
+        def each(&block)
+          @dict.each(&block)
+        end
+
+        alias_method :each_pair, :each
 
         private
 
