@@ -116,9 +116,14 @@ module TTFunk
     def sbix
       @sbix ||= TTFunk::Table::Sbix.new(self)
     end
+
+    def cff
+      @cff ||= TTFunk::Table::Cff.new(self)
+    end
   end
 end
 
+require_relative 'ttfunk/table/cff'
 require_relative 'ttfunk/table/cmap'
 require_relative 'ttfunk/table/glyf'
 require_relative 'ttfunk/table/head'
