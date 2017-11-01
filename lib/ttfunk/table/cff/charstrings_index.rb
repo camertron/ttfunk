@@ -4,16 +4,13 @@ module TTFunk
       class CharstringsIndex < TTFunk::Table::Cff::Index
         attr_reader :top_dict
 
-        def initialize(top_dict, file, offset, length = nil)
-          super(file, offset, length)
+        def initialize(top_dict, *remaining_args)
+          super(*remaining_args)
           @top_dict = top_dict
         end
 
         def [](index)
-          data[index] ||= begin
-            start, finish = data_offsets_for(index)
-            TTFunk::Table::Cff::Charstring.new(@raw_data_array[start...finish])
-          end
+          data[index] ||= TTFunk::Table::Cff::Charstring.new(top_dict, self[index])
         end
       end
     end

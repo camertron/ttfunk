@@ -36,9 +36,10 @@ module TTFunk
           37 => :flex1
         }
 
-        attr_reader :raw
+        attr_reader :raw, :path
 
-        def initialize(raw)
+        def initialize(top_dict, raw)
+          @top_dict = top_dict
           @raw = raw
           @path = Path.new
           @stack = []
@@ -55,7 +56,7 @@ module TTFunk
 
         private
 
-        def parse!(codes = @raw)
+        def parse!
           until eof?
             code = read_byte
 
@@ -100,33 +101,28 @@ module TTFunk
         end
 
         def default_width_x
-          # @TODO: get from top dict
-          0
+          binding.pry
+          @top_dict.private_dict.default_width_x
         end
 
         def nominal_width_x
-          # @TODO: get from top dict
-          0
+          @top_dict.private_dict.nominal_width_x
         end
 
         def subrs_bias
-          # @TODO: get from top dict
-          0
+          subrs.bias
         end
 
         def gsubrs_bias
-          # @TODO: get from top dict
-          0
+          gsubrs.bias
         end
 
         def subrs
-          # @TODO: get from top dict
-          []
+          @top_dict.private_dict.subr_index
         end
 
         def gsubrs
-          # @TODO: get from top dict
-          []
+          cff.global_subr_index
         end
 
         def hstem
@@ -161,19 +157,19 @@ module TTFunk
           add_contour(@x, @y)
         end
 
-        def add_contour
+        def add_contour(x, y)
           if @open
             @path.close_path
           end
 
-          @path.move_to(@x, @y)
+          @path.move_to(x, y)
           @open = true
         end
 
-        def rlinetov
+        def rlineto
           until @stack.empty?
-            @x += stack.shift
-            @y += stack.shift
+            @x += @stack.shift
+            @y += @stack.shift
             @path.line_to(@x, @y)
           end
         end
@@ -425,7 +421,7 @@ module TTFunk
           code_index = @stack.pop + gsubrs_bias
           subr_code = gsubrs[code_index]
 
-          if subrCode
+          if subr_code
             @frames.push(StringIO.new(subr_code))
           end
         end
@@ -471,7 +467,7 @@ module TTFunk
             @x = c2x + @stack.shift
             @y = c2y + (@stack.size == 1 ? @stack.shift : 0)
             @path.curve_to(c1x, c1y, c2x, c2y, @x, @y)
-          }
+          end
         end
       end
     end

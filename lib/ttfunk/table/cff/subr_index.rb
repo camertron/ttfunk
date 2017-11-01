@@ -3,10 +3,7 @@ module TTFunk
     class Cff < TTFunk::Table
       class SubrIndex < TTFunk::Table::Cff::Index
         def [](index)
-          data[index] ||= begin
-            start, finish = data_offsets_for(index)
-            @raw_data_array[start...finish].bytes
-          end
+          data[index] ||= self[index].bytes
         end
 
         # ignore charstring type for now

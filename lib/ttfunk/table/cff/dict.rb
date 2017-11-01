@@ -21,7 +21,9 @@ module TTFunk
           operands = []
           operator = nil
 
-          @length = read(1, 'C').first - 1
+          # @length can be set via the constructor, so only read a length if @length
+          # hasn't already been set
+          @length ||= read(1, 'C').first - 1
 
           while io.pos <= table_offset + length
             case b_zero = read(1, 'C').first

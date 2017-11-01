@@ -11,8 +11,8 @@ module TTFunk
 
         def [](index)
           data[index] ||= begin
-            start, finish = data_offsets_for(index)
-            TTFunk::Table::Cff::FontDict.new(file, table_offset + start + 4)
+            start, finish = absolute_data_offsets_for(index)
+            TTFunk::Table::Cff::FontDict.new(file, start, finish - start)
           end
         end
       end
