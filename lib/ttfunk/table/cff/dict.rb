@@ -23,7 +23,7 @@ module TTFunk
 
           @length = read(1, 'C').first - 1
 
-          while io.pos < table_offset + length
+          while io.pos <= table_offset + length
             case b_zero = read(1, 'C').first
               when 12
                 operator = get_two_byte_operator
@@ -38,8 +38,6 @@ module TTFunk
                 raise RuntimeError, "dict byte value #{b_zero} is reserved"
             end
           end
-
-          @dict[operator] = operands
         end
 
         def get_two_byte_operator

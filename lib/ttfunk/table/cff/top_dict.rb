@@ -11,6 +11,7 @@ module TTFunk
           charstrings: 17,
           charstring_type: 1206,
           ros: 1230,
+          fd_array: 1236,
           fd_select: 1237
         }
 
@@ -26,7 +27,7 @@ module TTFunk
           @encoding ||= begin
             # CID fonts don't specify an encoding, so this can be nil
             if encoding_offset = self[OPERATOR_MAP[:encoding]]
-              Encoding.new(self, file, encoding_offset)
+              Encoding.new(self, file, encoding_offset.first)
             end
           end
         end
@@ -40,7 +41,7 @@ module TTFunk
         def charstrings_index
           @charstrings_index ||= begin
             if charstrings_offset = self[OPERATOR_MAP[:charstrings]]
-              Index.new(file, charstrings_offset)
+              CharstringsIndex.new(self, file, cff_offset + charstrings_offset.first)
             end
           end
         end
@@ -51,10 +52,14 @@ module TTFunk
 
         def font_index
           @font_index ||= begin
-            if font_index_offset = self[OPERATOR_MAP[:fd_select]]
+            if font_index_offset = self[OPERATOR_MAP[:fd_array]]
               FontIndex.new(file, font_index_offset.first)
             end
           end
+        end
+
+        def cff_offset
+          file.directory.tables['CFF '][:offset]
         end
       end
     end

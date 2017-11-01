@@ -32,7 +32,7 @@ module TTFunk
           @count, @offset_size = read(3, 'nc')
           @raw_offset_array = io.read((count + 1) * offset_size)
           last_start, last_finish = data_offsets_for(count - 1)
-          binding.pry if self.class.name == 'TTFunk::Table::Cff::FontIndex'
+          # binding.pry if self.class.name == 'TTFunk::Table::Cff::FontIndex'
           @raw_data_array = io.read(last_finish)
           @length = 3 + @raw_offset_array.size + @raw_data_array.size
         end

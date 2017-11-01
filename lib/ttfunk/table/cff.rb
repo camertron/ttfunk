@@ -1,17 +1,19 @@
 module TTFunk
   class Table
     class Cff < TTFunk::Table
-      autoload :CffTable,  'ttfunk/table/cff/cff_table'
-      autoload :Charset,   'ttfunk/table/cff/charset'
-      autoload :Dict,      'ttfunk/table/cff/dict'
-      autoload :Encoding,  'ttfunk/table/cff/encoding'
-      autoload :FontDict,  'ttfunk/table/cff/font_dict'
-      autoload :FontIndex, 'ttfunk/table/cff/font_index'
-      autoload :Header,    'ttfunk/table/cff/header'
-      autoload :Index,     'ttfunk/table/cff/index'
-      autoload :SubrIndex, 'ttfunk/table/cff/subr_index'
-      autoload :TopDict,   'ttfunk/table/cff/top_dict'
-      autoload :TopIndex,  'ttfunk/table/cff/top_index'
+      autoload :CffTable,   'ttfunk/table/cff/cff_table'
+      autoload :Charset,    'ttfunk/table/cff/charset'
+      autoload :Charstring, 'ttfunk/table/cff/charstring'
+      autoload :Dict,       'ttfunk/table/cff/dict'
+      autoload :Encoding,   'ttfunk/table/cff/encoding'
+      autoload :FontDict,   'ttfunk/table/cff/font_dict'
+      autoload :FontIndex,  'ttfunk/table/cff/font_index'
+      autoload :Header,     'ttfunk/table/cff/header'
+      autoload :Index,      'ttfunk/table/cff/index'
+      autoload :Path,       'ttfunk/table/cff/path'
+      autoload :SubrIndex,  'ttfunk/table/cff/subr_index'
+      autoload :TopDict,    'ttfunk/table/cff/top_dict'
+      autoload :TopIndex,   'ttfunk/table/cff/top_index'
 
       TAG = 'CFF '.freeze  # extra space is important
 
