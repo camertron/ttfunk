@@ -88,6 +88,14 @@ module TTFunk
           end
         end
 
+        def font_dict_selector
+          @font_dict_selector ||= begin
+            if fd_select_offset = self[OPERATOR_MAP[:fd_select]]
+              FdSelector.new(self, file, cff_offset + fd_select_offset.first)
+            end
+          end
+        end
+
         def cff_offset
           cff.offset
         end

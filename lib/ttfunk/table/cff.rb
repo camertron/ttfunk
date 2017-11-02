@@ -7,6 +7,7 @@ module TTFunk
       autoload :CharstringsIndex, 'ttfunk/table/cff/charstrings_index'
       autoload :Dict,             'ttfunk/table/cff/dict'
       autoload :Encoding,         'ttfunk/table/cff/encoding'
+      autoload :FdSelector,       'ttfunk/table/cff/fd_selector'
       autoload :FontDict,         'ttfunk/table/cff/font_dict'
       autoload :FontIndex,        'ttfunk/table/cff/font_index'
       autoload :Header,           'ttfunk/table/cff/header'

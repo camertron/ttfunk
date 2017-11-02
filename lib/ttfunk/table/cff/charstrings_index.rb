@@ -10,7 +10,7 @@ module TTFunk
         end
 
         def [](index)
-          data[index] ||= TTFunk::Table::Cff::Charstring.new(top_dict, self[index])
+          data[index] ||= TTFunk::Table::Cff::Charstring.new(top_dict, get(index))
         end
       end
     end

@@ -11,14 +11,7 @@ module TTFunk
         attr_reader :offset_size
 
         def [](index)
-          if index >= count
-            raise ArgumentError, "index of #{index} is out-of-bounds"
-          end
-
-          data[index] ||= begin
-            start, finish = relative_data_offsets_for(index)
-            @raw_data_array[start...finish]
-          end
+          data[index] = get(index)
         end
 
         def each
@@ -27,6 +20,15 @@ module TTFunk
         end
 
         private
+
+        def get(index)
+          if index >= count
+            raise ArgumentError, "index of #{index} is out-of-bounds"
+          end
+
+          start, finish = relative_data_offsets_for(index)
+          @raw_data_array[start...finish]
+        end
 
         def parse!
           @count, @offset_size = read(3, 'nc')
