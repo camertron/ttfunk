@@ -12,7 +12,7 @@ module TTFunk
         def [](index)
           data[index] ||= begin
             start, finish = absolute_data_offsets_for(index)
-            TTFunk::Table::Cff::FontDict.new(file, start, finish - start)
+            TTFunk::Table::Cff::FontDict.new(top_dict, file, start, finish - start)
           end
         end
       end

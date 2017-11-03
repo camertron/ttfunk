@@ -9,7 +9,6 @@ module TTFunk
           charset: 15,
           encoding: 16,
           charstrings: 17,
-          private: 18,
           charstring_type: 1206,
           ros: 1230,
           fd_array: 1236,
@@ -29,15 +28,6 @@ module TTFunk
 
         def ros?
           !!ros
-        end
-
-        def private_dict
-          @private_dict ||= begin
-            if info = self[OPERATOR_MAP[:private]]
-              private_dict_length, private_dict_offset = info
-              Dict.new(file, cff_offset + private_dict_offset, private_dict_length)
-            end
-          end
         end
 
         def encoding

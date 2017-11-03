@@ -38,16 +38,26 @@ module TTFunk
 
         attr_reader :raw, :path
 
-        def initialize(top_dict, raw)
+        def initialize(top_dict, font_dict, raw)
           @top_dict = top_dict
+          @font_dict = font_dict
           @raw = raw
+
+          @default_width_x = @font_dict.private_dict.default_width_x
+          @nominal_width_x = @font_dict.private_dict.nominal_width_x
+          @subrs = @font_dict.private_dict.subr_index
+          @gsubrs = @top_dict.cff.global_subr_index
+          @subrs_bias = @subrs.bias if @subrs
+          @gsubrs_bias = @gsubrs.bias if @gsubrs
+
           @path = Path.new
           @stack = []
-          @frames = [StringIO.new(raw)]
+          @data = raw.bytes
+          @index = 0
           @n_stems = 0
           @have_width = false
           @open = false
-          @width = default_width_x
+          @width = @default_width_x
           @x = 0
           @y = 0
 
@@ -57,72 +67,41 @@ module TTFunk
         private
 
         def parse!
-          until eof?
+          until @index >= @data.size
             code = read_byte
 
-            case code
-              when 11
-                break
-              when *CODE_MAP.keys
-                send(CODE_MAP[code])
-              when 32..246
-                @stack.push(code - 139)
-              when 247..250
-                b0 = code
-                b1 = read_byte
-                @stack.push((b0 - 247) * 256 + b1 + 108)
-              when 251..254
-                b0 = code
-                b1 = read_byte
-                @stack.push(-(b0 - 251) * 256 - b1 - 108)
-              when 255
-                b0 = code
-                b1 = read_byte
-                b2 = read_byte
-                b3 = read_byte
-                b4 = read_byte
-                @stack.push(((b1 << 24) | (b2 << 16) | (b3 << 8) | b4) / 65536)
-              else
-                # bad
+            if code == 11
+              break
+            elsif code >= 32 && code <= 246
+              @stack.push(code - 139)
+            elsif code >= 247 && code <= 250
+              b0 = code
+              b1 = read_byte
+              @stack.push((b0 - 247) * 256 + b1 + 108)
+            elsif code >= 251 && code <= 254
+              b0 = code
+              b1 = read_byte
+              @stack.push(-(b0 - 251) * 256 - b1 - 108)
+            elsif code == 255
+              b0 = code
+              b1, b2, b3, b4 = read_bytes(4)
+              @stack.push(((b1 << 24) | (b2 << 16) | (b3 << 8) | b4) / 65536)
+            elsif m = CODE_MAP[code]
+              send(m)
             end
           end
         end
 
         def read_byte
-          return nil if @frames.empty?
-
-          @frames.last.read(1).ord.tap do
-            @frames.pop if @frames.last.eof?
-          end
+          byte = @data[@index]
+          @index += 1
+          byte
         end
 
-        def eof?
-          @frames.empty?
-        end
-
-        def default_width_x
-          binding.pry
-          @top_dict.private_dict.default_width_x
-        end
-
-        def nominal_width_x
-          @top_dict.private_dict.nominal_width_x
-        end
-
-        def subrs_bias
-          subrs.bias
-        end
-
-        def gsubrs_bias
-          gsubrs.bias
-        end
-
-        def subrs
-          @top_dict.private_dict.subr_index
-        end
-
-        def gsubrs
-          cff.global_subr_index
+        def read_bytes(length)
+          bytes = @data[@index, length]
+          @index += length
+          bytes
         end
 
         def hstem
@@ -139,7 +118,7 @@ module TTFunk
           has_width_arg = @stack.size.odd?
 
           if has_width_arg && !@have_width
-            @width = @stack.shift + nominal_width_x
+            @width = @stack.shift + @nominal_width_x
           end
 
           @n_stems += @stack.length >> 1
@@ -149,7 +128,7 @@ module TTFunk
 
         def vmoveto
           if @stack.size > 1 && !@have_width
-            @width = @stack.shift + nominal_width_x
+            @width = @stack.shift + @nominal_width_x
             @have_width = true
           end
 
@@ -211,9 +190,9 @@ module TTFunk
         end
 
         def callsubr
-          code_index = @stack.pop + subrs_bias
-          subr_codes = subrs[code_index]
-          @frames.push(StringIO.new(subr_codes)) if subr_codes
+          code_index = @stack.pop + @subrs_bias
+          subr_codes = @subrs[code_index].bytes
+          @data.insert(@index, *subr_codes) if subr_codes
         end
 
         def flex_select
@@ -298,7 +277,7 @@ module TTFunk
 
         def endchar
           if @stack.size > 0 && !@have_width
-            @width = @stack.shift + nominal_width_x
+            @width = @stack.shift + @nominal_width_x
             @have_width = true
           end
 
@@ -313,7 +292,7 @@ module TTFunk
         end
 
         def hintmask
-          # noop
+          cntrmask
         end
 
         def cntrmask
@@ -323,7 +302,7 @@ module TTFunk
 
         def rmoveto
           if @stack.size > 2 && !@have_width
-            @width = @stack.shift + nominal_width_x
+            @width = @stack.shift + @nominal_width_x
             @have_width = true
           end
 
@@ -334,11 +313,11 @@ module TTFunk
 
         def hmoveto
           if @stack.size > 1 && !@have_width
-            @width = @stack.shift + nominal_width_x;
+            @width = @stack.shift + @nominal_width_x;
             @have_width = true
           end
 
-          @x += stack.pop
+          @x += @stack.pop
           add_contour(@x, @y)
         end
 
@@ -412,31 +391,27 @@ module TTFunk
         end
 
         def shortint
-          b1 = 28
-          b2 = read_byte
+          b1, b2 = read_bytes(2)
           @stack.push(((b1 << 24) | (b2 << 16)) >> 16)
         end
 
         def callgsubr
-          code_index = @stack.pop + gsubrs_bias
-          subr_code = gsubrs[code_index]
-
-          if subr_code
-            @frames.push(StringIO.new(subr_code))
-          end
+          code_index = @stack.pop + @gsubrs_bias
+          subr_code = @gsubrs[code_index].bytes
+          @data.insert(@index, *subr_code) if subr_code
         end
 
         def vhcurveto
-          until stack.empty?
+          until @stack.empty?
             c1x = @x
             c1y = @y + @stack.shift
             c2x = c1x + @stack.shift
-            c2y = c1y + stack.shift
+            c2y = c1y + @stack.shift
             @x = c2x + @stack.shift
             @y = c2y + (@stack.size == 1 ? @stack.shift : 0)
             @path.curve_to(c1x, c1y, c2x, c2y, @x, @y)
 
-            break if stack.empty?
+            break if @stack.empty?
 
             c1x = @x + @stack.shift
             c1y = @y
