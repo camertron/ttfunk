@@ -11,10 +11,9 @@ module TTFunk
 
         def [](index)
           data[index] ||= begin
-            puts "index: #{index}"
             fd_index = top_dict.font_dict_selector[index]
             font_dict = top_dict.font_index[fd_index]
-            TTFunk::Table::Cff::Charstring.new(top_dict, font_dict, get(index))
+            TTFunk::Table::Cff::Charstring.new(index, top_dict, font_dict, get(index))
           end
         end
       end

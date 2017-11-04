@@ -28,6 +28,16 @@ module TTFunk
           }
         end
 
+        def quad_to(x1, y1, x, y)
+          @commands << {
+            type: :quad,
+            x1: x1,
+            y1: y1,
+            x: x,
+            y: y
+          }
+        end
+
         def close_path
           @commands << { type: :close }
         end

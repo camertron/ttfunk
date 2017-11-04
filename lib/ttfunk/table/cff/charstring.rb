@@ -36,9 +36,10 @@ module TTFunk
           37 => :flex1
         }
 
-        attr_reader :raw, :path
+        attr_reader :glyph_id, :raw, :path
 
-        def initialize(top_dict, font_dict, raw)
+        def initialize(glyph_id, top_dict, font_dict, raw)
+          @glyph_id = glyph_id
           @top_dict = top_dict
           @font_dict = font_dict
           @raw = raw
@@ -64,6 +65,14 @@ module TTFunk
           parse!
         end
 
+        def glyph
+          @glyph ||= begin
+            horizontal_metrics = @top_dict.file.horizontal_metrics.for(glyph_id)
+            path = @top_dict.charstrings_index[glyph_id].path
+            Glyf::PathBased.new(path, horizontal_metrics)
+          end
+        end
+
         private
 
         def parse!
@@ -71,7 +80,7 @@ module TTFunk
             code = read_byte
 
             if code == 11
-              break
+              # return from callgsubr - do nothing since we inline subrs
             elsif code >= 32 && code <= 246
               @stack.push(code - 139)
             elsif code >= 247 && code <= 250
