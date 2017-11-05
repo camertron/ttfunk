@@ -120,6 +120,10 @@ module TTFunk
     def cff
       @cff ||= TTFunk::Table::Cff.new(self)
     end
+
+    def vertical_origins
+      @vertical_origins ||= TTFunk::Table::Vorg.new(self)
+    end
   end
 end
 
@@ -136,3 +140,4 @@ require_relative 'ttfunk/table/name'
 require_relative 'ttfunk/table/os2'
 require_relative 'ttfunk/table/post'
 require_relative 'ttfunk/table/sbix'
+require_relative 'ttfunk/table/vorg'
