@@ -2,6 +2,10 @@ module TTFunk
   class Table
     class Cff < TTFunk::Table
       class TopDict < TTFunk::Table::Cff::Dict
+        def self.encode(dict)
+          binding.pry
+        end
+
         DEFAULT_CHARSTRING_TYPE = 2
         DEFAULT_CHARSET_ID = 0
 
@@ -42,18 +46,22 @@ module TTFunk
         def charset
           @charset ||= begin
             if charset_offset_or_id = self[OPERATOR_MAP[:charset]]
-              # Numbers from 0..2 mean charset IDs instead of offsets. IDs are basically
-              # pre-defined sets of characters.
-              #
-              # In the case of an offset, add the CFF table's offset since the charset offset
-              # is relative to the start of the CFF table.
-              if charset_offset_or_id > 2
-                charset_offset_or_id += cff_offset
-              end
+              if charset_offset_or_id.empty?
+                Charset.new(self, file, DEFAULT_CHARSET_ID)
+              else
+                # Numbers from 0..2 mean charset IDs instead of offsets. IDs are basically
+                # pre-defined sets of characters.
+                #
+                # In the case of an offset, add the CFF table's offset since the charset offset
+                # is relative to the start of the CFF table.
+                charset_offset_or_id = charset_offset_or_id.first
 
-              Charset.new(self, file, charset_offset_or_id)
-            else
-              Charset.new(self, file, DEFAULT_CHARSET_ID)
+                if charset_offset_or_id > 2
+                  charset_offset_or_id += cff_offset
+                end
+
+                Charset.new(self, file, charset_offset_or_id)
+              end
             end
           end
         end

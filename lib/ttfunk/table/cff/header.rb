@@ -2,6 +2,15 @@ module TTFunk
   class Table
     class Cff < TTFunk::Table
       class Header < TTFunk::Table::Cff::CffTable
+        def self.encode(header)
+          [
+            header.major,
+            header.minor,
+            header.header_size,
+            header.absolute_offset_size
+          ].pack('C*')
+        end
+
         # cff format version numbers
         attr_reader :major
         attr_reader :minor
