@@ -2,52 +2,6 @@ module TTFunk
   class Table
     class Cff < TTFunk::Table
       class Index < TTFunk::Table::Cff::CffTable
-        class << self
-          def encode(enum, encoder = nil, *args)
-            result = StringIO.new.binmode
-
-            entries = enum.map do |entry|
-              encoder ? encoder.encode(entry, *args) : entry
-            end
-
-            offset_size = if entries.size > 1
-              (Math.log2(entries.size).ceil / 8.0).ceil
-            else
-              1
-            end
-
-            result << [entries.size, offset_size].pack('nc')
-            data_offset = 1
-
-            data = StringIO.new.binmode
-
-            entries.each_with_index do |entry, index|
-              result << encode_offset(data_offset, offset_size)
-              data << entry
-              data_offset += entry.bytesize
-            end
-
-            result << encode_offset(data_offset, offset_size)
-
-            result.string + data.string
-          end
-
-          private
-
-          def encode_offset(offset, offset_size)
-            case offset_size
-              when 1
-                [offset].pack('C')
-              when 2
-                [offset].pack('n')
-              when 3
-                [offset].pack('N')[1..-1]
-              when 4
-                [offset].pack('N')
-            end
-          end
-        end
-
         include Enumerable
 
         # number of objects in the index
@@ -63,6 +17,51 @@ module TTFunk
         def each
           return to_enum(__method__) unless block_given?
           count.times { |i| yield self[i] }
+        end
+
+        def encode
+          result = ''
+
+          entries = each_with_object([]) do |entry, ret|
+            new_entry = block_given? ? yield(entry) : entry
+            ret << new_entry if new_entry
+          end
+
+          offset_size = if entries.size > 1
+            (Math.log2(entries.size).ceil / 8.0).ceil
+          else
+            1
+          end
+
+          result << [entries.size, offset_size].pack('nc')
+          data_offset = 1
+
+          data = ''
+
+          entries.each_with_index do |entry, index|
+            result << encode_offset(data_offset, offset_size)
+            data << entry
+            data_offset += entry.bytesize
+          end
+
+          result << encode_offset(data_offset, offset_size)
+
+          result + data
+        end
+
+        private
+
+        def encode_offset(offset, offset_size)
+          case offset_size
+            when 1
+              [offset].pack('C')
+            when 2
+              [offset].pack('n')
+            when 3
+              [offset].pack('N')[1..-1]
+            when 4
+              [offset].pack('N')
+          end
         end
 
         private

@@ -28,6 +28,16 @@ module TTFunk
         TAG
       end
 
+      def encode(cff)
+        ''.tap do |result|
+          result << cff.header.encode
+          result << cff.name_index.encode
+          result << cff.top_index.encode do |top_dict|
+            top_dict.encode
+          end
+        end
+      end
+
       private
 
       def parse!

@@ -2,21 +2,17 @@ module TTFunk
   class Table
     class Cff < TTFunk::Table
       class TopDict < TTFunk::Table::Cff::Dict
-        def self.encode(dict)
-          binding.pry
-        end
-
         DEFAULT_CHARSTRING_TYPE = 2
         DEFAULT_CHARSET_ID = 0
 
-        OPERATOR_MAP = {
+        NAMES_TO_OPERATORS = {
           charset: 15,
           encoding: 16,
-          charstrings: 17,
+          charstrings_index: 17,
           charstring_type: 1206,
           ros: 1230,
-          fd_array: 1236,
-          fd_select: 1237
+          font_index: 1236,
+          font_dict_selector: 1237
         }
 
         attr_reader :cff
@@ -27,7 +23,7 @@ module TTFunk
         end
 
         def ros
-          self[OPERATOR_MAP[:ros]]
+          self[NAMES_TO_OPERATORS[:ros]]
         end
 
         def ros?
@@ -37,7 +33,7 @@ module TTFunk
         def encoding
           @encoding ||= begin
             # CID fonts don't specify an encoding, so this can be nil
-            if encoding_offset = self[OPERATOR_MAP[:encoding]]
+            if encoding_offset = self[NAMES_TO_OPERATORS[:encoding]]
               Encoding.new(self, file, cff_offset + encoding_offset.first)
             end
           end
@@ -45,7 +41,7 @@ module TTFunk
 
         def charset
           @charset ||= begin
-            if charset_offset_or_id = self[OPERATOR_MAP[:charset]]
+            if charset_offset_or_id = self[NAMES_TO_OPERATORS[:charset]]
               if charset_offset_or_id.empty?
                 Charset.new(self, file, DEFAULT_CHARSET_ID)
               else
@@ -68,19 +64,19 @@ module TTFunk
 
         def charstrings_index
           @charstrings_index ||= begin
-            if charstrings_offset = self[OPERATOR_MAP[:charstrings]]
+            if charstrings_offset = self[NAMES_TO_OPERATORS[:charstrings_index]]
               CharstringsIndex.new(self, file, cff_offset + charstrings_offset.first)
             end
           end
         end
 
         def charstring_type
-          @charstring_type = self[OPERATOR_MAP[:charstring_type]] || DEFAULT_CHARSTRING_TYPE
+          @charstring_type = self[NAMES_TO_OPERATORS[:charstring_type]] || DEFAULT_CHARSTRING_TYPE
         end
 
         def font_index
           @font_index ||= begin
-            if font_index_offset = self[OPERATOR_MAP[:fd_array]]
+            if font_index_offset = self[NAMES_TO_OPERATORS[:font_index]]
               FontIndex.new(self, file, cff_offset + font_index_offset.first)
             end
           end
@@ -88,7 +84,7 @@ module TTFunk
 
         def font_dict_selector
           @font_dict_selector ||= begin
-            if fd_select_offset = self[OPERATOR_MAP[:fd_select]]
+            if fd_select_offset = self[NAMES_TO_OPERATORS[:font_dict_selector]]
               FdSelector.new(self, file, cff_offset + fd_select_offset.first)
             end
           end
@@ -96,6 +92,16 @@ module TTFunk
 
         def cff_offset
           cff.offset
+        end
+
+        private
+
+        def encode_charstring_type(charstring_type)
+          if charstring_type == DEFAULT_CHARSTRING_TYPE
+            ''
+          else
+            encode_operand(charstring_type)
+          end
         end
       end
     end

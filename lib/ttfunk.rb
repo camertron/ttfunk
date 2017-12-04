@@ -6,6 +6,7 @@ require_relative 'ttfunk/resource_file'
 require_relative 'ttfunk/collection'
 require_relative 'ttfunk/ttf_encoder'
 require_relative 'ttfunk/otf_encoder'
+require_relative 'ttfunk/real'
 
 module TTFunk
   class File

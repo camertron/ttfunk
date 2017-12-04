@@ -1,3 +1,5 @@
+require 'bigdecimal'
+
 module TTFunk
   class Table
     class Cff < TTFunk::Table
@@ -14,7 +16,111 @@ module TTFunk
 
         alias_method :each_pair, :each
 
+        def encode
+          ''.tap do |result|
+            result << [length + 1].pack('C')
+
+            each_with_index do |(operator, operands), idx|
+              operands.each { |operand| result << encode_operand(operand) }
+              result << encode_operator(operator)
+            end
+          end
+        end
+
         private
+
+        def encode_operator(operator)
+          if operator >= 1200
+            [12, operator - 1200].pack('C*')
+          else
+            [operator].pack('C')
+          end
+        end
+
+        def encode_operand(operand)
+          bytes = case operand
+            when Integer
+              encode_integer(operand)
+            when Float, BigDecimal
+              encode_float(operand)
+            when Real
+              encode_real(operand)
+            else
+              # @TODO, raise an error?
+          end
+
+          bytes.pack('C*')
+        end
+
+        def encode_integer(int)
+          case int
+            when -107..107
+              [int + 139]
+
+            when 108..1131
+              int -= 108
+              [(int >> 8) + 247, int & 0xFF]
+
+            when -1131..-108
+              int = -int - 108
+              [(int >> 8) + 251, int & 0xFF]
+
+            when -32768..32767
+              [28, (int >> 8) & 0xFF, int & 0xFF]
+
+            else
+              [
+                29,
+                (int >> 24) & 0xFF,
+                (int >> 16) & 0xFF,
+                (int >> 8) & 0xFF,
+                int & 0xFF
+              ]
+          end
+        end
+
+        def encode_float(float)
+          pack_decimal_nibbles(encode_base(float))
+        end
+
+        def encode_real(real)
+          base_bytes = encode_base(real.base)
+          exp_bytes = encode_exponent(real.exponent)
+          pack_decimal_nibbles(base_bytes + exp_bytes)
+        end
+
+        def encode_exponent(exp)
+          return [] if exp.zero?
+          [exp.positive? ? 0xB : 0xC, *encode_base(exp)]
+        end
+
+        def encode_base(base)
+          base.to_s.each_char.with_object([]) do |char, ret|
+            case char
+              when '0'..'9'
+                ret << char.to_i
+              when '.'
+                ret << 0xA
+              when '-'
+                ret << 0xE
+              else
+                break ret
+            end
+          end
+        end
+
+        def pack_decimal_nibbles(nibbles)
+          packed = [30]
+
+          nibbles.each_slice(2).each do |(high_nb, low_nb)|
+            # low_nb can be nil if nibbles contains an odd number of elements
+            low_nb ||= 0xF
+            packed << (high_nb << 4 + low_nb)
+          end
+
+          packed << 0xFF if packed.size.even?
+          packed
+        end
 
         def parse!
           @dict = {}
@@ -28,38 +134,35 @@ module TTFunk
           while io.pos <= table_offset + length
             case b_zero = read(1, 'C').first
               when 12
-                operator = get_two_byte_operator
+                operator = decode_two_byte_operator
                 @dict[operator] = operands
                 operands = []
               when 0..21
                 @dict[b_zero] = operands
                 operands = []
               when 28..30, 32..254
-                operands << get_operand(b_zero)
+                operands << decode_operand(b_zero)
               else
                 raise RuntimeError, "dict byte value #{b_zero} is reserved"
             end
           end
         end
 
-        def get_two_byte_operator
+        def decode_two_byte_operator
           1200 + read(1, 'C').first
         end
 
-        def get_operator
-          read(1, 'C').first
-        end
-
-        def get_operand(b_zero)
+        def decode_operand(b_zero)
           case b_zero
             when 30
-              get_real
+              decode_real
             else
-              get_integer(b_zero)
+              decode_integer(b_zero)
           end
         end
 
-        def get_real
+        # yeah, seriously
+        def decode_real
           mantissa = ''
           exponent = ''
 
@@ -68,7 +171,7 @@ module TTFunk
             break if current == 0xFF
 
             high_nibble = current >> 4
-            low_nibble = current & 0b00001111
+            low_nibble = current & 0x0F  #  0b00001111
 
             [high_nibble, low_nibble].each do |nibble|
               case nibble
@@ -89,10 +192,10 @@ module TTFunk
             break if low_nibble == 0xF
           end
 
-          mantissa.to_f * (10 ** exponent.to_i)
+          Real.new(BigDecimal.new(mantissa), exponent.to_i)
         end
 
-        def get_integer(b_zero)
+        def decode_integer(b_zero)
           case b_zero
             when 32..246
               # 1 byte
