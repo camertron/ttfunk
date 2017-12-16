@@ -44,8 +44,6 @@ module TTFunk
             data_offset += entry.bytesize
           end
 
-          result << encode_offset(data_offset, offset_size)
-
           result + data
         end
 

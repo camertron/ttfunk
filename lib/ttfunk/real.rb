@@ -39,7 +39,7 @@ module TTFunk
     end
 
     def to_s
-      to_d.to_s
+      "#{base.to_s}e#{exponent}"
     end
 
     private

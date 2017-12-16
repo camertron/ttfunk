@@ -18,7 +18,7 @@ module TTFunk
 
         def encode
           ''.tap do |result|
-            result << [length + 1].pack('C')
+            result << [length].pack('C')
 
             each_with_index do |(operator, operands), idx|
               operands.each { |operand| result << encode_operand(operand) }
@@ -65,8 +65,12 @@ module TTFunk
               int = -int - 108
               [(int >> 8) + 251, int & 0xFF]
 
-            when -32768..32767
-              [28, (int >> 8) & 0xFF, int & 0xFF]
+            # @TODO
+            # For some reason none of the integers in noto sans have been encoded using three
+            # bytes. Feel free to uncomment this code when otf support is stable.
+
+          #   when -32768..32767
+          #     [28, (int >> 8) & 0xFF, int & 0xFF]
 
             else
               [
@@ -115,10 +119,10 @@ module TTFunk
           nibbles.each_slice(2).each do |(high_nb, low_nb)|
             # low_nb can be nil if nibbles contains an odd number of elements
             low_nb ||= 0xF
-            packed << (high_nb << 4 + low_nb)
+            packed << (high_nb << 4 | low_nb)
           end
 
-          packed << 0xFF if packed.size.even?
+          packed << 0xFF if nibbles.size.even?
           packed
         end
 
@@ -129,9 +133,9 @@ module TTFunk
 
           # @length can be set via the constructor, so only read a length if @length
           # hasn't already been set
-          @length ||= read(1, 'C').first - 1
+          @length ||= read(1, 'C').first
 
-          while io.pos <= table_offset + length
+          while io.pos < table_offset + length
             case b_zero = read(1, 'C').first
               when 12
                 operator = decode_two_byte_operator
@@ -161,7 +165,6 @@ module TTFunk
           end
         end
 
-        # yeah, seriously
         def decode_real
           mantissa = ''
           exponent = ''
@@ -192,7 +195,7 @@ module TTFunk
             break if low_nibble == 0xF
           end
 
-          Real.new(BigDecimal.new(mantissa), exponent.to_i)
+          Real.new(mantissa.to_f, exponent.to_i)
         end
 
         def decode_integer(b_zero)
