@@ -15,6 +15,10 @@ module TTFunk
             TTFunk::Table::Cff::FontDict.new(top_dict, file, start, finish - start)
           end
         end
+
+        def finalize(new_cff_data)
+          each { |font_dict| font_dict.finalize(new_cff_data) }
+        end
       end
     end
   end

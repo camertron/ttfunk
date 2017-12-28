@@ -31,7 +31,37 @@ module TTFunk
           end
         end
 
+        def encode
+          result = [@format].pack('C')
+
+          result << case format_sym
+            when :array_format
+              encode_array_format
+            when :range_format
+              encode_range_format
+          end
+
+          result
+        end
+
         private
+
+        def encode_array_format
+          entries.pack('C*')
+        end
+
+        def encode_range_format
+          ''.tap do |result|
+            result << [@count].pack('n')
+
+            entries.each do |entry|
+              range, fd_index = entry
+              result << [range.first, fd_index].pack('nC')
+            end
+
+            result << [n_glyphs].pack('n')
+          end
+        end
 
         def parse!
           @format = read(1, 'C').first
@@ -45,7 +75,9 @@ module TTFunk
 
             when :range_format
               @count = read(2, 'n').first
-              @length += (@count * RANGE_ENTRY_SIZE) + 2  # +2 for sentinel GID
+              # +2 for sentinel GID, +2 for count
+              @length += (@count * RANGE_ENTRY_SIZE) + 4
+              # +2 for sentinel GID
               @raw_data_array = io.read((@count * RANGE_ENTRY_SIZE) + 2)
           end
         end

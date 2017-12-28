@@ -42,6 +42,14 @@ module TTFunk
       "#{base.to_s}e#{exponent}"
     end
 
+    def inspect
+      if exponent == 0
+        base.to_s
+      else
+        to_s
+      end
+    end
+
     private
 
     def base_from(other)

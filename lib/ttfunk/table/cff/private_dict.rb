@@ -12,11 +12,10 @@ module TTFunk
         }
 
         def subr_index
-          @subr_index ||= begin
+          @subr_index ||=
             if subr_offset = self[OPERATOR_MAP[:subrs]]
               SubrIndex.new(file, table_offset + subr_offset.first)
             end
-          end
         end
 
         def default_width_x

@@ -20,23 +20,19 @@ module TTFunk
         end
 
         def encode
-          result = ''
+          result = EncodedString.new
 
           entries = each_with_object([]) do |entry, ret|
             new_entry = block_given? ? yield(entry) : entry
             ret << new_entry if new_entry
           end
 
-          offset_size = if entries.size > 1
-            (Math.log2(entries.size).ceil / 8.0).ceil
-          else
-            1
-          end
-
+          # @TODO: is #round really the right answer here? Seems to work...
+          offset_size = (Math.log2(entries.size) / 8.0).round + 1
           result << [entries.size, offset_size].pack('nc')
           data_offset = 1
 
-          data = ''
+          data = EncodedString.new
 
           entries.each_with_index do |entry, index|
             result << encode_offset(data_offset, offset_size)
@@ -44,7 +40,11 @@ module TTFunk
             data_offset += entry.bytesize
           end
 
-          result + data
+          if entries.size > 0
+            result << encode_offset(data_offset, offset_size)
+          end
+
+          result << data
         end
 
         private

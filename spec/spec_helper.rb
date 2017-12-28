@@ -5,6 +5,7 @@ Bundler.setup
 
 require 'ttfunk'
 require 'rspec'
+require 'pry-byebug'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/extensions/ and its subdirectories.

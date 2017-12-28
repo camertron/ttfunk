@@ -29,14 +29,11 @@ module TTFunk
 
       def encode(options = {})
         cmap_table = new_cmap_table(options)
-        encoder.encode(original_glyph_ids, cmap_table, options)
+        encoder = encoder_klass.new(original, original_glyph_ids, cmap_table, options)
+        encoder.encode
       end
 
       private
-
-      def encoder
-        @encoder ||= encoder_klass.new(original)
-      end
 
       def encoder_klass
         original.cff.exists? ? OtfEncoder : TtfEncoder

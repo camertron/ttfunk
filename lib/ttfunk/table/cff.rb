@@ -28,14 +28,17 @@ module TTFunk
         TAG
       end
 
-      def encode(cff)
-        ''.tap do |result|
-          result << cff.header.encode
-          result << cff.name_index.encode
-          result << cff.top_index.encode do |top_dict|
-            top_dict.encode
-          end
+      def encode
+        result = EncodedString.new.tap do |result|
+          result << header.encode
+          result << name_index.encode
+          result << top_index.encode { |top_dict| top_dict.encode }
+          result << string_index.encode
+          result << global_subr_index.encode
         end
+
+        top_index[0].finalize(result)
+        result.string
       end
 
       private

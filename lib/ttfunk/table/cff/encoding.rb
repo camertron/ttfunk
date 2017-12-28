@@ -29,6 +29,26 @@ module TTFunk
           end
         end
 
+        def encode
+          bytes = [].tap do |result|
+            result << @format
+            result << @count
+
+            case @format
+              when 0
+                result += @array
+
+              when 1
+                @array.each do |range|
+                  result << range.first
+                  result << range.last - range.first
+                end
+            end
+          end
+
+          bytes.pack('C*')
+        end
+
         private
 
         def parse!

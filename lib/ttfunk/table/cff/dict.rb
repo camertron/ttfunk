@@ -73,14 +73,18 @@ module TTFunk
           #     [28, (int >> 8) & 0xFF, int & 0xFF]
 
             else
-              [
-                29,
-                (int >> 24) & 0xFF,
-                (int >> 16) & 0xFF,
-                (int >> 8) & 0xFF,
-                int & 0xFF
-              ]
+              encode_integer32(int)
           end
+        end
+
+        def encode_integer32(int)
+          [
+            29,
+            (int >> 24) & 0xFF,
+            (int >> 16) & 0xFF,
+            (int >> 8) & 0xFF,
+            int & 0xFF
+          ]
         end
 
         def encode_float(float)
@@ -142,6 +146,7 @@ module TTFunk
                 @dict[operator] = operands
                 operands = []
               when 0..21
+                # binding.pry if self.class == TopDict && b_zero == 15
                 @dict[b_zero] = operands
                 operands = []
               when 28..30, 32..254

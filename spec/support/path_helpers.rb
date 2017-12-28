@@ -9,3 +9,5 @@ module PathHelpers
     end
   end
 end
+
+PathHelpers.extend(PathHelpers)

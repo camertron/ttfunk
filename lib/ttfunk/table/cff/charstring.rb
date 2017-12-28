@@ -51,7 +51,6 @@ module TTFunk
           @subrs_bias = @subrs.bias if @subrs
           @gsubrs_bias = @gsubrs.bias if @gsubrs
 
-          @path = Path.new
           @stack = []
           @data = raw.bytes
           @index = 0
@@ -61,16 +60,25 @@ module TTFunk
           @width = @default_width_x
           @x = 0
           @y = 0
+        end
 
-          parse!
+        def path
+          @path || begin
+            @path = Path.new
+            parse!
+            @path
+          end
         end
 
         def glyph
           @glyph ||= begin
             horizontal_metrics = @top_dict.file.horizontal_metrics.for(glyph_id)
-            path = @top_dict.charstrings_index[glyph_id].path
             Glyf::PathBased.new(path, horizontal_metrics)
           end
+        end
+
+        def encode
+          raw  # let's not do anything fancy right now
         end
 
         private
