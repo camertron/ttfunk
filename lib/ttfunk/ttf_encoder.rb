@@ -1,15 +1,14 @@
 module TTFunk
   class TtfEncoder
-    attr_reader :original, :original_glyph_ids, :cmap_table, :options
+    attr_reader :original, :subset, :options
 
-    def initialize(original, original_glyph_ids, cmap_table, options = {})
+    def initialize(original, subset, options = {})
       @original = original
-      @original_glyph_ids = original_glyph_ids
-      @cmap_table = cmap_table
+      @subset = subset
       @options = options
     end
 
-    def encode(options = {})
+    def encode
       # https://www.microsoft.com/typography/otspec/otff.htm#offsetTable
       search_range = 2 ** Math.log2(tables.length).ceil * 16
       entry_selector = Math.log2(2 ** Math.log2(tables.length).ceil).to_i
@@ -65,23 +64,22 @@ module TTFunk
       newfont
     end
 
-    # "mandatory" tables. Every font should ("should") have these, including
-    # the cmap table (encoded above).
+    # "mandatory" tables. Every font should ("should") have these
+
+    def cmap_table
+      @cmap_table ||= subset.new_cmap_table
+    end
 
     def glyf_table
-      @glyf_table ||= if original.directory.tables.include?('glyf')
-        TTFunk::Table::Glyf.encode(glyphs, new2old_glyph, old2new_glyph)
-      else
-        {}
-      end
+      @glyf_table ||= TTFunk::Table::Glyf.encode(
+        glyphs, new2old_glyph, old2new_glyph
+      )
     end
 
     def loca_table
-      @loca_table ||= if original.directory.tables.include?('loca')
-        TTFunk::Table::Loca.encode(glyf_table[:offsets])
-      else
-        {}
-      end
+      @loca_table ||= TTFunk::Table::Loca.encode(
+        glyf_table[:offsets]
+      )
     end
 
     def hmtx_table
@@ -125,7 +123,8 @@ module TTFunk
     # modification, if they exist.
 
     def os2_table
-      @os2_table ||= original.os2.raw
+      # @os2_table ||= original.os2.raw
+      @os2_table ||= TTFunk::Table::OS2.encode(original.os2, subset)
     end
 
     def cvt_table
@@ -180,6 +179,25 @@ module TTFunk
 
         next_glyph_id = cmap_table[:max_glyph_id]
 
+        # Add glyph mappings that were not part of the original subset, i.e. won't
+        # have been included in the old cmap. This begs the question however: how
+        # do these new glyphs get added to the cmap? It appears they never do since
+        # the new cmap table has already been encoded at this point. So, that's
+        # probably a bug. Moreover, the value of cmap_table[:charmap] contains these
+        # new glyphs as having old and new IDs of 0 (i.e. undefined), which
+        # unfortunately means the code above that constructs the old2new hash
+        # overwrites them. By the time we get to the code below, the new glyphs are
+        # all but a forgotten memory. That's probably fine since this library was
+        # meant to generate subsets of existing fonts (I'm not aware of any use
+        # cases that require the ability to add new glyphs to a font). Let's leave
+        # in the code below for now. It's innocuous because it will never actually
+        # do anything. If we want to enable adding new glyphs to fonts, it may come
+        # in handy. I would advocate moving it to the TTFunk::Subset classes however
+        # (specifically the new_cmap_table method) since, as I mentioned above, the
+        # cmap table has already been encoded at this point. The move will also
+        # obviate the need for Cmap#encode to return a max_glyph_id, since all the
+        # glyph ids will have already been assigned to their respective characters
+        # during the construction of the cmap.
         glyphs.keys.each do |old_id|
           unless old2new.key?(old_id)
             old2new[old_id] = next_glyph_id
@@ -196,7 +214,7 @@ module TTFunk
     end
 
     def glyphs
-      @glyphs ||= collect_glyphs(original_glyph_ids)
+      @glyphs ||= collect_glyphs(subset.original_glyph_ids)
     end
 
     def collect_glyphs(glyph_ids)

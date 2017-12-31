@@ -28,9 +28,7 @@ module TTFunk
       end
 
       def encode(options = {})
-        cmap_table = new_cmap_table(options)
-        encoder = encoder_klass.new(original, original_glyph_ids, cmap_table, options)
-        encoder.encode
+        encoder_klass.new(original, self, options).encode
       end
 
       private

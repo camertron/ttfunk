@@ -16,6 +16,11 @@ module TTFunk
         TAG
       end
 
+      def encode
+        # @TODO
+        raw
+      end
+
       private
 
       def parse!

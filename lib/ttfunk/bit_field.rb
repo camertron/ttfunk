@@ -1,0 +1,33 @@
+module TTFunk
+  class BitField
+    attr_reader :value
+
+    def initialize(value = 0)
+      @value = value
+    end
+
+    def on(pos)
+      @value |= 2 ** pos
+    end
+
+    def on?(pos)
+      value & 2 ** pos > 0
+    end
+
+    def off(pos)
+      @value &= 2 ** pos - 1 | 2 ** (pos + 1)
+    end
+
+    def off?(pos)
+      !on?(pos)
+    end
+
+    def clear
+      @value = 0
+    end
+
+    def dup
+      self.class.new(value)
+    end
+  end
+end
