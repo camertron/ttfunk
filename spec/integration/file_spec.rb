@@ -16,7 +16,7 @@ end
 describe TTFunk::File, '::from_ttc' do
   it 'returns font at requested index in TTC file' do
     font = TTFunk::File.from_ttc(test_font('DejaVuSans', :ttc), 1)
-    expect(font.name.font_name.first).to eq 'DejaVu Sans Bold'
+    expect(font.name.font_name.first.text).to eq 'DejaVu Sans Bold'
   end
 end
 
@@ -64,7 +64,7 @@ describe TTFunk::File, 'preferred_family_name' do
   context 'with DejaVuSans' do
     let!(:file) { TTFunk::File.open(test_font('DejaVuSans')) }
     it 'should extract the correct value' do
-      expect(file.name.preferred_family.first).to eq('DejaVu Sans')
+      expect(file.name.preferred_family.first.text).to eq('DejaVu Sans')
     end
   end
 end

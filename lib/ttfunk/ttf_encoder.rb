@@ -1,5 +1,10 @@
 module TTFunk
   class TtfEncoder
+    OPTIMAL_TABLE_ORDER = %w(
+      head hhea maxp OS/2 hmtx LTSH VDMX hdmx cmap fpgm
+      prep cvt loca glyfkern name post gasp PCLT
+    )
+
     attr_reader :original, :subset, :options
 
     def initialize(original, subset, options = {})
@@ -15,7 +20,9 @@ module TTFunk
       range_shift = tables.length * 16 - search_range
       range_shift = 0 if range_shift < 0
 
-      newfont = [
+      newfont = EncodedString.new
+
+      newfont << [
         original.directory.sfnt_version,
         tables.length,
         search_range,
@@ -23,30 +30,38 @@ module TTFunk
         range_shift
       ].pack('Nn*')
 
-      directory_size = tables.length * 16
-      offset = newfont.length + directory_size
-
       table_data = ''
       head_offset = nil
 
-      # tables are supposed to be listed in ascending order
+      # Tables are supposed to be listed in ascending order whereas there is a
+      # known optimal order for table data.
       tables.keys.sort.each do |tag|
         data = tables[tag]
-        byte_align!(data)
-        newfont << [tag, checksum(data), offset, data.length].pack('A4N*')
-        table_data << data
-        head_offset = offset if tag == 'head'
-        offset += data.length
+        newfont << [tag, checksum(data)].pack('A4N')
+        newfont.add_placeholder(:tables, tag, newfont.length, 4)
+        newfont << [0, data.length].pack('N*')  # zero is fake offset to data
+      end
 
-        while offset % 4 != 0
-          offset += 1
-          table_data << "\0"
+      offset = newfont.length
+
+      optimal_table_order.each do |optimal_tag|
+        head_offset = offset if optimal_tag == 'head'
+
+        if tables.include?(optimal_tag)
+          newfont.resolve_placeholder(:tables, optimal_tag, [offset].pack('N'))
+          data = tables[optimal_tag]
+          newfont << data
+
+          offset += data.length
+
+          # align to 4 bytes
+          newfont << "\0" * (offset % 4)
+          offset += offset % 4
         end
       end
 
-      newfont << table_data
+      newfont = newfont.string
 
-      byte_align!(newfont)
       sum = checksum(newfont)
       adjustment = 0xB1B0AFBA - sum
       newfont[head_offset + 8, 4] = [adjustment].pack('N')
@@ -56,8 +71,8 @@ module TTFunk
 
     private
 
-    def byte_align!(data)
-      data << "\0" * (4 - data.length % 4) unless data.length % 4 == 0
+    def optimal_table_order
+      OPTIMAL_TABLE_ORDER + (tables.keys - ['DSIG'] - OPTIMAL_TABLE_ORDER) + ['DSIG']
     end
 
     def finalize(newfont)
@@ -233,8 +248,19 @@ module TTFunk
     end
 
     def checksum(data)
+      # For some reason, 32-bit alignment is only important when checksumming.
+      # Microsoft's FontValidator tool will complain if the table data itself
+      # is padded with null (i.e. \0) alignment bytes (reports the table is
+      # too long), but will also complain if the checksum is calculated with
+      # unaligned data. I guess the solution is to calculate the checksum on
+      # aligned data but encode the table unaligned. Weird but it works.
       data = data.respond_to?(:string) ? data.string : data
-      data.unpack('N*').reduce(0, :+) & 0xFFFF_FFFF
+      align(data).unpack('N*').reduce(0, :+) & 0xFFFF_FFFF
+    end
+
+    def align(data)
+      return data if data.length % 4 == 0
+      data + "\0" * (4 - data.length % 4)
     end
   end
 end

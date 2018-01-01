@@ -13,7 +13,7 @@ describe 'subsetting' do
     subset2.use(97)
     name2 = TTFunk::File.new(subset2.encode).name.strings[6]
 
-    expect(name1).to eq name2
+    expect(name1.text).to eq name2.text
   end
 
   it 'changes font names for different subsets' do
@@ -28,7 +28,7 @@ describe 'subsetting' do
     subset2.use(98)
     name2 = TTFunk::File.new(subset2.encode).name.strings[6]
 
-    expect(name1).to_not eq name2
+    expect(name1.text).to_not eq name2.text
   end
 
   it 'calculates checksum correctly for empty table data' do

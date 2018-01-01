@@ -1,5 +1,9 @@
 module TTFunk
   class OtfEncoder < TtfEncoder
+    OPTIMAL_TABLE_ORDER = [
+      'head', 'hhea', 'maxp', 'OS/2', 'name', 'cmap', 'post', 'CFF '
+    ]
+
     private
 
     # CFF fonts don't maintain a glyf table, all glyph information is stored
@@ -41,6 +45,11 @@ module TTFunk
         tb['VORG'] = vorg_table
         tb['CFF '] = cff_table
       end
+    end
+
+    def optimal_table_order
+      # DSIG is always last
+      OPTIMAL_TABLE_ORDER + (tables.keys - ['DSIG'] - OPTIMAL_TABLE_ORDER) + ['DSIG']
     end
 
     def collect_glyphs(glyph_ids)

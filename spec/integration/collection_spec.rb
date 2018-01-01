@@ -21,8 +21,8 @@ describe TTFunk::Collection, '::open' do
   it 'will report fonts in TTC' do
     TTFunk::Collection.open(test_font('DejaVuSans', :ttc)) do |ttc|
       expect(ttc.count).to eq 2
-      expect(ttc[0].name.font_name.first).to eq 'DejaVu Sans'
-      expect(ttc[1].name.font_name.first).to eq 'DejaVu Sans Bold'
+      expect(ttc[0].name.font_name.first.text).to eq 'DejaVu Sans'
+      expect(ttc[1].name.font_name.first.text).to eq 'DejaVu Sans Bold'
     end
   end
 end
