@@ -16,7 +16,7 @@ describe 'OTF Roundtrip' do
   end
 
   it 'name_index' do
-    expect(font.cff.name_index.encode).to(
+    expect(font.cff.name_index.encode.string).to(
       eq(
         font.cff.send(:parse_from, font.cff.name_index.table_offset) do
           font.cff.send(:io).read(font.cff.name_index.length)
@@ -27,7 +27,7 @@ describe 'OTF Roundtrip' do
 
   # this fails but afaict it's encoding correctly, so disable for now
   xit 'top_index' do
-    expect(font.cff.top_index.encode { |td| td.encode }).to(
+    expect(font.cff.top_index.encode { |td| td.encode }.string).to(
       eq(
         font.cff.send(:parse_from, font.cff.top_index.table_offset) do
           font.cff.send(:io).read(font.cff.top_index.length)
@@ -37,7 +37,7 @@ describe 'OTF Roundtrip' do
   end
 
   it 'string_index' do
-    expect(font.cff.string_index.encode { |td| td.encode }).to(
+    expect(font.cff.string_index.encode { |td| td.encode }.string).to(
       eq(
         font.cff.send(:parse_from, font.cff.string_index.table_offset) do
           font.cff.send(:io).read(font.cff.string_index.length)
@@ -47,7 +47,7 @@ describe 'OTF Roundtrip' do
   end
 
   it 'global_subr_index' do
-    expect(font.cff.global_subr_index.encode).to(
+    expect(font.cff.global_subr_index.encode.string).to(
       eq(
         font.cff.send(:parse_from, font.cff.global_subr_index.table_offset) do
           font.cff.send(:io).read(font.cff.global_subr_index.length)

@@ -124,8 +124,8 @@ module TTFunk
             result << os2.vendor_id
 
             code_points = subset.new_cmap_table[:charmap].keys.sort
-            first_char_index = code_points.min
-            last_char_index = code_points.max
+            first_char_index = code_points.min || 0
+            last_char_index = code_points.max || 0
             result << [os2.selection, first_char_index, last_char_index].pack('n*')
 
             if os2.version > 0

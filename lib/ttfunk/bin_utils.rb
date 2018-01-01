@@ -11,6 +11,7 @@ module TTFunk
     end
 
     def self.unpack_int(value, bit_width)
+      return [0] if value == 0
       num_elements = (Math.log2(value).ceil / bit_width).ceil + 1
       mask = 2 ** bit_width - 1
 
