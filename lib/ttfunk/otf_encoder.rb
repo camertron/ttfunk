@@ -26,7 +26,7 @@ module TTFunk
 
     # @TODO pass desired glyphs
     def cff_table
-      @cff_table ||= original.cff.encode
+      @cff_table ||= original.cff.encode(new2old_glyph)
     end
 
     # @TODO sign fonts correctly. But how??

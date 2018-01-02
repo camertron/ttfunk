@@ -53,13 +53,13 @@ module TTFunk
           end
         end
 
-        def finalize(new_cff_data)
+        def finalize(new_cff_data, mapping)
           finalize_subtable(new_cff_data, :charset, charset.encode) if charset
           finalize_subtable(new_cff_data, :encoding, encoding.encode) if encoding
 
           if charstrings_index
             finalize_subtable(
-              new_cff_data, :charstrings_index, charstrings_index.encode do |charstring|
+              new_cff_data, :charstrings_index, charstrings_index.encode(mapping) do |charstring|
                 charstring.encode
               end
             )

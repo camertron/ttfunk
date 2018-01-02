@@ -28,7 +28,7 @@ module TTFunk
         TAG
       end
 
-      def encode
+      def encode(mapping)
         result = EncodedString.new.tap do |result|
           result << header.encode
           result << name_index.encode
@@ -37,7 +37,7 @@ module TTFunk
           result << global_subr_index.encode
         end
 
-        top_index[0].finalize(result)
+        top_index[0].finalize(result, mapping)
         result.string
       end
 

@@ -20,18 +20,12 @@ module TTFunk
 
         def encode
           EncodedString.new.tap do |result|
-            result << [length].pack('C')
-
             each_with_index do |(operator, operands), idx|
-              if OPERATOR_CODES.include?(operator)
-                result.add_placeholder(
-                  :cff_font_dict, :"#{OPERATOR_CODES[operator]}_#{@table_offset}",
-                  result.pos, PLACEHOLDER_LENGTH
-                )
-
-                result << PLACEHOLDER
-              else
-                operands.each { |operand| result << encode_operand(operand) }
+              case OPERATOR_CODES[operator]
+                when :private
+                  result << encode_private
+                else
+                  operands.each { |operand| result << encode_operand(operand) }
               end
 
               result << encode_operator(operator)
@@ -40,9 +34,20 @@ module TTFunk
         end
 
         def finalize(new_cff_data)
-          encoded = encode_integer32(new_cff_data.length)
-          new_cff_data.resolve_placeholder(:cff_font_dict, :"private_#{@table_offset}", encoded.pack('C*'))
-          new_cff_data << private_dict.encode
+          encoded_private_dict = private_dict.encode
+          encoded_offset = encode_integer32(new_cff_data.length)
+          encoded_length = encode_integer32(encoded_private_dict.bytesize)
+
+          new_cff_data.resolve_placeholder(
+            :cff_font_dict, :"private_length_#{@table_offset}", encoded_length.pack('C*')
+          )
+
+          new_cff_data.resolve_placeholder(
+            :cff_font_dict, :"private_offset_#{@table_offset}", encoded_offset.pack('C*')
+          )
+
+          new_cff_data << encoded_private_dict
+          private_dict.finalize(new_cff_data)
         end
 
         def private_dict
@@ -54,6 +59,26 @@ module TTFunk
                 file, top_dict.cff_offset + private_dict_offset, private_dict_length
               )
             end
+        end
+
+        private
+
+        def encode_private
+          EncodedString.new.tap do |result|
+            result.add_placeholder(
+              :cff_font_dict, :"private_length_#{@table_offset}",
+              result.pos, PLACEHOLDER_LENGTH
+            )
+
+            result << PLACEHOLDER
+
+            result.add_placeholder(
+              :cff_font_dict, :"private_offset_#{@table_offset}",
+              result.pos, PLACEHOLDER_LENGTH
+            )
+
+            result << PLACEHOLDER
+          end
         end
       end
     end

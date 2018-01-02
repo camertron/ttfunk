@@ -16,6 +16,13 @@ module TTFunk
             TTFunk::Table::Cff::Charstring.new(index, top_dict, font_dict, super)
           end
         end
+
+        # gets passed a mapping of new => old glyph ids
+        def encode(mapping)
+          super() do |entry, index|
+            self[mapping[index]].encode if mapping.include?(index)
+          end
+        end
       end
     end
   end

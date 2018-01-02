@@ -22,8 +22,8 @@ module TTFunk
         def encode
           result = EncodedString.new
 
-          entries = each_with_object([]) do |entry, ret|
-            new_entry = block_given? ? yield(entry) : entry
+          entries = each_with_object([]).with_index do |(entry, ret), index|
+            new_entry = block_given? ? yield(entry, index) : entry
             ret << new_entry if new_entry
           end
 
@@ -43,6 +43,8 @@ module TTFunk
           if entries.size > 0
             result << encode_offset(data_offset, offset_size)
           end
+
+          binding.pry if self.class == SubrIndex
 
           result << data
         end

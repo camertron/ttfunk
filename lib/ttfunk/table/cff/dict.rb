@@ -18,8 +18,6 @@ module TTFunk
 
         def encode
           ''.tap do |result|
-            result << [length].pack('C')
-
             each_with_index do |(operator, operands), idx|
               operands.each { |operand| result << encode_operand(operand) }
               result << encode_operator(operator)
@@ -146,7 +144,6 @@ module TTFunk
                 @dict[operator] = operands
                 operands = []
               when 0..21
-                # binding.pry if self.class == TopDict && b_zero == 15
                 @dict[b_zero] = operands
                 operands = []
               when 28..30, 32..254
