@@ -31,13 +31,17 @@ module TTFunk
           end
         end
 
-        def finalize(new_cff_data)
+        def finalize(private_dict_data)
           return unless subr_index
-          encoded = encode_integer32(new_cff_data.length)
-          new_cff_data.resolve_placeholder(
-            :cff_private_dict, :"subrs_#{@table_offset}", encoded.pack('C*')
+
+          encoded_subr_index = subr_index.encode
+          encoded_offset = encode_integer32(private_dict_data.bytesize)
+
+          private_dict_data.resolve_placeholder(
+            :cff_private_dict, :"subrs_#{@table_offset}", encoded_offset.pack('C*')
           )
-          new_cff_data << subr_index.encode
+
+          private_dict_data << encoded_subr_index
         end
 
         def subr_index

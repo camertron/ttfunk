@@ -46,8 +46,8 @@ module TTFunk
             :cff_font_dict, :"private_offset_#{@table_offset}", encoded_offset.pack('C*')
           )
 
+          private_dict.finalize(encoded_private_dict)
           new_cff_data << encoded_private_dict
-          private_dict.finalize(new_cff_data)
         end
 
         def private_dict
