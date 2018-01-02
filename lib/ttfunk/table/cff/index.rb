@@ -44,8 +44,6 @@ module TTFunk
             result << encode_offset(data_offset, offset_size)
           end
 
-          binding.pry if self.class == SubrIndex
-
           result << data
         end
 
