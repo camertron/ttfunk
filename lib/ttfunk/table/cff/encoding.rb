@@ -1,7 +1,7 @@
 module TTFunk
   class Table
     class Cff < TTFunk::Table
-      class Encoding < TTFunk::Table::Cff::CffTable
+      class Encoding < TTFunk::SubTable
         attr_reader :top_dict
 
         def initialize(top_dict, file, offset, length = nil)

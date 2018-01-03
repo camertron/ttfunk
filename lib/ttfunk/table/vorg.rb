@@ -1,3 +1,5 @@
+require_relative '../table'
+
 module TTFunk
   class Table
     class Vorg < Table

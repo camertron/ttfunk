@@ -1,7 +1,7 @@
 module TTFunk
   class Table
     class Cff < TTFunk::Table
-      class Header < TTFunk::Table::Cff::CffTable
+      class Header < TTFunk::SubTable
         # cff format version numbers
         attr_reader :major
         attr_reader :minor

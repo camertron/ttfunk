@@ -1,7 +1,7 @@
 module TTFunk
   class Table
     class Cff < TTFunk::Table
-      class Charset < TTFunk::Table::Cff::CffTable
+      class Charset < TTFunk::SubTable
         DEFAULT_CHARSET_ID = 0
 
         attr_reader :top_dict, :count, :offset_or_id

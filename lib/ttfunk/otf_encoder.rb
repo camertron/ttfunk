@@ -34,12 +34,22 @@ module TTFunk
       @dsig_table ||= TTFunk::Table::Simple.new(original, 'DSIG').raw
     end
 
+    def gpos_table
+      @gpos_table ||= TTFunk::Table::Gpos.encode(original)
+    end
+
+    def gsub_table
+      @gsub_table ||= TTFunk::Table::Gsub.encode(original)
+    end
+
     def vorg_table
       @vorg_table ||= original.vertical_origins.encode
     end
 
     def tables
       @tables ||= super.tap do |tb|
+        tb['GPOS'] = gpos_table
+        tb['GSUB'] = gsub_table
         tb['BASE'] = base_table
         tb['DSIG'] = dsig_table
         tb['VORG'] = vorg_table

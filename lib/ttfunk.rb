@@ -10,6 +10,7 @@ require_relative 'ttfunk/real'
 require_relative 'ttfunk/encoded_string'
 require_relative 'ttfunk/bit_field'
 require_relative 'ttfunk/bin_utils'
+require_relative 'ttfunk/sub_table'
 
 module TTFunk
   class File
@@ -130,12 +131,22 @@ module TTFunk
     def vertical_origins
       @vertical_origins ||= TTFunk::Table::Vorg.new(self)
     end
+
+    def glyph_positioning
+      @glyph_positioning ||= TTFunk::Table::Gpos.new(self)
+    end
+
+    def glyph_substitution
+      @glyph_substitution ||= TTFunk::Table::Gsub.new(self)
+    end
   end
 end
 
 require_relative 'ttfunk/table/cff'
 require_relative 'ttfunk/table/cmap'
 require_relative 'ttfunk/table/glyf'
+require_relative 'ttfunk/table/gpos'
+require_relative 'ttfunk/table/gsub'
 require_relative 'ttfunk/table/head'
 require_relative 'ttfunk/table/hhea'
 require_relative 'ttfunk/table/hmtx'

@@ -1,7 +1,7 @@
 module TTFunk
   class Table
     class Cff < TTFunk::Table
-      class FdSelector < TTFunk::Table::Cff::CffTable
+      class FdSelector < TTFunk::SubTable
         RANGE_ENTRY_SIZE = 3
 
         attr_reader :top_dict, :count

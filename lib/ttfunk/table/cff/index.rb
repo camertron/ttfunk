@@ -1,7 +1,7 @@
 module TTFunk
   class Table
     class Cff < TTFunk::Table
-      class Index < TTFunk::Table::Cff::CffTable
+      class Index < TTFunk::SubTable
         include Enumerable
 
         # number of objects in the index

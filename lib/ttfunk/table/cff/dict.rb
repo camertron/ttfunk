@@ -3,7 +3,7 @@ require 'bigdecimal'
 module TTFunk
   class Table
     class Cff < TTFunk::Table
-      class Dict < TTFunk::Table::Cff::CffTable
+      class Dict < TTFunk::SubTable
         include Enumerable
 
         def [](operator)
@@ -219,26 +219,12 @@ module TTFunk
             when 28
                # 2 bytes in number (3 total)
               b_one, b_two = read(2, 'C*')
-              twos_comp(b_one << 8 | b_two, 2)
+              BinUtils.twos_comp(b_one << 8 | b_two, 16)
 
             when 29
               # 4 bytes in number (5 total)
               b_one, b_two, b_three, b_four = read(4, 'C*')
-              twos_comp(b_one << 24 | b_two << 16 | b_three << 8 | b_four, 4)
-          end
-        end
-
-        def twos_comp(num, byte_len)
-          bit_len = byte_len * 8
-
-          if num >> (bit_len - 1) == 1
-            # we want all ones
-            mask = (2 ** bit_len) - 1
-
-            # find 2's complement, i.e. flip bits (xor with mask) and add 1
-            -((num ^ mask) + 1)
-          else
-            num
+              BinUtils.twos_comp(b_one << 24 | b_two << 16 | b_three << 8 | b_four, 32)
           end
         end
       end

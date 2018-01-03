@@ -10,6 +10,12 @@ module TTFunk
         io.read(bytes).unpack(format)
       end
 
+      def read_f2dot14(count)
+        io.read(count * 2).unpack('n*').map do |value|
+          BinUtils.unpack_f2dot14(value)
+        end
+      end
+
       def read_signed(count)
         read(count * 2, 'n*').map { |i| to_signed(i) }
       end
