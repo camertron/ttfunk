@@ -12,7 +12,7 @@ module TTFunk
 
         def alternate_feature_table
           @alternate_feature_table ||= FeatureTable.new(
-            file, alternate_feature_table_offset
+            file, table_offset + alternate_feature_table_offset
           )
         end
       end

@@ -9,6 +9,7 @@ require_relative 'ttfunk/otf_encoder'
 require_relative 'ttfunk/real'
 require_relative 'ttfunk/encoded_string'
 require_relative 'ttfunk/bit_field'
+require_relative 'ttfunk/sequence'
 require_relative 'ttfunk/bin_utils'
 require_relative 'ttfunk/sub_table'
 
