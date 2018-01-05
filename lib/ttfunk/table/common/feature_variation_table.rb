@@ -2,10 +2,6 @@ module TTFunk
   class Table
     module Common
       class FeatureVariationTable < TTFunk::SubTable
-        include Enumerable
-
-        RECORD_LENGTH = 2
-
         attr_reader :feature_variation_list
         attr_reader :condition_set_offset, :feature_table_substitution_offset
 

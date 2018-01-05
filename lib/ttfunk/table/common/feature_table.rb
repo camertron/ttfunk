@@ -15,12 +15,7 @@ module TTFunk
 
         def parse!
           @feature_params_offset, count = read(4, 'nn')
-          lookup_index_array = io.read(count * LOOKUP_INDEX_LENGTH)
-
-          @lookup_indices = Sequence.new(lookup_index_array, LOOKUP_INDEX_LENGTH) do |lookup_index|
-            index_data.unpack('n').first
-          end
-
+          @lookup_indices = Sequence.from(io, count, 'n')
           @length = 4 + lookup_indices.length
         end
       end

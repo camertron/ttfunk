@@ -1,7 +1,7 @@
 module TTFunk
   class Table
     module Common
-      class FeatureTableSubstitutionRecord
+      class FeatureTableSubstitutionTable
         attr_reader :file, :feature_table_index, :alternate_feature_table_offset
 
         def initialize(file, feature_table_index, alternate_feature_table_offset)

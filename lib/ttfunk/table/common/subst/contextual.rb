@@ -2,9 +2,9 @@ module TTFunk
   class Table
     module Common
       module Subst
-        class Single
+        class Contextual
           FORMAT_MAP = {
-            1 => Single1, 2 => Single2
+            1 => Contextual1, 2 => Contextual2, 3 => Contextual3
           }
 
           def self.create(lookup_table, offset)
@@ -19,3 +19,4 @@ module TTFunk
     end
   end
 end
+

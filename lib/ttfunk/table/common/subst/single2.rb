@@ -3,36 +3,21 @@ module TTFunk
     module Common
       module Subst
         class Single2 < TTFunk::SubTable
-          include Enumerable
+          GLYPH_ID_LENGTH = 2
 
-          SUBSTITUTE_GLYPH_ID_LENGTH = 2
-
-          attr_reader :count
-
-          def each
-            return to_enum(__method__) unless block_given?
-            count.times { |i| yield self[i] }
-          end
-
-          def [](index)
-            substitute_glyph_ids[index] ||= begin
-              offset = index * SUBSTITUTE_GLYPH_ID_LENGTH
-              @raw_substitute_glyph_id_array[offset, SUBSTITUTE_GLYPH_ID_LENGTH].unpack('n').first
-            end
-          end
+          attr_reader :format, :coverage_offset, :glyph_ids
 
           private
 
           def parse!
-            @format, @coverage_offset, @count = read(6, 'nnn')
-            @raw_substitute_glyph_id_array = io.read(count * SUBSTITUTE_GLYPH_ID_LENGTH)
-            @length = 6 + @raw_substitute_glyph_id_array.length
-          end
+            @format, @coverage_offset, count = read(6, 'nnn')
+            glyph_id_array = io.read(count * GLYPH_ID_LENGTH)
 
-          private
+            @glyph_ids = Sequence.new(glyph_id_array, GLYPH_ID_LENGTH) do |glyph_data|
+              glyph_data.unpack('n').first
+            end
 
-          def substitute_glyph_ids
-            @substitute_glyph_ids ||= {}
+            @length = 6 + glyph_ids.length
           end
         end
       end

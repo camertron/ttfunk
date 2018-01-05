@@ -2,10 +2,19 @@ module TTFunk
   class Sequence
     include Enumerable
 
-    attr_reader :data, :element_length, :reifier
+    attr_reader :data, :count, :pack_format, :reifier, :element_length
 
-    def initialize(data, element_length, &reifier)
+    def self.from(io, count, pack_format, &reifier)
+      element_length = BinUtils.length_of(pack_format)
+      data = io.read(count * element_length)
+      binding.pry
+      new(data, count, pack_format, element_length, &reifier)
+    end
+
+    def initialize(data, count, pack_format, element_length, &reifier)
       @data = data
+      @count = count
+      @pack_format = pack_format
       @element_length = element_length
       @reifier = reifier
     end
@@ -14,15 +23,16 @@ module TTFunk
       data.length
     end
 
-    def count
-      length / element_length
-    end
-
     def [](index)
       element_cache[index] ||= begin
         offset = index * element_length
-        element = data[offset, element_length]
-        reifier ? reifier.call(element) : element
+        element_parts = data[offset, element_length].unpack(pack_format)
+
+        if reifier
+          reifier.call(*element_parts)
+        else
+          element_parts.size == 1 ? element_parts.first : element_parts
+        end
       end
     end
 

@@ -2,28 +2,22 @@ module TTFunk
   class Table
     module Common
       class FeatureVariationList < TTFunk::SubTable
-        FEATURE_VARIATION_RECORD_LENGTH = 8
-
-        attr_reader :major_version, :minor_version, :records
+        attr_reader :major_version, :minor_version, :tables
 
         private
 
         def parse!
           @major_version, @minor_version, count = read(8, 'nnN')
-          feature_variation_array = io.read(count * FEATURE_VARIATION_RECORD_LENGTH)
 
-          @records = Sequence.new(feature_variation_array, FEATURE_VARIATION_RECORD_LENGTH) do |feature_variation_data|
-            condition_set_offset, feature_table_substitution_offset =
-              feature_variation_data.unpack('NN')
-
+          @tables = Sequence.from(io, count, 'NN') do |condition_set_offset, feature_table_sub_offset|
             FeatureVariationRecord.new(
               self,
               table_offset + condition_set_offset,
-              table_offset + feature_table_substitution_offset
+              table_offset + feature_table_sub_offset
             )
           end
 
-          @length = 8 + records.length
+          @length = 8 + tables.length
         end
       end
     end
