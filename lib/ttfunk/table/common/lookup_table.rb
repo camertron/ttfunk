@@ -7,7 +7,9 @@ module TTFunk
           2 => Subst::Multiple,
           3 => Subst::Alternate,
           4 => Subst::Ligature,
-          5 => Subst::Contextual
+          5 => Subst::Contextual,
+          6 => Subst::Chaining,
+          7 => Subst::Extension
         }
 
         attr_reader :lookup_type, :lookup_flag, :sub_tables
@@ -19,7 +21,7 @@ module TTFunk
           @lookup_type, @lookup_flag, count = read(6, 'nnn')
 
           @sub_tables = Sequence.from(io, count, 'n') do |sub_table_offset|
-            SUB_TABLE_MAP[lookup_type].create(table_offset + sub_table_offset)
+            SUB_TABLE_MAP[lookup_type].create(file, table_offset + sub_table_offset)
           end
 
           @mark_filtering_set = read(2, 'n')

@@ -3,22 +3,23 @@ module TTFunk
     module Common
       module Subst
         class Multiple < TTFunk::SubTable
-          SEQUENCE_TABLE_OFFSET_LENGTH = 2
+          def self.create(file, offset)
+            new(file, offset)
+          end
 
           attr_reader :format, :coverage_offset, :sequences
 
-          def self.create(file, offset)
-            new(file, offset)
+          def coverage_table
+            @coverage_table ||= CoverageTable.create(self, coverage_offset)
           end
 
           private
 
           def parse!
             @format, @coverage_offset, count = read(6, 'n')
-            sequence_table_offset_array = io.read(count * SEQUENCE_TABLE_OFFSET_LENGTH)
 
-            @sequences = Sequence.new(sequence_table_offset_array, SEQUENCE_TABLE_OFFSET_LENGTH) do |sequence_offset_data|
-              sequence_offset_data.unpack('n').first
+            @sequences = Sequence.from(io, count, 'n') do |sequence_table_offset|
+              SequenceTable.new(file, table_offset + sequence_table_offset)
             end
 
             @length = 6 + sequences.length

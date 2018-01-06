@@ -5,6 +5,14 @@ module TTFunk
         class Contextual2 < TTFunk::SubTable
           attr_reader :format, :coverage_offset, :class_def_offset
 
+          def coverage_table
+            @coverage_table ||= CoverageTable.create(self, coverage_offset)
+          end
+
+          def class_def
+            @class_def ||= ClassDef.create(self, class_def_offset)
+          end
+
           private
 
           def parse!

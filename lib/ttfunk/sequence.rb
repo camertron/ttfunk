@@ -7,7 +7,6 @@ module TTFunk
     def self.from(io, count, pack_format, &reifier)
       element_length = BinUtils.length_of(pack_format)
       data = io.read(count * element_length)
-      binding.pry
       new(data, count, pack_format, element_length, &reifier)
     end
 

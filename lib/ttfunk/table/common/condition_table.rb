@@ -10,6 +10,7 @@ module TTFunk
         def parse!
           @format, @axis_index = read(4, 'nn')
           @filter_range_min_value, @filter_range_max_value = read_f2dot14(2)
+          @length = 8
         end
       end
     end

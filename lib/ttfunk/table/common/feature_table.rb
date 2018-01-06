@@ -2,8 +2,6 @@ module TTFunk
   class Table
     module Common
       class FeatureTable < TTFunk::SubTable
-        LOOKUP_INDEX_LENGTH = 2
-
         attr_reader :tag, :feature_params_offset, :lookup_indices
 
         def initialize(file, tag, offset)

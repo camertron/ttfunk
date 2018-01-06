@@ -14,6 +14,8 @@ module TTFunk
           @subst_lookup_tables = Sequence.from(io, subst_count, SubstLookupTable::FORMAT) do |*args|
             SubstLookupTable.new(*args)
           end
+
+          @length = 4 + input_sequence.length + subst_lookup_tables.length
         end
       end
     end

@@ -5,6 +5,10 @@ module TTFunk
         class Single1 < TTFunk::SubTable
           attr_reader :format, :coverage_offset, :delta_glyph_id
 
+          def coverage_table
+            @coverage_table ||= CoverageTable.create(self, coverage_offset)
+          end
+
           private
 
           def parse!

@@ -1,15 +1,15 @@
 module TTFunk
   class Table
     module Common
-      class AlternateSet < TTFunk::SubTable
-        attr_reader :glyph_ids
+      class CoverageTable1 < TTFunk::SubTable
+        attr_reader :format, :glyph_ids
 
         private
 
         def parse!
-          count = read(2, 'n').first
+          @format, count = read(4, 'nn')
           @glyph_ids = Sequence.from(io, count, 'n')
-          @length = 2 + glyph_ids.length
+          @length = 4 + glyph_ids.length
         end
       end
     end
