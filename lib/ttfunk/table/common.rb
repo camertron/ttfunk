@@ -2,7 +2,7 @@ module TTFunk
   class Table
     module Common
       autoload :AlternateSet,                  'ttfunk/table/common/alternate_set'
-      autoload :ChainRuleTable,                'ttfunk/table/common/chain_rule_table'
+      autoload :ChainSubRuleTable,             'ttfunk/table/common/chain_sub_rule_table'
       autoload :ChainSubClassRuleTable,        'ttfunk/table/common/chain_sub_class_rule_table'
       autoload :ChainSubClassSet,              'ttfunk/table/common/chain_sub_class_set'
       autoload :ChainSubRuleSet,               'ttfunk/table/common/chain_sub_rule_set'

@@ -1,9 +1,9 @@
 module TTFunk
   class Table
-    module Common
-      class CoverageTable
+    class Gsub
+      class Contextual
         FORMAT_MAP = {
-          1 => CoverageTable1, 2 => CoverageTable2
+          1 => Contextual1, 2 => Contextual2, 3 => Contextual3
         }
 
         def self.create(file, parent_table, offset)
@@ -17,3 +17,4 @@ module TTFunk
     end
   end
 end
+

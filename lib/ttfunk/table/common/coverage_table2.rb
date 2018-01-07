@@ -10,7 +10,7 @@ module TTFunk
           @format, count = read(4, 'nn')
 
           @range_tables = Sequence.from(io, count, 'n') do |range_table_offset|
-            RangeTable.new(table_offset + range_table_offset)
+            RangeTable.new(file, table_offset + range_table_offset)
           end
 
           @length = 4 + range_tables.length

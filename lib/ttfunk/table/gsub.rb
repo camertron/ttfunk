@@ -3,6 +3,24 @@ require_relative '../table'
 module TTFunk
   class Table
     class Gsub < TTFunk::Table
+      autoload :Alternate,       'ttfunk/table/gsub/alternate'
+      autoload :Chaining,        'ttfunk/table/gsub/chaining'
+      autoload :Chaining1,       'ttfunk/table/gsub/chaining1'
+      autoload :Chaining2,       'ttfunk/table/gsub/chaining2'
+      autoload :Chaining3,       'ttfunk/table/gsub/chaining3'
+      autoload :Contextual,      'ttfunk/table/gsub/contextual'
+      autoload :Contextual1,     'ttfunk/table/gsub/contextual1'
+      autoload :Contextual2,     'ttfunk/table/gsub/contextual2'
+      autoload :Contextual3,     'ttfunk/table/gsub/contextual3'
+      autoload :Extension,       'ttfunk/table/gsub/extension'
+      autoload :Ligature,        'ttfunk/table/gsub/ligature'
+      autoload :LookupTable,     'ttfunk/table/gsub/lookup_table'
+      autoload :Multiple,        'ttfunk/table/gsub/multiple'
+      autoload :ReverseChaining, 'ttfunk/table/gsub/reverse_chaining'
+      autoload :Single,          'ttfunk/table/gsub/single'
+      autoload :Single1,         'ttfunk/table/gsub/single1'
+      autoload :Single2,         'ttfunk/table/gsub/single2'
+
       TAG = 'GSUB'.freeze
 
       attr_reader :major_version, :minor_version
@@ -27,7 +45,7 @@ module TTFunk
       end
 
       def lookup_list
-        @lookup_list ||= Common::LookupList.new(file, offset + lookup_list_offset)
+        @lookup_list ||= Common::LookupList.new(file, offset + lookup_list_offset, Gsub::LookupTable)
       end
 
       def feature_variation_list
@@ -36,6 +54,16 @@ module TTFunk
             file, offset + feature_variations_offset
           )
         end
+      end
+
+      def max_context
+        @max_context ||= feature_list.tables.flat_map do |feature|
+          feature.lookup_indices.flat_map do |lookup_index|
+            lookup_list.tables[lookup_index].sub_tables.map do |sub_table|
+              sub_table.max_context
+            end
+          end
+        end.max
       end
 
       private

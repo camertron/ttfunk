@@ -10,7 +10,7 @@ module TTFunk
           count = read(2, 'n').first
 
           @chain_sub_rules = Sequence.from(io, count, 'n') do |chain_rule_offset|
-            ChainRuleTable.new(file, table_offset + chain_rule_offset)
+            ChainSubRuleTable.new(file, table_offset + chain_rule_offset)
           end
 
           @length = 2 + chain_sub_rules.length

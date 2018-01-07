@@ -1,7 +1,7 @@
 module TTFunk
   class Table
     module Common
-      class ChainRuleTable < TTFunk::SubTable
+      class ChainSubRuleTable < TTFunk::SubTable
         attr_reader :backtrack_glyph_ids, :input_glyph_ids, :lookahead_glyph_ids
         attr_reader :subst_lookup_tables
 

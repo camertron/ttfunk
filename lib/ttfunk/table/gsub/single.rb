@@ -1,9 +1,9 @@
 module TTFunk
   class Table
-    module Common
-      class CoverageTable
+    class Gsub
+      class Single
         FORMAT_MAP = {
-          1 => CoverageTable1, 2 => CoverageTable2
+          1 => Single1, 2 => Single2
         }
 
         def self.create(file, parent_table, offset)

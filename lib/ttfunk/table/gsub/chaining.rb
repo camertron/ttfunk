@@ -1,9 +1,9 @@
 module TTFunk
   class Table
-    module Common
-      class CoverageTable
+    class Gsub
+      class Chaining
         FORMAT_MAP = {
-          1 => CoverageTable1, 2 => CoverageTable2
+          1 => Chaining1, 2 => Chaining2, 3 => Chaining3
         }
 
         def self.create(file, parent_table, offset)
@@ -17,3 +17,4 @@ module TTFunk
     end
   end
 end
+
