@@ -13,7 +13,7 @@ module TTFunk
 
             sub_class_rules.each do |sub_class_rule|
               result.resolve_placeholder(
-                :common, sub_class_rule.id, [result.length].encode('n')
+                :common, sub_class_rule.id, [result.length].pack('n')
               )
 
               result << sub_class_rule.encode

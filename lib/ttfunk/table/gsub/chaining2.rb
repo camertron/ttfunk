@@ -7,25 +7,25 @@ module TTFunk
         attr_reader :chain_sub_class_sets
 
         def coverage_table
-          @coverage_table ||= CoverageTable.create(
+          @coverage_table ||= Common::CoverageTable.create(
             file, self, table_offset + coverage_offset
           )
         end
 
         def backtrack_class_def
-          @backtrack_class_def ||= ClassDef.create(
+          @backtrack_class_def ||= Common::ClassDef.create(
             self, backtrack_class_def_offset
           )
         end
 
         def input_class_def
-          @input_class_def ||= ClassDef.create(
+          @input_class_def ||= Common::ClassDef.create(
             self, input_class_def_offset
           )
         end
 
         def lookahead_class_def
-          @lookahead_class_def ||= ClassDef.create(
+          @lookahead_class_def ||= Common::ClassDef.create(
             self, lookahead_class_def_offset
           )
         end
@@ -50,16 +50,16 @@ module TTFunk
               [ph(:gsub, chain_sub_class_set.id, 2)]
             end
 
-            result.resolve_placeholder(:gsub, backtrack_class_def.id, [result.length].encode('n'))
+            result.resolve_placeholder(:gsub, backtrack_class_def.id, [result.length].pack('n'))
             result << backtrack_class_def.encode
-            result.resolve_placeholder(:gsub, input_class_def.id, [result.length].encode('n'))
+            result.resolve_placeholder(:gsub, input_class_def.id, [result.length].pack('n'))
             result << input_class_def.encode
-            result.resolve_placeholder(:gsub, lookahead_class_def.id, [result.length].encode('n'))
+            result.resolve_placeholder(:gsub, lookahead_class_def.id, [result.length].pack('n'))
             result << lookahead_class_def.encode
 
             chain_sub_class_sets.each do |chain_sub_class_set|
               result.resolve_placeholder(
-                :gsub, chain_sub_class_set.id, [result.length].encode('n')
+                :gsub, chain_sub_class_set.id, [result.length].pack('n')
               )
 
               result << chain_sub_class_set.encode
@@ -75,7 +75,7 @@ module TTFunk
             count = read(12, 'n6')
 
           @chain_sub_class_sets = Sequence.from(io, count, 'n') do |chain_sub_class_set_offset|
-            ChainSubClassSet.new(file, table_offset + chain_sub_class_set_offset)
+            Common::ChainSubClassSet.new(file, table_offset + chain_sub_class_set_offset)
           end
 
           @length = 12 + chain_sub_class_sets.length

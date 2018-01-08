@@ -9,7 +9,7 @@ module TTFunk
         end
 
         def coverage_table
-          @coverage_table ||= CoverageTable.create(
+          @coverage_table ||= Common::CoverageTable.create(
             file, self, table_offset + coverage_offset
           )
         end
@@ -28,7 +28,7 @@ module TTFunk
 
             alternate_sets.each do |alternate_set|
               result.resolve_placeholder(
-                :gsub, alternate_set.id, [result.length].encode('n')
+                :gsub, alternate_set.id, [result.length].pack('n')
               )
 
               result << alternate_set.encode
@@ -42,7 +42,7 @@ module TTFunk
           @format, @coverage_offset, count = read(6, 'nnn')
 
           @alternate_sets = Sequence.from(io, count, 'n') do |alternate_set_offset|
-            AlternateSet.new(file, table_offset + alternate_set_offset)
+            Common::AlternateSet.new(file, table_offset + alternate_set_offset)
           end
 
           @length = 6 + alternate_sets.length

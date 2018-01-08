@@ -29,7 +29,11 @@ module TTFunk
           count = read(2, 'n').first
 
           @tables = Sequence.from(io, count, 'n') do |lookup_table_offset|
-            lookup_table_class.new(file, table_offset + lookup_table_offset)
+            lookup_table_class.new(
+              file,
+              table_offset + lookup_table_offset,
+              lookup_table_class::SUB_TABLE_MAP
+            )
           end
 
           @length = 2 + @tables.length

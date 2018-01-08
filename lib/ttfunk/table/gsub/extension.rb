@@ -9,7 +9,7 @@ module TTFunk
         attr_reader :format, :extension_lookup_type, :extension_offset
 
         def sub_table
-          @sub_table ||= LookupTable::SUB_TABLE_MAP[extension_lookup_type].create(
+          @sub_table ||= Gsub::LookupTable::SUB_TABLE_MAP[extension_lookup_type].create(
             file, self, table_offset + extension_offset
           )
         end

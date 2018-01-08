@@ -5,13 +5,21 @@ module TTFunk
         attr_reader :format, :coverage_offset, :delta_glyph_id
 
         def coverage_table
-          @coverage_table ||= CoverageTable.create(
+          @coverage_table ||= Common::CoverageTable.create(
             file, self, table_offset + coverage_offset
           )
         end
 
         def max_context
           1
+        end
+
+        def encode
+          EncodedString.create do |result|
+            result.write(format, 'n')
+            result << ph(:gsub, coverage_table.id, 2)
+            result.write(delta_glyph_id, 'n')
+          end
         end
 
         private

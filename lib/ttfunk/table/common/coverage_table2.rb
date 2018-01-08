@@ -13,7 +13,7 @@ module TTFunk
 
             range_tables.each do |range_table|
               result.resolve_placeholder(
-                :common, range_table.id, [result.length].encode('n')
+                :common, range_table.id, [result.length].pack('n')
               )
 
               result << range_table.encode

@@ -5,13 +5,13 @@ module TTFunk
         attr_reader :format, :coverage_offset, :class_def_offset, :sub_class_sets
 
         def coverage_table
-          @coverage_table ||= CoverageTable.create(
+          @coverage_table ||= Common::CoverageTable.create(
             file, self, table_offset + coverage_offset
           )
         end
 
         def class_def
-          @class_def ||= ClassDef.create(self, class_def_offset)
+          @class_def ||= Common::ClassDef.create(self, class_def_offset)
         end
 
         def max_context
@@ -34,7 +34,7 @@ module TTFunk
 
             sub_class_sets.each do |sub_class_set|
               result.resolve_placeholder(
-                :gsub, sub_class_set.id, [result.length].encode('n')
+                :gsub, sub_class_set.id, [result.length].pack('n')
               )
 
               result << sub_class_set.encode
@@ -48,7 +48,7 @@ module TTFunk
           @format, @coverage_offset, @class_def_offset, count = read(8, 'n4')
 
           @sub_class_sets = Sequence.from(io, count, 'n') do |sub_class_set_offset|
-            SubClassSet.new(file, table_offset + sub_class_set_offset)
+            Common::SubClassSet.new(file, table_offset + sub_class_set_offset)
           end
 
           @length = 8 + sub_class_sets.length

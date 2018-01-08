@@ -13,7 +13,7 @@ module TTFunk
 
             conditions.each do |condition|
               result.resolve_placeholder(
-                :common, condition.id, [result.length].encode('N')
+                :common, condition.id, [result.length].pack('N')
               )
 
               result << condition.encode

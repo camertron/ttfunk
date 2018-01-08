@@ -5,7 +5,7 @@ module TTFunk
         attr_reader :format, :coverage_offset, :sub_rule_sets
 
         def coverage_table
-          @coverage_table ||= CoverageTable.create(
+          @coverage_table ||= Common::CoverageTable.create(
             file, self, table_offset + coverage_offset
           )
         end
@@ -28,7 +28,7 @@ module TTFunk
 
             sub_rule_sets.each do |sub_rule_set|
               result.resolve_placeholder(
-                :gsub, sub_rule_set.id, [result.length].encode('n')
+                :gsub, sub_rule_set.id, [result.length].pack('n')
               )
 
               result << sub_rule_set.encode
@@ -42,7 +42,7 @@ module TTFunk
           @format, @coverage_offset, count = read(6, 'nnn')
 
           @sub_rule_sets = Sequence.from(io, count, 'n') do |sub_rule_set_offset|
-            SubRuleSet.new(file, table_offset + sub_rule_set_offset)
+            Common::SubRuleSet.new(file, table_offset + sub_rule_set_offset)
           end
 
           @length = 6 + sub_rule_sets.length

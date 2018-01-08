@@ -16,7 +16,7 @@ module TTFunk
 
             tables.each do |table|
               result.resolve_placeholder(
-                :common, table.alternate_feature_table.id, [result.length].encode('N')
+                :common, table.alternate_feature_table.id, [result.length].pack('N')
               )
 
               result << table.alternate_feature_table.encode

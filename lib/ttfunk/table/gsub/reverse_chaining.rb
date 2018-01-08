@@ -10,13 +10,24 @@ module TTFunk
         attr_reader :lookahead_coverage_offsets, :substitute_glyph_ids
 
         def coverage_table
-          @coverage_table ||= CoverageTable.create(
+          @coverage_table ||= Common::CoverageTable.create(
             file, self, table_offset + coverage_offset
           )
         end
 
         def max_context
           backtrack_coverage_offsets.count + lookahead_coverage_offsets.count
+        end
+
+        def encode
+          EncodedString.create do |result|
+            result.write(format, 'n')
+            result << ph(:gsub, coverage_table.id, 2)
+
+            result << backtrack_coverage_tables.encode { |t| [ph(:gsub, t.id, 2)] }
+            result << lookahead_coverage_tables.encode { |t| [ph(:gsub, t.id, 2)] }
+            reuslt << substitute_glyph_ids.encode
+          end
         end
 
         private

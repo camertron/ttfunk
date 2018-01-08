@@ -16,13 +16,13 @@ module TTFunk
 
             tables.each do |table|
               result.resolve_placeholder(
-                :common, table.condition_set.id, [result.length].encode('N')
+                :common, table.condition_set.id, [result.length].pack('N')
               )
 
               result << table.condition_set.encode
 
               result.resolve_placeholder(
-                :common, table.feature_table_substitutions.id, [result.length].encode('N')
+                :common, table.feature_table_substitutions.id, [result.length].pack('N')
               )
 
               result << table.feature_table_substitutions.encode
