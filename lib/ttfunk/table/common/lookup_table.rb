@@ -15,13 +15,13 @@ module TTFunk
             result.write([lookup_type, lookup_flag, sub_tables.count], 'nnn')
 
             result << sub_tables.encode do |sub_table|
-              [ph(:common, sub_table.id, 2)]
+              [ph(:common, sub_table.id, length: 2)]
             end
 
             result.write(mark_filtering_set, 'n')
 
             sub_tables.each do |sub_table|
-              result.resolve_placeholder(:common, sub_table.id, [result.length].pack('n'))
+              result.resolve_placeholders(:common, sub_table.id, [result.length].pack('n'))
               result << sub_table.encode
             end
           end

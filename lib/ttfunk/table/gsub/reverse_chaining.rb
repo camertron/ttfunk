@@ -22,10 +22,16 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, 2)
+            result << ph(:gsub, coverage_table.id, length: 2, relative_to: result.length)
 
-            result << backtrack_coverage_tables.encode { |t| [ph(:gsub, t.id, 2)] }
-            result << lookahead_coverage_tables.encode { |t| [ph(:gsub, t.id, 2)] }
+            result << backtrack_coverage_tables.encode do |table|
+              [ph(:gsub, table.id, length: 2, relative_to: result.length)]
+            end
+
+            result << lookahead_coverage_tables.encode do |table|
+              [ph(:gsub, table.id, length: 2), relative_to: result.length]
+            end
+
             reuslt << substitute_glyph_ids.encode
           end
         end

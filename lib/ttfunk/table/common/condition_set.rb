@@ -8,11 +8,11 @@ module TTFunk
           EncodedString.create do |result|
             result.write(conditions.count, 'n')
             result << conditions.encode do |condition|
-              [ph(:common, condition.id, 2)]
+              [ph(:common, condition.id, length: 2)]
             end
 
             conditions.each do |condition|
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :common, condition.id, [result.length].pack('N')
               )
 

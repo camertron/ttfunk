@@ -13,11 +13,11 @@ module TTFunk
           EncodedString.create do |result|
             result.write(tables.count, 'n')
             result << tables.encode do |table|
-              [ph(:common, table.id, 2)]
+              [ph(:common, table.id, length: 2)]
             end
 
             tables.each do |table|
-              result.resolve_placeholder(:common, table.id, [result.length].pack('n'))
+              result.resolve_placeholders(:common, table.id, [result.length].pack('n'))
               result << table.encode
             end
           end

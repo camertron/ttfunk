@@ -42,7 +42,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, 2)
+            result << ph(:gsub, coverage_table.id, 2, relative_to: result.length)
             result << ph(:gsub, backtrack_class_def.id, 2)
             result << ph(:gsub, input_class_def.id, 2)
             result << ph(:gsub, lookahead_class_def.id, 2)
@@ -50,20 +50,30 @@ module TTFunk
               [ph(:gsub, chain_sub_class_set.id, 2)]
             end
 
-            result.resolve_placeholder(:gsub, backtrack_class_def.id, [result.length].pack('n'))
+            result.resolve_placeholders(:gsub, backtrack_class_def.id, [result.length].pack('n'))
             result << backtrack_class_def.encode
-            result.resolve_placeholder(:gsub, input_class_def.id, [result.length].pack('n'))
+            result.resolve_placeholders(:gsub, input_class_def.id, [result.length].pack('n'))
             result << input_class_def.encode
-            result.resolve_placeholder(:gsub, lookahead_class_def.id, [result.length].pack('n'))
+            result.resolve_placeholders(:gsub, lookahead_class_def.id, [result.length].pack('n'))
             result << lookahead_class_def.encode
 
             chain_sub_class_sets.each do |chain_sub_class_set|
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :gsub, chain_sub_class_set.id, [result.length].pack('n')
               )
 
               result << chain_sub_class_set.encode
             end
+          end
+        end
+
+        def finalize(data)
+          if data.has_placeholder?(:gsub, coverage_table.id)
+            data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+              [data.length - placeholder.relative_to].pack('n')
+            end
+
+            data << coverage_table.encode
           end
         end
 

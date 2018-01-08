@@ -25,15 +25,15 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, 2)
-            result << ph(:gsub, class_def.id, 2)
+            result << ph(:gsub, coverage_table.id, length: 2, relative_to: result.length)
+            result << ph(:gsub, class_def.id, length: 2)
             result.write(sub_class_sets.count, 'n')
             result << sub_class_sets.each do |sub_class_set|
-              [ph(:gsub, sub_class_set.id, 2)]
+              [ph(:gsub, sub_class_set.id, length: 2)]
             end
 
             sub_class_sets.each do |sub_class_set|
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :gsub, sub_class_set.id, [result.length].pack('n')
               )
 

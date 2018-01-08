@@ -25,13 +25,13 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, 2)
+            result << ph(:gsub, coverage_table.id, length: 2, relative_to: result.length)
             result << ligature_sets.encode do |ligature_set|
-              [ph(:gsub, ligature_set.id, 2)]
+              [ph(:gsub, ligature_set.id, length: 2)]
             end
 
             ligature_sets.each do |ligature_set|
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :gsub, ligature_set.id, [result.length].pack('n')
               )
 

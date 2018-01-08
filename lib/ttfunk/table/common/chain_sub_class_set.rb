@@ -8,11 +8,11 @@ module TTFunk
           EncodedString.create do |result|
             result.write(chain_sub_class_rules.count, 'n')
             result << chain_sub_class_rules.encode do |chain_sub_class_rule|
-              [ph(:common, chain_sub_class_rule.id, 2)]
+              [ph(:common, chain_sub_class_rule.id, length: 2)]
             end
 
             chain_sub_class_rules.each do |chain_sub_class_rule|
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :common, chain_sub_class_rule.id, [result.length].pack('n')
               )
 

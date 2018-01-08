@@ -25,10 +25,7 @@ module TTFunk
 
           values.each_with_index do |value, idx|
             if value.is_a?(Placeholder)
-              result.add_placeholder(
-                value.category, value.name, result.length, value.length
-              )
-
+              result << value
               result << [0].pack(pack_segments[idx])
             else
               result << [value].pack(pack_segments[idx])

@@ -9,19 +9,19 @@ module TTFunk
             result.write([major_version, minor_version, tables.count], 'nnn')
             result << tables.encode do |table|
               [
-                ph(:common, table.condition_set.id, 4),
-                ph(:common, table.feature_table_substitutions.id, 4)
+                ph(:common, table.condition_set.id, length: 4),
+                ph(:common, table.feature_table_substitutions.id, length: 4)
               ]
             end
 
             tables.each do |table|
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :common, table.condition_set.id, [result.length].pack('N')
               )
 
               result << table.condition_set.encode
 
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :common, table.feature_table_substitutions.id, [result.length].pack('N')
               )
 

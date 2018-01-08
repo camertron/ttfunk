@@ -8,11 +8,11 @@ module TTFunk
           EncodedString.create do |result|
             result.write([format, class_range_tables.count], 'nn')
             result << class_range_tables.encode do |class_range_table|
-              [ph(:common, class_range_table.id, 2)]
+              [ph(:common, class_range_table.id, length: 2)]
             end
 
             class_range_tables.each do |class_range_table|
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :common, class_range_table.id, [result.length].pack('n')
               )
 

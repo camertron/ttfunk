@@ -21,18 +21,28 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, 2)
+            result << ph(:gsub, coverage_table.id, length: 2, relative_to: result.length)
             result << chain_sub_rule_sets.encode do |chain_sub_rule_set|
-              [ph(:gsub, chain_sub_rule_set.id, 2)]
+              [ph(:gsub, chain_sub_rule_set.id, length: 2)]
             end
 
             chain_sub_rule_sets.each do |chain_sub_rule_set|
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :gsub, chain_sub_rule_set.id, [result.length].pack('n')
               )
 
               result << chain_sub_rule_set.encode
             end
+          end
+        end
+
+        def finalize(data)
+          if data.has_placeholder?(:gsub, coverage_table.id)
+            data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+              [data.length - placeholder.relative_to].pack('n')
+            end
+
+            data << coverage_table.encode
           end
         end
 

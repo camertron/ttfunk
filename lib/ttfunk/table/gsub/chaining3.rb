@@ -14,19 +14,19 @@ module TTFunk
             result.write([format, backtrack_coverage_tables.count], 'nn')
 
             result << backtrack_coverage_tables.encode do |backtrack_coverage_table|
-              [ph(:gsub, backtrack_coverage_table.id, 2)]
+              [ph(:gsub, backtrack_coverage_table.id, length: 2, relative_to: result.length)]
             end
 
             result.write(input_coverage_tables.count, 'n')
 
             result << input_coverage_tables.encode do |input_coverage_table|
-              [ph(:gsub, input_coverage_table.id, 2)]
+              [ph(:gsub, input_coverage_table.id, length: 2, relative_to: result.length)]
             end
 
             result.write(lookahead_coverage_tables.count, 'n')
 
             result << lookahead_coverage_tables.encode do |lookahead_coverage_table|
-              [ph(:gsub, lookahead_coverage_table.id, 2)]
+              [ph(:gsub, lookahead_coverage_table.id, length: 2, relative_to: result.length)]
             end
 
             result.write(subst_lookup_tables.count, 'n')
@@ -37,7 +37,34 @@ module TTFunk
           end
         end
 
+        def finalize(data)
+          if data.has_placeholder?(:gsub, coverage_table.id)
+            data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+              [data.length - placeholder.relative_to].pack('n')
+            end
+
+            data << coverage_table.encode
+          end
+
+          finalize_coverage_sequence(backtrack_coverage_tables)
+          finalize_coverage_sequence(input_coverage_tables)
+          finalize_coverage_sequence(lookahead_coverage_tables)
+        end
+
         private
+
+        # @TODO: Move to base class? Other things need this functionality.
+        def finalize_coverage_sequence(coverage_sequence, data)
+          coverage_sequence.each do |coverage_table|
+            if data.has_placeholder?(:gsub, coverage_table.id)
+              data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+                [data.length - placeholder.relative_to].pack('n')
+              end
+
+              data << coverage_table.encode
+            end
+          end
+        end
 
         def parse!
           @format, backtrack_count = read(4, 'nn')

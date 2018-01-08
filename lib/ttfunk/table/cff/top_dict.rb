@@ -80,7 +80,7 @@ module TTFunk
 
         def finalize_subtable(new_cff_data, name, table_data)
           encoded = encode_integer32(new_cff_data.length)
-          new_cff_data.resolve_placeholder(:cff_top_dict, name, encoded.pack('C*'))
+          new_cff_data.resolve_placeholders(:cff_top_dict, name, encoded.pack('C*'))
           new_cff_data << table_data
         end
 

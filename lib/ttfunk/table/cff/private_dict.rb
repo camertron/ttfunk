@@ -37,7 +37,7 @@ module TTFunk
           encoded_subr_index = subr_index.encode
           encoded_offset = encode_integer32(private_dict_data.bytesize)
 
-          private_dict_data.resolve_placeholder(
+          private_dict_data.resolve_placeholders(
             :cff_private_dict, :"subrs_#{@table_offset}", encoded_offset.pack('C*')
           )
 

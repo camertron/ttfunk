@@ -30,8 +30,8 @@ module TTFunk
 
     private
 
-    def ph(category, name, length)
-      Placeholder.new(category, name, length)
+    def ph(category, name, length: 1, relative_to: nil)
+      Placeholder.new(category, name, length: length, relative_to: relative_to)
     end
   end
 end

@@ -10,12 +10,12 @@ module TTFunk
             result << tables.encode do |table|
               [
                 table.feature_table_index,
-                ph(:common, table.alternate_feature_table.id, 2)
+                ph(:common, table.alternate_feature_table.id, length: 2)
               ]
             end
 
             tables.each do |table|
-              result.resolve_placeholder(
+              result.resolve_placeholders(
                 :common, table.alternate_feature_table.id, [result.length].pack('N')
               )
 

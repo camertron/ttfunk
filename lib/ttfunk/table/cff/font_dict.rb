@@ -38,11 +38,11 @@ module TTFunk
           encoded_offset = encode_integer32(new_cff_data.length)
           encoded_length = encode_integer32(encoded_private_dict.bytesize)
 
-          new_cff_data.resolve_placeholder(
+          new_cff_data.resolve_placeholders(
             :cff_font_dict, :"private_length_#{@table_offset}", encoded_length.pack('C*')
           )
 
-          new_cff_data.resolve_placeholder(
+          new_cff_data.resolve_placeholders(
             :cff_font_dict, :"private_offset_#{@table_offset}", encoded_offset.pack('C*')
           )
 

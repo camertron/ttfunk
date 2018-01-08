@@ -48,7 +48,7 @@ module TTFunk
         head_offset = offset if optimal_tag == 'head'
 
         if tables.include?(optimal_tag)
-          newfont.resolve_placeholder(:tables, optimal_tag, [offset].pack('N'))
+          newfont.resolve_placeholders(:tables, optimal_tag, [offset].pack('N'))
           data = tables[optimal_tag]
           newfont << data
 
