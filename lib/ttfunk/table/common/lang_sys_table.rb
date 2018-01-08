@@ -9,6 +9,13 @@ module TTFunk
           super(file, offset)
         end
 
+        def encode
+          EncodedString.create do |result|
+            result.write([lookup_order, required_feature_index, feature_indices.count], 'nnn')
+            result << feature_indices.encode
+          end
+        end
+
         private
 
         def parse!

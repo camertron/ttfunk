@@ -18,6 +18,24 @@ module TTFunk
           1
         end
 
+        def encode
+          EncodedString.create do |result|
+            result.write(format, 'n')
+            result << ph(:gsub, coverage_table.id, 2)
+            result << alternate_sets.encode do |alternate_set|
+              [ph(:gsub, alternate_set.id, 2)]
+            end
+
+            alternate_sets.each do |alternate_set|
+              result.resolve_placeholder(
+                :gsub, alternate_set.id, [result.length].encode('n')
+              )
+
+              result << alternate_set.encode
+            end
+          end
+        end
+
         private
 
         def parse!

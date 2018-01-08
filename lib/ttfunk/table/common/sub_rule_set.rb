@@ -4,6 +4,23 @@ module TTFunk
       class SubRuleSet < TTFunk::SubTable
         attr_reader :sub_rules
 
+        def encode
+          EncodedString.create do |result|
+            result.write(sub_rules.count, 'n')
+            result << sub_rules.encode do |sub_rule|
+              [ph(:common, sub_rule.id, 2)]
+            end
+
+            sub_rules.each do |sub_rule|
+              result.resolve_placeholder(
+                :common, sub_rule.id, [result.length].encode('n')
+              )
+
+              result << sub_rule.encode
+            end
+          end
+        end
+
         private
 
         def parse!

@@ -5,6 +5,21 @@ module TTFunk
         attr_reader :backtrack_glyph_ids, :input_glyph_ids, :lookahead_glyph_ids
         attr_reader :subst_lookup_tables
 
+        def encode
+          EncodedString.create do |result|
+            result.write(backtrack_glyph_ids.count, 'n')
+            result << backtrack_glyph_ids.encode
+            result.write(input_glyph_ids.count, 'n')
+            result << input_glyph_ids.encode
+            result.write(lookahead_glyph_ids.count, 'n')
+            result << lookahead_glyph_ids.encode
+            result.write(subst_lookup_tables.count, 'n')
+            result << subst_lookup_tables.encode do |subst_lookup_table|
+              [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
+            end
+          end
+        end
+
         private
 
         def parse!

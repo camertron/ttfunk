@@ -5,6 +5,14 @@ module TTFunk
         attr_reader :format, :axis_index
         attr_reader :filter_range_min_value, :filter_range_max_value
 
+        def encode
+          EncodedString.create do |result|
+            result.write([format, axis_index], 'nn')
+            result.write_f2dot14(filter_range_min_value)
+            result.write_f2dot14(filter_range_max_value)
+          end
+        end
+
         private
 
         def parse!

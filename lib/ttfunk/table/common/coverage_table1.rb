@@ -4,6 +4,13 @@ module TTFunk
       class CoverageTable1 < TTFunk::SubTable
         attr_reader :format, :glyph_ids
 
+        def encode
+          EncodedString.create do |result|
+            result.write([format, glyph_ids.count], 'nn')
+            result << glyph_ids.encode
+          end
+        end
+
         private
 
         def parse!

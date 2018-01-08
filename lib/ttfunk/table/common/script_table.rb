@@ -9,6 +9,20 @@ module TTFunk
           super(file, offset)
         end
 
+        def encode
+          EncodedString.create do |result|
+            result.write(lang_sys_tables.count, 'n')
+            result << lang_sys_tables.encode do |lang_sys_table|
+              [lang_sys_table.tag, ph(:common, lang_sys_table.id, 2)]
+            end
+
+            lang_sys_tables.each do |lang_sys_table|
+              result.resolve_placeholder(:common, lang_sys_table.id, [result.length].pack('n'))
+              result << lang_sys_table.encode
+            end
+          end
+        end
+
         private
 
         def parse!

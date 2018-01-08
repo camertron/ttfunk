@@ -18,6 +18,24 @@ module TTFunk
           end.max
         end
 
+        def encode
+          EncodedString.create do |result|
+            result.write(format, 'n')
+            result << ph(:gsub, coverage_table.id, 2)
+            result << chain_sub_rule_sets.encode do |chain_sub_rule_set|
+              [ph(:gsub, chain_sub_rule_set.id, 2)]
+            end
+
+            chain_sub_rule_sets.each do |chain_sub_rule_set|
+              result.resolve_placeholder(
+                :gsub, chain_sub_rule_set.id, [result.length].encode('n')
+              )
+
+              result << chain_sub_rule_set.encode
+            end
+          end
+        end
+
         private
 
         def parse!

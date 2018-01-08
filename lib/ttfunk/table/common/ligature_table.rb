@@ -4,6 +4,13 @@ module TTFunk
       class LigatureTable < TTFunk::SubTable
         attr_reader :ligature_glyph_id, :component_glyph_ids
 
+        def encode
+          EncodedString.create do |result|
+            result.write([ligature_glyph_id, component_glyph_ids.count + 1], 'nn')
+            result << component_glyph_ids.encode
+          end
+        end
+
         private
 
         def parse!

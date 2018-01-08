@@ -2,10 +2,17 @@ require 'stringio'
 
 module TTFunk
   class EncodedString
+    def self.create
+      new.tap { |enc_str| yield enc_str }
+    end
+
     def <<(obj)
       case obj
         when String
           io << obj
+        when Placeholder
+          add_placeholder(obj.category, obj.name, length, obj.length)
+          io << "\0" * obj.length
         when self.class
           # adjust placeholders to be relative to the entire encoded string
           obj.placeholders.each_pair do |category, ph_hash|
@@ -18,6 +25,14 @@ module TTFunk
       end
 
       self
+    end
+
+    def write(value, pack_format)
+      self << Array(value).pack(pack_format)
+    end
+
+    def write_f2dot14(num)
+      self << BinUtils.pack_f2dot14(num)
     end
 
     def pos

@@ -8,6 +8,20 @@ module TTFunk
           @coverage_tables.count
         end
 
+        def encode
+          EncodedString.create do |result|
+            result.write([format, coverage_tables.count, subst_lookup_tables.count], 'nnn')
+
+            coverage_tables.encode do |coverage_table|
+              [ph(:gsub, coverage_table.id, 2)]
+            end
+
+            result << subst_lookup_tables.encode do |subst_lookup_table|
+              [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
+            end
+          end
+        end
+
         private
 
         def parse!

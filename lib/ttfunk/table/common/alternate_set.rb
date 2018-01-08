@@ -4,6 +4,13 @@ module TTFunk
       class AlternateSet < TTFunk::SubTable
         attr_reader :glyph_ids
 
+        def encode
+          EncodedString.create do |result|
+            result.write(count, 'n')
+            result << glyph_ids.encode
+          end
+        end
+
         private
 
         def parse!

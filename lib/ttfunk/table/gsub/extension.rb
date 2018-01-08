@@ -18,6 +18,14 @@ module TTFunk
           sub_table.max_context
         end
 
+        def encode
+          EncodedString.create do |result|
+            result.write([format, extension_lookup_type], 'nn')
+            result.write(result.length + 4, 'N')  # no need for a placeholder here
+            result << sub_table.encode
+          end
+        end
+
         private
 
         def parse!

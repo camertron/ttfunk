@@ -4,6 +4,23 @@ module TTFunk
       class ConditionSet < TTFunk::SubTable
         attr_reader :conditions
 
+        def encode
+          EncodedString.create do |result|
+            result.write(conditions.count, 'n')
+            result << conditions.encode do |condition|
+              [ph(:common, condition.id, 2)]
+            end
+
+            conditions.each do |condition|
+              result.resolve_placeholder(
+                :common, condition.id, [result.length].encode('N')
+              )
+
+              result << condition.encode
+            end
+          end
+        end
+
         private
 
         def parse!

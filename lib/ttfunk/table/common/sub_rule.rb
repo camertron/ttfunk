@@ -6,6 +6,17 @@ module TTFunk
       class SubRule < TTFunk::SubTable
         attr_reader :input_sequence, :subst_lookup_tables
 
+        def encode
+          EncodedString.create do |result|
+            result.write([input_sequence.count, subst_lookup_tables.count], 'nn')
+            result << input_sequence.encode
+            result.write(subst_lookup_tables.count, 'n')
+            result << subst_lookup_tables.encode do |subst_lookup_table|
+              [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
+            end
+          end
+        end
+
         private
 
         def parse!

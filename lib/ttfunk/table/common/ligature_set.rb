@@ -4,6 +4,23 @@ module TTFunk
       class LigatureSet < TTFunk::SubTable
         attr_reader :tables
 
+        def encode
+          EncodedString.create do |result|
+            result.write(tables.count, 'n')
+            result << tables.encode do |table|
+              [ph(:common, table.id, 2)]
+            end
+
+            tables.each do |table|
+              result.resolve_placeholder(
+                :common, table.id, [result.length].encode('N')
+              )
+
+              result << table.encode
+            end
+          end
+        end
+
         private
 
         def parse!

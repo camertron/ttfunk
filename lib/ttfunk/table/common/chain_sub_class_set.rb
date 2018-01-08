@@ -4,6 +4,23 @@ module TTFunk
       class ChainSubClassSet < TTFunk::SubTable
         attr_reader :chain_sub_class_rules
 
+        def encode
+          EncodedString.create do |result|
+            result.write(chain_sub_class_rules.count, 'n')
+            result << chain_sub_class_rules.encode do |chain_sub_class_rule|
+              [ph(:common, chain_sub_class_rule.id, 2)]
+            end
+
+            chain_sub_class_rules.each do |chain_sub_class_rule|
+              result.resolve_placeholder(
+                :common, chain_sub_class_rule.id, [result.length].encode('n')
+              )
+
+              result << chain_sub_class_rule.encode
+            end
+          end
+        end
+
         private
 
         def parse!

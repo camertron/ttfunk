@@ -5,6 +5,23 @@ module TTFunk
         attr_reader :lookup_type, :lookup_flag, :sub_tables
         attr_reader :mark_filtering_set
 
+        def encode
+          EncodedString.create do |result|
+            result.write([lookup_type, lookup_flag, sub_tables.count], 'nnn')
+
+            result << sub_tables.encode do |sub_table|
+              [sub_table.tag, ph(:common, sub_table.id, 2)]
+            end
+
+            result.write(mark_filtering_set, 'n')
+
+            sub_tables.each do |sub_table|
+              result.resolve_placeholder(:common, sub_table.id, [result.length].pack('n'))
+              result << sub_table.encode
+            end
+          end
+        end
+
         private
 
         def parse!

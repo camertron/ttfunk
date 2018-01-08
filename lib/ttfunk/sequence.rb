@@ -5,7 +5,7 @@ module TTFunk
     attr_reader :data, :count, :pack_format, :reifier, :element_length
 
     def self.from(io, count, pack_format, &reifier)
-      element_length = BinUtils.length_of(pack_format)
+      element_length = PackFormat.length_of(pack_format)
       data = io.read(count * element_length)
       new(data, count, pack_format, element_length, &reifier)
     end
@@ -16,6 +16,26 @@ module TTFunk
       @pack_format = pack_format
       @element_length = element_length
       @reifier = reifier
+    end
+
+    def encode
+      EncodedString.new.tap do |result|
+        each do |element|
+          values = Array(block_given? ? yield(element) : element)
+
+          values.each_with_index do |value, idx|
+            if value.is_a?(Placeholder)
+              result.add_placeholder(
+                value.category, value.name, result.length, value.length
+              )
+
+              result << [0].pack(pack_segments[idx])
+            else
+              result << [value].pack(pack_segments[idx])
+            end
+          end
+        end
+      end
     end
 
     def length
@@ -41,6 +61,10 @@ module TTFunk
     end
 
     private
+
+    def pack_segments
+      @pack_segments ||= PackFormat.split(pack_format)
+    end
 
     def element_cache
       @element_cache ||= {}

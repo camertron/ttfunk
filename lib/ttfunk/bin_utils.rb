@@ -1,31 +1,5 @@
 module TTFunk
   module BinUtils
-    PACK_MAP = {
-      'A' => 1,
-      'C' => 1,
-      'n' => 2,
-      'N' => 4
-    }
-
-    def length_of(pack_format)
-      len = 0
-      last_format_char = nil
-
-      pack_format.each_char do |char|
-        if PACK_MAP.include?(char)
-          last_format_char = char
-          len += PACK_MAP[char]
-        elsif char == '*'
-          raise ArgumentError, "unbounded quantifiers (i.e. '*') are not supported."
-        else
-          # must be a numeric quantifier
-          len += (char.to_i - 1) * PACK_MAP[last_format_char]
-        end
-      end
-
-      len
-    end
-
     def pack_int(arr, bit_width)
       value = 0
 
