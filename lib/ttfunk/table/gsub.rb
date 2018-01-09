@@ -31,8 +31,11 @@ module TTFunk
         EncodedString.create do |result|
           result.write([gsub.major_version, gsub.minor_version], 'nn')
           result.add_placeholder(:gsub, gsub.script_list.id, position: result.length, length: 2)
+          result << "\0\0"
           result.add_placeholder(:gsub, gsub.feature_list.id, position: result.length, length: 2)
+          result << "\0\0"
           result.add_placeholder(:gsub, gsub.lookup_list.id, position: result.length, length: 2)
+          result << "\0\0"
 
           result.resolve_placeholders(:gsub, gsub.script_list.id, [result.length].pack('n'))
           result << gsub.script_list.encode

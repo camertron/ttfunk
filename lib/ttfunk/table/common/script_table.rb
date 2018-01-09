@@ -9,9 +9,24 @@ module TTFunk
           super(file, offset)
         end
 
+        def default_lang_sys_table
+          @default_lang_sys_table ||= if default_lang_sys_offset > 0
+            LangSysTable.new(
+              file, 'default', table_offset + default_lang_sys_offset
+            )
+          end
+        end
+
         def encode
           EncodedString.create do |result|
+            if default_lang_sys_table
+              result << ph(:common, default_lang_sys_table.id, length: 2)
+            else
+              result.write(0, 'n')
+            end
+
             result.write(lang_sys_tables.count, 'n')
+
             result << lang_sys_tables.encode do |lang_sys_table|
               [lang_sys_table.tag, ph(:common, lang_sys_table.id, length: 2)]
             end
@@ -19,6 +34,14 @@ module TTFunk
             lang_sys_tables.each do |lang_sys_table|
               result.resolve_placeholders(:common, lang_sys_table.id, [result.length].pack('n'))
               result << lang_sys_table.encode
+            end
+
+            if default_lang_sys_table
+              result.resolve_placeholders(
+                :common, default_lang_sys_table.id, [result.length].pack('n')
+              )
+
+              result << default_lang_sys_table.encode
             end
           end
         end

@@ -19,6 +19,7 @@ module TTFunk
         private
 
         def parse!
+          # lookup order is a reserved field and should always be null (0)
           @lookup_order, @required_feature_index, count = read(6, 'nnn')
           @feature_indices = Sequence.from(io, count, 'n')
           @length = 6 + feature_indices.length
