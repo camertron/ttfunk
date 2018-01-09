@@ -68,7 +68,7 @@ module TTFunk
         end
 
         def finalize(data)
-          if data.has_placeholder?(:gsub, coverage_table.id)
+          if data.has_placeholders?(:gsub, coverage_table.id)
             data.resolve_each(:gsub, coverage_table.id) do |placeholder|
               [data.length - placeholder.relative_to].pack('n')
             end

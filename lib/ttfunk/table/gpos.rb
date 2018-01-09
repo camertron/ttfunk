@@ -5,9 +5,9 @@ module TTFunk
     class Gpos < TTFunk::Table
       TAG = 'GPOS'.freeze
 
-      def self.encode
+      def self.encode(gpos)
         # @TODO
-        raw
+        gpos.raw
       end
 
       def tag

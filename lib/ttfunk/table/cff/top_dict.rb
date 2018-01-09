@@ -40,7 +40,7 @@ module TTFunk
               if pointer_operator?(operator)
                 result.add_placeholder(
                   :cff_top_dict, OPERATOR_CODES[operator],
-                  result.pos, POINTER_PLACEHOLDER_LENGTH
+                  position: result.pos, length: POINTER_PLACEHOLDER_LENGTH
                 )
 
                 result << POINTER_PLACEHOLDER

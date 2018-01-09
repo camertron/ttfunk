@@ -26,7 +26,6 @@ module TTFunk
           values.each_with_index do |value, idx|
             if value.is_a?(Placeholder)
               result << value
-              result << [0].pack(pack_segments[idx])
             else
               result << [value].pack(pack_segments[idx])
             end

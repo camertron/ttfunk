@@ -23,6 +23,10 @@ module TTFunk
           end
         end
 
+        def finalize(data)
+          tables.each { |table| table.finalize(data) }
+        end
+
         private
 
         def parse!

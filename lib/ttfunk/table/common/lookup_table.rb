@@ -27,6 +27,10 @@ module TTFunk
           end
         end
 
+        def finalize(data)
+          sub_tables.each { |sub_table| sub_table.finalize(data) }
+        end
+
         private
 
         def parse!

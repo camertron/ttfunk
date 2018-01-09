@@ -38,7 +38,7 @@ module TTFunk
       tables.keys.sort.each do |tag|
         data = tables[tag]
         newfont << [tag, checksum(data)].pack('A4N')
-        newfont.add_placeholder(:tables, tag, newfont.length, 4)
+        newfont.add_placeholder(:tables, tag, position: newfont.length, length: 4)
         newfont << [0, data.length].pack('N*')  # zero is fake offset to data
       end
 

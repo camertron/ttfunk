@@ -35,11 +35,11 @@ module TTFunk
     end
 
     def gpos_table
-      @gpos_table ||= TTFunk::Table::Gpos.encode(original)
+      @gpos_table ||= TTFunk::Table::Gpos.encode(original.glyph_positioning)
     end
 
     def gsub_table
-      @gsub_table ||= TTFunk::Table::Gsub.encode(original)
+      @gsub_table ||= TTFunk::Table::Gsub.encode(original.glyph_substitution)
     end
 
     def vorg_table

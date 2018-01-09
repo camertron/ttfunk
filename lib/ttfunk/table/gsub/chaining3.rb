@@ -38,17 +38,9 @@ module TTFunk
         end
 
         def finalize(data)
-          if data.has_placeholder?(:gsub, coverage_table.id)
-            data.resolve_each(:gsub, coverage_table.id) do |placeholder|
-              [data.length - placeholder.relative_to].pack('n')
-            end
-
-            data << coverage_table.encode
-          end
-
-          finalize_coverage_sequence(backtrack_coverage_tables)
-          finalize_coverage_sequence(input_coverage_tables)
-          finalize_coverage_sequence(lookahead_coverage_tables)
+          finalize_coverage_sequence(backtrack_coverage_tables, data)
+          finalize_coverage_sequence(input_coverage_tables, data)
+          finalize_coverage_sequence(lookahead_coverage_tables, data)
         end
 
         private
@@ -56,7 +48,7 @@ module TTFunk
         # @TODO: Move to base class? Other things need this functionality.
         def finalize_coverage_sequence(coverage_sequence, data)
           coverage_sequence.each do |coverage_table|
-            if data.has_placeholder?(:gsub, coverage_table.id)
+            if data.has_placeholders?(:gsub, coverage_table.id)
               data.resolve_each(:gsub, coverage_table.id) do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end

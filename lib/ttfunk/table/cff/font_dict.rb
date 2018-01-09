@@ -67,14 +67,14 @@ module TTFunk
           EncodedString.new.tap do |result|
             result.add_placeholder(
               :cff_font_dict, :"private_length_#{@table_offset}",
-              result.pos, PLACEHOLDER_LENGTH
+              position: result.pos, length: PLACEHOLDER_LENGTH
             )
 
             result << PLACEHOLDER
 
             result.add_placeholder(
               :cff_font_dict, :"private_offset_#{@table_offset}",
-              result.pos, PLACEHOLDER_LENGTH
+              position: result.pos, length: PLACEHOLDER_LENGTH
             )
 
             result << PLACEHOLDER

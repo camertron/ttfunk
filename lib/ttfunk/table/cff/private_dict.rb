@@ -73,7 +73,7 @@ module TTFunk
           EncodedString.new.tap do |result|
             result.add_placeholder(
               :cff_private_dict, :"subrs_#{@table_offset}",
-              result.pos, PLACEHOLDER_LENGTH
+              position: result.pos, length: PLACEHOLDER_LENGTH
             )
 
             result << PLACEHOLDER
