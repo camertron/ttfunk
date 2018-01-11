@@ -48,7 +48,7 @@ module TTFunk
           gsub.lookup_list.finalize(result)
 
           if gsub.feature_variation_list
-            result.resolve_placeholders(:gsub, gsub.lookup_list.id, [result.length].pack('N'))
+            result.resolve_placeholders(:gsub, gsub.feature_variation_list.id, [result.length].pack('N'))
             result << gsub.feature_variation_list.encode
           end
         end.string

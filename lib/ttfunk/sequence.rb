@@ -19,6 +19,8 @@ module TTFunk
     end
 
     def encode
+      return to_enum(__method__) unless block_given?
+
       EncodedString.new.tap do |result|
         each do |element|
           values = Array(block_given? ? yield(element) : element)

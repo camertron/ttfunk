@@ -25,7 +25,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, length: 2, relative_to: result.length)
+            result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
             result << ph(:gsub, class_def.id, length: 2)
             result.write(sub_class_sets.count, 'n')
             result << sub_class_sets.each do |sub_class_set|

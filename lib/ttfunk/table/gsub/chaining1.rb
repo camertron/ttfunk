@@ -21,7 +21,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, length: 2, relative_to: result.length)
+            result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
             result << chain_sub_rule_sets.encode do |chain_sub_rule_set|
               [ph(:gsub, chain_sub_rule_set.id, length: 2)]
             end

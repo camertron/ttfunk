@@ -17,7 +17,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, length: 2, relative_to: result.length)
+            result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
             result << sequences.encode do |sequence|
               [ph(:gsub, sequence.id, length: 2)]
             end

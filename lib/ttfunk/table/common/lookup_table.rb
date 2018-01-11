@@ -2,6 +2,8 @@ module TTFunk
   class Table
     module Common
       class LookupTable < TTFunk::SubTable
+        MARK_FILTERING_BIT_POS = 4
+
         attr_reader :sub_table_class_map
         attr_reader :lookup_type, :lookup_flag, :sub_tables, :mark_filtering_set
 
@@ -12,13 +14,13 @@ module TTFunk
 
         def encode
           EncodedString.create do |result|
-            result.write([lookup_type, lookup_flag, sub_tables.count], 'nnn')
+            result.write([lookup_type, lookup_flag.value, sub_tables.count], 'nnn')
 
             result << sub_tables.encode do |sub_table|
               [ph(:common, sub_table.id, length: 2)]
             end
 
-            result.write(mark_filtering_set, 'n')
+            result.write(mark_filtering_set, 'n') if mark_filtering_set
 
             sub_tables.each do |sub_table|
               result.resolve_placeholders(:common, sub_table.id, [result.length].pack('n'))
@@ -34,7 +36,8 @@ module TTFunk
         private
 
         def parse!
-          @lookup_type, @lookup_flag, count = read(6, 'nnn')
+          @lookup_type, lookup_flag_value, count = read(6, 'nnn')
+          @lookup_flag = BitField.new(lookup_flag_value)
 
           @sub_tables = Sequence.from(io, count, 'n') do |sub_table_offset|
             sub_table_class_map[lookup_type].create(
@@ -42,8 +45,11 @@ module TTFunk
             )
           end
 
-          @mark_filtering_set = read(2, 'n')
-          @length = 8 + sub_tables.length
+          if lookup_flag.on?(MARK_FILTERING_BIT_POS)
+            @mark_filtering_set = read(2, 'n')
+          end
+
+          @length = 6 + sub_tables.length + (mark_filtering_set ? 2 : 0)
         end
       end
     end

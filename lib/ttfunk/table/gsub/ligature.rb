@@ -25,7 +25,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, length: 2, relative_to: result.length)
+            result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
             result << ligature_sets.encode do |ligature_set|
               [ph(:gsub, ligature_set.id, length: 2)]
             end

@@ -42,7 +42,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
-            result << ph(:gsub, coverage_table.id, 2, relative_to: result.length)
+            result << ph(:gsub, coverage_table.id, 2, relative_to: 0)
             result << ph(:gsub, backtrack_class_def.id, 2)
             result << ph(:gsub, input_class_def.id, 2)
             result << ph(:gsub, lookahead_class_def.id, 2)

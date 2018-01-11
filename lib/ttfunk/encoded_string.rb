@@ -79,8 +79,9 @@ module TTFunk
           io.seek(placeholder.relative_to + placeholder.position)
         else
           io.seek(placeholder.position)
-          io.write(value[0..placeholder.length])
         end
+
+        io.write(value[0..placeholder.length])
       end
 
       placeholders[category].delete(name)
@@ -103,8 +104,9 @@ module TTFunk
           io.seek(placeholder.relative_to + placeholder.position)
         else
           io.seek(placeholder.position)
-          io.write(value[0..placeholder.length])
         end
+
+        io.write(value[0..placeholder.length])
       end
 
       placeholders[category].delete(name)

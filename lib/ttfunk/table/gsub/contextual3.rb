@@ -13,7 +13,7 @@ module TTFunk
             result.write([format, coverage_tables.count, subst_lookup_tables.count], 'nnn')
 
             coverage_tables.encode do |coverage_table|
-              [ph(:gsub, coverage_table.id, length: 2, relative_to: result.length)]
+              [ph(:gsub, coverage_table.id, length: 2, relative_to: 0)]
             end
 
             result << subst_lookup_tables.encode do |subst_lookup_table|

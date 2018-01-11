@@ -14,19 +14,19 @@ module TTFunk
             result.write([format, backtrack_coverage_tables.count], 'nn')
 
             result << backtrack_coverage_tables.encode do |backtrack_coverage_table|
-              [ph(:gsub, backtrack_coverage_table.id, length: 2, relative_to: result.length)]
+              [ph(:gsub, backtrack_coverage_table.id, length: 2, relative_to: 0)]
             end
 
             result.write(input_coverage_tables.count, 'n')
 
             result << input_coverage_tables.encode do |input_coverage_table|
-              [ph(:gsub, input_coverage_table.id, length: 2, relative_to: result.length)]
+              [ph(:gsub, input_coverage_table.id, length: 2, relative_to: 0)]
             end
 
             result.write(lookahead_coverage_tables.count, 'n')
 
             result << lookahead_coverage_tables.encode do |lookahead_coverage_table|
-              [ph(:gsub, lookahead_coverage_table.id, length: 2, relative_to: result.length)]
+              [ph(:gsub, lookahead_coverage_table.id, length: 2, relative_to: 0)]
             end
 
             result.write(subst_lookup_tables.count, 'n')
