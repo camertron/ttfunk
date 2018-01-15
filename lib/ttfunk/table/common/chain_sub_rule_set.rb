@@ -7,7 +7,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(chain_sub_rules.count, 'n')
-            result << chain_sub_rules.encode do |chain_sub_rule|
+            chain_sub_rules.encode_to(result) do |chain_sub_rule|
               [ph(:common, chain_sub_rule.id, length: 2)]
             end
 

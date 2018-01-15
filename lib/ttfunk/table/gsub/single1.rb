@@ -14,6 +14,10 @@ module TTFunk
           1
         end
 
+        def dependent_coverage_tables
+          [coverage_table]
+        end
+
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')

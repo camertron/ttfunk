@@ -7,7 +7,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write([ligature_glyph_id, component_glyph_ids.count + 1], 'nn')
-            result << component_glyph_ids.encode
+            component_glyph_ids.encode_to(result)
           end
         end
 

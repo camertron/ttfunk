@@ -14,6 +14,15 @@ module TTFunk
           )
         end
 
+        def dependent_coverage_tables
+          [coverage_table]
+        end
+
+        # @TODO never got implemented?
+        def max_context
+          0
+        end
+
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')

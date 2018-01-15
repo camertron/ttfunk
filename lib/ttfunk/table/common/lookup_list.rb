@@ -1,3 +1,5 @@
+require 'tsort'
+
 module TTFunk
   class Table
     module Common
@@ -11,12 +13,17 @@ module TTFunk
 
         def encode
           EncodedString.create do |result|
-            result.write(tables.count, 'n')
-            result << tables.encode do |table|
-              [ph(:common, table.id, length: 2)]
+            # result.write(tables.count, 'n')
+            num_to_encode = 45
+            result.write(num_to_encode, 'n')
+            counter = 0
+            tables.encode_to(result) do |table|
+              next if counter >= num_to_encode
+              [ph(:common, table.id, length: 2)].tap { counter += 1 }
             end
 
-            tables.each do |table|
+            tables.each.with_index do |table, idx|
+              next if idx >= num_to_encode
               result.resolve_placeholders(:common, table.id, [result.length].pack('n'))
               result << table.encode
             end
@@ -40,7 +47,7 @@ module TTFunk
             )
           end
 
-          @length = 2 + @tables.length
+          @length = 2 + tables.length
         end
       end
     end

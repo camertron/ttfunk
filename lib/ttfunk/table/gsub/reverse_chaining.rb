@@ -19,6 +19,10 @@ module TTFunk
           backtrack_coverage_offsets.count + lookahead_coverage_offsets.count
         end
 
+        def dependent_coverage_tables
+          [coverage_table] + backtrack_coverage_tables.to_a + lookahead_coverage_tables.to_a
+        end
+
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')

@@ -18,19 +18,15 @@ module TTFunk
       @reifier = reifier
     end
 
-    def encode
-      return to_enum(__method__) unless block_given?
+    def encode_to(str)
+      each do |element|
+        values = Array(block_given? ? yield(element) : element)
 
-      EncodedString.new.tap do |result|
-        each do |element|
-          values = Array(block_given? ? yield(element) : element)
-
-          values.each_with_index do |value, idx|
-            if value.is_a?(Placeholder)
-              result << value
-            else
-              result << [value].pack(pack_segments[idx])
-            end
+        values.each_with_index do |value, idx|
+          if value.is_a?(Placeholder)
+            str << value
+          else
+            str << [value].pack(pack_segments[idx])
           end
         end
       end

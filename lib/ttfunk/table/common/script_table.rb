@@ -27,7 +27,7 @@ module TTFunk
 
             result.write(lang_sys_tables.count, 'n')
 
-            result << lang_sys_tables.encode do |lang_sys_table|
+            lang_sys_tables.encode_to(result) do |lang_sys_table|
               [lang_sys_table.tag, ph(:common, lang_sys_table.id, length: 2)]
             end
 

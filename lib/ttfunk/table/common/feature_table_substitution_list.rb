@@ -7,7 +7,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write([major_version, minor_version, tables.count], 'nnn')
-            result << tables.encode do |table|
+            tables.encode_to(result) do |table|
               [
                 table.feature_table_index,
                 ph(:common, table.alternate_feature_table.id, length: 2)

@@ -9,29 +9,33 @@ module TTFunk
           input_coverage_tables.count + lookahead_coverage_tables.count
         end
 
+        def dependent_coverage_tables
+          backtrack_coverage_tables.to_a + input_coverage_tables.to_a + lookahead_coverage_tables.to_a
+        end
+
         def encode
           EncodedString.create do |result|
             result.write([format, backtrack_coverage_tables.count], 'nn')
 
-            result << backtrack_coverage_tables.encode do |backtrack_coverage_table|
+            backtrack_coverage_tables.encode_to(result) do |backtrack_coverage_table|
               [ph(:gsub, backtrack_coverage_table.id, length: 2, relative_to: 0)]
             end
 
             result.write(input_coverage_tables.count, 'n')
 
-            result << input_coverage_tables.encode do |input_coverage_table|
+            input_coverage_tables.encode_to(result) do |input_coverage_table|
               [ph(:gsub, input_coverage_table.id, length: 2, relative_to: 0)]
             end
 
             result.write(lookahead_coverage_tables.count, 'n')
 
-            result << lookahead_coverage_tables.encode do |lookahead_coverage_table|
+            lookahead_coverage_tables.encode_to(result) do |lookahead_coverage_table|
               [ph(:gsub, lookahead_coverage_table.id, length: 2, relative_to: 0)]
             end
 
             result.write(subst_lookup_tables.count, 'n')
 
-            result << subst_lookup_tables.encode do |subst_lookup_table|
+            subst_lookup_tables.encode_to(result) do |subst_lookup_table|
               [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
             end
           end

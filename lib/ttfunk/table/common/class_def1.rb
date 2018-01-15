@@ -6,8 +6,8 @@ module TTFunk
 
         def encode
           EncodedString.create do |result|
-            result.write([format, start_glyph_id, class_values.length], 'nnn')
-            result << class_values.encode
+            result.write([format, start_glyph_id, class_values.count], 'nnn')
+            class_values.encode_to(result)
           end
         end
 

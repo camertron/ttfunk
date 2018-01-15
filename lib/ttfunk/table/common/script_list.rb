@@ -7,7 +7,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(tables.count, 'n')
-            result << tables.encode do |table|
+            tables.encode_to(result) do |table|
               [table.tag, ph(:common, table.id, length: 2)]
             end
 

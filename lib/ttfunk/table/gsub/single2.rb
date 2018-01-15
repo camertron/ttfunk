@@ -14,12 +14,16 @@ module TTFunk
           1
         end
 
+        def dependent_coverage_tables
+          [coverage_table]
+        end
+
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
             result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
             result.write(glyph_ids.count, 'n')
-            result << glyph_ids.encode
+            glyph_ids.encode_to(result)
           end
         end
 

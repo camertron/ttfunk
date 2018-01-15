@@ -9,9 +9,9 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write([input_sequence.count, subst_lookup_tables.count], 'nn')
-            result << input_sequence.encode
+            input_sequence.encode_to(result)
             result.write(subst_lookup_tables.count, 'n')
-            result << subst_lookup_tables.encode do |subst_lookup_table|
+            subst_lookup_tables.encode_to(result) do |subst_lookup_table|
               [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
             end
           end

@@ -18,13 +18,17 @@ module TTFunk
           1
         end
 
+        def dependent_coverage_tables
+          [coverage_table]
+        end
+
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
             result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
             result.write(alternate_sets.count, 'n')
 
-            result << alternate_sets.encode do |alternate_set|
+            alternate_sets.encode_to(result) do |alternate_set|
               [ph(:gsub, alternate_set.id, length: 2)]
             end
 

@@ -12,7 +12,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write([lookup_order, required_feature_index, feature_indices.count], 'nnn')
-            result << feature_indices.encode
+            feature_indices.encode_to(result)
           end
         end
 

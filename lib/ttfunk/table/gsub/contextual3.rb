@@ -8,11 +8,15 @@ module TTFunk
           @coverage_tables.count
         end
 
+        def dependent_coverage_tables
+          coverage_tables
+        end
+
         def encode
           EncodedString.create do |result|
             result.write([format, coverage_tables.count, subst_lookup_tables.count], 'nnn')
 
-            coverage_tables.encode do |coverage_table|
+            result << coverage_tables.encode do |coverage_table|
               [ph(:gsub, coverage_table.id, length: 2, relative_to: 0)]
             end
 

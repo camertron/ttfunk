@@ -22,11 +22,16 @@ module TTFunk
           end.max
         end
 
+        def dependent_coverage_tables
+          [coverage_table]
+        end
+
         def encode
           EncodedString.create do |result|
             result.write(format, 'n')
             result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
-            result << ligature_sets.encode do |ligature_set|
+            result.write(ligature_sets.count, 'n')
+            ligature_sets.encode_to(result) do |ligature_set|
               [ph(:gsub, ligature_set.id, length: 2)]
             end
 

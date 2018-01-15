@@ -12,7 +12,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write([feature_params_offset, lookup_indices.count], 'nn')
-            result << lookup_indices.encode
+            lookup_indices.encode_to(result)
           end
         end
 

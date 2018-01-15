@@ -18,6 +18,10 @@ module TTFunk
           sub_table.max_context
         end
 
+        def dependent_coverage_tables
+          sub_table.dependent_coverage_tables
+        end
+
         def encode
           EncodedString.create do |result|
             result.write([format, extension_lookup_type], 'nn')

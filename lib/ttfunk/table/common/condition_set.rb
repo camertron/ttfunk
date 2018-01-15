@@ -7,7 +7,7 @@ module TTFunk
         def encode
           EncodedString.create do |result|
             result.write(conditions.count, 'n')
-            result << conditions.encode do |condition|
+            conditions.encode_to(result) do |condition|
               [ph(:common, condition.id, length: 2)]
             end
 

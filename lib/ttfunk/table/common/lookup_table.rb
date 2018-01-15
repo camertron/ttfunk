@@ -16,7 +16,7 @@ module TTFunk
           EncodedString.create do |result|
             result.write([lookup_type, lookup_flag.value, sub_tables.count], 'nnn')
 
-            result << sub_tables.encode do |sub_table|
+            sub_tables.encode_to(result) do |sub_table|
               [ph(:common, sub_table.id, length: 2)]
             end
 
@@ -46,7 +46,7 @@ module TTFunk
           end
 
           if lookup_flag.on?(MARK_FILTERING_BIT_POS)
-            @mark_filtering_set = read(2, 'n')
+            @mark_filtering_set = read(2, 'n').first
           end
 
           @length = 6 + sub_tables.length + (mark_filtering_set ? 2 : 0)
