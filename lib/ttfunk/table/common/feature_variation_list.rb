@@ -30,6 +30,10 @@ module TTFunk
           end
         end
 
+        def length
+          @length + sum(tables, &:length)
+        end
+
         private
 
         def parse!

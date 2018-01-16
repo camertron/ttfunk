@@ -54,6 +54,11 @@ module TTFunk
         end.string
       end
 
+      # @TODO: remove
+      # def calc_length
+      #   script_list.length + feature_list.length + lookup_list.length + lookup_list.tables.flat_map { |t| t.sub_tables.flat_map(&:dependent_coverage_tables) }.uniq { |t| t.id }.inject(0) { |ret, t| ret + t.length }
+      # end
+
       def tag
         TAG
       end

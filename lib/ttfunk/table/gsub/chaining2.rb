@@ -2,9 +2,15 @@ module TTFunk
   class Table
     class Gsub
       class Chaining2 < TTFunk::SubTable
+        attr_reader :lookup_type
         attr_reader :format, :coverage_offset, :backtrack_class_def_offset
         attr_reader :input_class_def_offset, :lookahead_class_def_offset
         attr_reader :chain_sub_class_sets
+
+        def initialize(file, offset, lookup_type)
+          @lookup_type = lookup_type
+          super(file, offset)
+        end
 
         def coverage_table
           @coverage_table ||= Common::CoverageTable.create(
@@ -79,6 +85,10 @@ module TTFunk
 
             data << coverage_table.encode
           end
+        end
+
+        def length
+          @length + sum(chain_sub_class_sets, &:length)
         end
 
         private

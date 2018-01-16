@@ -2,7 +2,12 @@ module TTFunk
   class Table
     class Gsub
       class Contextual3 < TTFunk::SubTable
-        attr_reader :coverage_tables, :subst_lookup_tables
+        attr_reader :lookup_type, :coverage_tables, :subst_lookup_tables
+
+        def initialize(file, offset, lookup_type)
+          @lookup_type = lookup_type
+          super(file, offset)
+        end
 
         def max_context
           @coverage_tables.count

@@ -2,10 +2,15 @@ module TTFunk
   class Table
     class Gsub
       class Alternate < TTFunk::SubTable
-        attr_reader :format, :coverage_offset, :alternate_sets
+        attr_reader :lookup_type, :format, :coverage_offset, :alternate_sets
 
-        def self.create(file, _parent_table, offset)
-          new(file, offset)
+        def self.create(file, _parent_table, offset, lookup_type)
+          new(file, offset, lookup_type)
+        end
+
+        def initialize(file, offset, lookup_type)
+          @lookup_type = lookup_type
+          super(file, offset)
         end
 
         def coverage_table
@@ -50,6 +55,10 @@ module TTFunk
 
             data << coverage_table.encode
           end
+        end
+
+        def length
+          @length + sum(alternate_sets, &:length)
         end
 
         private

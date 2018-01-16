@@ -46,6 +46,10 @@ module TTFunk
           end
         end
 
+        def length
+          @length + sum(lang_sys_tables, &:length)
+        end
+
         private
 
         def parse!

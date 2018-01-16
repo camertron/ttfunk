@@ -2,11 +2,16 @@ module TTFunk
   class Table
     class Gsub
       class Multiple < TTFunk::SubTable
-        def self.create(file, _parent_table, offset)
-          new(file, offset)
+        def self.create(file, _parent_table, offset, lookup_type)
+          new(file, offset, lookup_type)
         end
 
-        attr_reader :format, :coverage_offset, :sequences
+        attr_reader :lookup_type, :format, :coverage_offset, :sequences
+
+        def initialize(file, offset, lookup_type)
+          @lookup_type = lookup_type
+          super(file, offset)
+        end
 
         def coverage_table
           @coverage_table ||= Common::CoverageTable.create(
@@ -49,6 +54,10 @@ module TTFunk
 
             data << coverage_table.encode
           end
+        end
+
+        def length
+          @length + sum(sequences, &:length)
         end
 
         private

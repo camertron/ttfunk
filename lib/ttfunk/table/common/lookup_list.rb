@@ -1,5 +1,3 @@
-require 'tsort'
-
 module TTFunk
   class Table
     module Common
@@ -12,6 +10,7 @@ module TTFunk
         end
 
         def encode
+          # binding.pry
           EncodedString.create do |result|
             # result.write(tables.count, 'n')
             num_to_encode = 45
@@ -31,7 +30,44 @@ module TTFunk
         end
 
         def finalize(data)
+          # total_length = 0
+
+          # tables.each do |table|
+          #   needs_extension = false
+          #   sub_table_length = 0
+
+          #   table.sub_tables.each do |sub_table|
+          #     data.placeholders_for(:common, sub_table.id).each do |placeholder|
+          #       if (data.length - placeholder.relative_to) + total_length + sub_table_length >= (2 ** 16) - 1
+          #         needs_extension = true
+          #         break
+          #       end
+          #     end
+
+          #     break if needs_extension
+          #     sub_table_length += sub_table.length
+          #   end
+
+          #   if needs_extension
+          #     total_length += 8
+          #   else
+          #     total_length += sub_table_length
+          #   end
+
+          #   puts needs_extension
+          # end
+
+          # # handle coverage table overflows
+          # tables.each do |table|
+          #   table.sub_tables.each do |sub_table|
+          #   end
+          # end
+
           tables.each { |table| table.finalize(data) }
+        end
+
+        def length
+          @length + sum(tables, &:length)
         end
 
         private

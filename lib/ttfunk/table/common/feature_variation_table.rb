@@ -18,6 +18,10 @@ module TTFunk
             file, table_offset + feature_table_substitution_offset
           )
         end
+
+        def length
+          condition_set.length + feature_table_substitutions.length
+        end
       end
     end
   end

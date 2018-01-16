@@ -2,8 +2,14 @@ module TTFunk
   class Table
     class Gsub
       class Chaining3 < TTFunk::SubTable
+        attr_reader :lookup_type
         attr_reader :format, :backtrack_coverage_tables, :input_coverage_tables
         attr_reader :lookahead_coverage_tables, :subst_lookup_tables
+
+        def initialize(file, offset, lookup_type)
+          @lookup_type = lookup_type
+          super(file, offset)
+        end
 
         def max_context
           input_coverage_tables.count + lookahead_coverage_tables.count
@@ -45,6 +51,13 @@ module TTFunk
           finalize_coverage_sequence(backtrack_coverage_tables, data)
           finalize_coverage_sequence(input_coverage_tables, data)
           finalize_coverage_sequence(lookahead_coverage_tables, data)
+        end
+
+        def length
+          @length
+            + sum(backtrack_coverage_tables, &:length)
+            + sum(input_coverage_tables, &:length)
+            + sum(lookahead_coverage_tables, &:length)
         end
 
         private

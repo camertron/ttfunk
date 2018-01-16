@@ -21,6 +21,10 @@ module TTFunk
             file, table_offset + alternate_feature_table_offset
           )
         end
+
+        def length
+          6 + alternate_feature_table.length
+        end
       end
     end
   end

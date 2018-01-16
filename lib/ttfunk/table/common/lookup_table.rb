@@ -14,23 +14,34 @@ module TTFunk
 
         def encode
           EncodedString.create do |result|
-            result.write([lookup_type, lookup_flag.value, sub_tables.count], 'nnn')
+            result.write([Gsub::Extension::LOOKUP_TYPE, lookup_flag.value, sub_tables.count], 'nnn')
 
             sub_tables.encode_to(result) do |sub_table|
-              [ph(:common, sub_table.id, length: 2)]
+              [ph(:common, sub_table.id, length: 2, relative_to: 0)]
             end
 
             result.write(mark_filtering_set, 'n') if mark_filtering_set
-
-            sub_tables.each do |sub_table|
-              result.resolve_placeholders(:common, sub_table.id, [result.length].pack('n'))
-              result << sub_table.encode
-            end
           end
         end
 
         def finalize(data)
-          sub_tables.each { |sub_table| sub_table.finalize(data) }
+          sub_tables.each do |sub_table|
+            data.resolve_each(:common, sub_table.id) do |placeholder|
+              [data.length - placeholder.relative_to].pack('n')
+            end
+
+            # just wrap everything in a freaking extension table so we don't have to
+            # worry about super complicated overflow issues
+            data << Gsub::Extension.encode(sub_table)
+          end
+
+          sub_tables.each do |sub_table|
+            Gsub::Extension.finalize(sub_table, data)
+          end
+        end
+
+        def length
+          @length + sum(sub_tables, &:length)
         end
 
         private
@@ -41,7 +52,7 @@ module TTFunk
 
           @sub_tables = Sequence.from(io, count, 'n') do |sub_table_offset|
             sub_table_class_map[lookup_type].create(
-              file, self, table_offset + sub_table_offset
+              file, self, table_offset + sub_table_offset, lookup_type
             )
           end
 

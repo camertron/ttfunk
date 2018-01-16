@@ -21,6 +21,10 @@ module TTFunk
           end
         end
 
+        def length
+          @length + sum(range_tables, &:length)
+        end
+
         private
 
         def parse!

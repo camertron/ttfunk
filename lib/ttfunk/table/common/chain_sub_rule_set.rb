@@ -21,6 +21,10 @@ module TTFunk
           end
         end
 
+        def length
+          @length + sum(chain_sub_rules, &:length)
+        end
+
         private
 
         def parse!

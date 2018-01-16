@@ -2,7 +2,12 @@ module TTFunk
   class Table
     class Gsub
       class Contextual1 < TTFunk::SubTable
-        attr_reader :format, :coverage_offset, :sub_rule_sets
+        attr_reader :lookup_type, :format, :coverage_offset, :sub_rule_sets
+
+        def initialize(file, offset, lookup_type)
+          @lookup_type = lookup_type
+          super(file, offset)
+        end
 
         def coverage_table
           @coverage_table ||= Common::CoverageTable.create(
@@ -48,6 +53,10 @@ module TTFunk
 
             data << coverage_table.encode
           end
+        end
+
+        def length
+          @length + sum(sub_rule_sets, &:length)
         end
 
         private

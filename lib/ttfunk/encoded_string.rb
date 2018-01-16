@@ -128,6 +128,10 @@ module TTFunk
       end
     end
 
+    def placeholders_for(category, name)
+      placeholders.fetch(category, {}).fetch(name, [])
+    end
+
     def placeholders
       @placeholders ||= Hash.new { |h, k| h[k] = Hash.new { |h, k| h[k] = [] } }
     end

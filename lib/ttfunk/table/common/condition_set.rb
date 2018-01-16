@@ -21,6 +21,10 @@ module TTFunk
           end
         end
 
+        def length
+          @length + sum(conditions, &:length)
+        end
+
         private
 
         def parse!

@@ -2,7 +2,12 @@ module TTFunk
   class Table
     class Gsub
       class Single1 < TTFunk::SubTable
-        attr_reader :format, :coverage_offset, :delta_glyph_id
+        attr_reader :lookup_type, :format, :coverage_offset, :delta_glyph_id
+
+        def initialize(file, offset, lookup_type)
+          @lookup_type = lookup_type
+          super(file, offset)
+        end
 
         def coverage_table
           @coverage_table ||= Common::CoverageTable.create(

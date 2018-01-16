@@ -9,7 +9,8 @@ module TTFunk
           4 => Gsub::Ligature,
           5 => Gsub::Contextual,
           6 => Gsub::Chaining,
-          7 => Gsub::Extension
+          7 => Gsub::Extension,
+          8 => Gsub::ReverseChaining
         }
       end
     end
