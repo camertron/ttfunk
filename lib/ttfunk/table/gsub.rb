@@ -3,23 +3,25 @@ require_relative '../table'
 module TTFunk
   class Table
     class Gsub < TTFunk::Table
-      autoload :Alternate,       'ttfunk/table/gsub/alternate'
-      autoload :Chaining,        'ttfunk/table/gsub/chaining'
-      autoload :Chaining1,       'ttfunk/table/gsub/chaining1'
-      autoload :Chaining2,       'ttfunk/table/gsub/chaining2'
-      autoload :Chaining3,       'ttfunk/table/gsub/chaining3'
-      autoload :Contextual,      'ttfunk/table/gsub/contextual'
-      autoload :Contextual1,     'ttfunk/table/gsub/contextual1'
-      autoload :Contextual2,     'ttfunk/table/gsub/contextual2'
-      autoload :Contextual3,     'ttfunk/table/gsub/contextual3'
-      autoload :Extension,       'ttfunk/table/gsub/extension'
-      autoload :Ligature,        'ttfunk/table/gsub/ligature'
-      autoload :LookupTable,     'ttfunk/table/gsub/lookup_table'
-      autoload :Multiple,        'ttfunk/table/gsub/multiple'
-      autoload :ReverseChaining, 'ttfunk/table/gsub/reverse_chaining'
-      autoload :Single,          'ttfunk/table/gsub/single'
-      autoload :Single1,         'ttfunk/table/gsub/single1'
-      autoload :Single2,         'ttfunk/table/gsub/single2'
+      autoload :AlternateSet,      'ttfunk/table/gsub/alternate_set'
+      autoload :ChainSubClassSet,  'ttfunk/table/gsub/chain_sub_class_set'
+      autoload :ChainSubRuleSet,   'ttfunk/table/gsub/chain_sub_rule_set'
+      autoload :ChainSubRuleTable, 'ttfunk/table/gsub/chain_sub_rule_table'
+      autoload :ClassDef,          'ttfunk/table/gsub/class_def'
+      autoload :ClassDef1,         'ttfunk/table/gsub/class_def1'
+      autoload :ClassDef2,         'ttfunk/table/gsub/class_def2'
+      autoload :ClassRangeTable,   'ttfunk/table/gsub/class_range_table'
+      autoload :ConditionSet,      'ttfunk/table/gsub/condition_set'
+      autoload :ConditionTable,    'ttfunk/table/gsub/condition_table'
+      autoload :LigatureSet,       'ttfunk/table/gsub/ligature_set'
+      autoload :LigatureTable,     'ttfunk/table/gsub/ligature_table'
+      autoload :Lookup,            'ttfunk/table/gsub/lookup'
+      autoload :SequenceTable,     'ttfunk/table/gsub/sequence_table'
+      autoload :SubClassRule,      'ttfunk/table/gsub/sub_class_rule'
+      autoload :SubClassSet,       'ttfunk/table/gsub/sub_class_set'
+      autoload :SubRule,           'ttfunk/table/gsub/sub_rule'
+      autoload :SubRuleSet,        'ttfunk/table/gsub/sub_rule_set'
+      autoload :SubstLookupTable,  'ttfunk/table/gsub/subst_lookup_table'
 
       TAG = 'GSUB'.freeze
 
@@ -54,11 +56,6 @@ module TTFunk
         end.string
       end
 
-      # @TODO: remove
-      # def calc_length
-      #   script_list.length + feature_list.length + lookup_list.length + lookup_list.tables.flat_map { |t| t.sub_tables.flat_map(&:dependent_coverage_tables) }.uniq { |t| t.id }.inject(0) { |ret, t| ret + t.length }
-      # end
-
       def tag
         TAG
       end
@@ -72,7 +69,7 @@ module TTFunk
       end
 
       def lookup_list
-        @lookup_list ||= Common::LookupList.new(file, offset + lookup_list_offset, Gsub::LookupTable)
+        @lookup_list ||= Common::LookupList.new(file, offset + lookup_list_offset, Gsub::Lookup::LookupTable)
       end
 
       def feature_variation_list

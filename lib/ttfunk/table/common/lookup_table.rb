@@ -4,17 +4,17 @@ module TTFunk
       class LookupTable < TTFunk::SubTable
         MARK_FILTERING_BIT_POS = 4
 
-        attr_reader :sub_table_class_map
+        attr_reader :lookup_table_class
         attr_reader :lookup_type, :lookup_flag, :sub_tables, :mark_filtering_set
 
-        def initialize(file, offset, sub_table_class_map)
-          @sub_table_class_map = sub_table_class_map
+        def initialize(file, offset, lookup_table_class)
+          @lookup_table_class = lookup_table_class
           super(file, offset)
         end
 
         def encode
           EncodedString.create do |result|
-            result.write([Gsub::Extension::LOOKUP_TYPE, lookup_flag.value, sub_tables.count], 'nnn')
+            result.write([lookup_table_class::EXTENSION_LOOKUP_TYPE, lookup_flag.value, sub_tables.count], 'nnn')
 
             sub_tables.encode_to(result) do |sub_table|
               [ph(:common, sub_table.id, length: 2, relative_to: 0)]
@@ -32,13 +32,13 @@ module TTFunk
 
             # just wrap everything in a freaking extension table so we don't have to
             # worry about super complicated overflow issues
-            data << Gsub::Extension.encode(sub_table)
+            data << lookup_table_class::EXTENSION_CLASS.encode(sub_table)
           end
         end
 
         def finalize_sub_tables(data)
           sub_tables.each do |sub_table|
-            Gsub::Extension.finalize(sub_table, data)
+            lookup_table_class::EXTENSION_CLASS.finalize(sub_table, data)
           end
         end
 
@@ -53,7 +53,7 @@ module TTFunk
           @lookup_flag = BitField.new(lookup_flag_value)
 
           @sub_tables = Sequence.from(io, count, 'n') do |sub_table_offset|
-            sub_table_class_map[lookup_type].create(
+            lookup_table_class::SUB_TABLE_MAP[lookup_type].create(
               file, self, table_offset + sub_table_offset, lookup_type
             )
           end
