@@ -14,7 +14,6 @@ module TTFunk
             EncodedString.create do |result|
               result.write([FORMAT, sub_table.lookup_type], 'nn')
               result << Placeholder.new(:common, sub_table.id, length: 4, relative_to: 0)
-              # result.write(result.length + 4, 'N')  # no need for a placeholder here
             end
           end
 

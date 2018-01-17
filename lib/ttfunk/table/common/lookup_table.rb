@@ -34,7 +34,9 @@ module TTFunk
             # worry about super complicated overflow issues
             data << Gsub::Extension.encode(sub_table)
           end
+        end
 
+        def finalize_sub_tables(data)
           sub_tables.each do |sub_table|
             Gsub::Extension.finalize(sub_table, data)
           end

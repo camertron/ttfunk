@@ -12,17 +12,17 @@ module TTFunk
         def encode
           # binding.pry
           EncodedString.create do |result|
-            # result.write(tables.count, 'n')
-            num_to_encode = 45
-            result.write(num_to_encode, 'n')
-            counter = 0
+            result.write(tables.count, 'n')
+            # num_to_encode = 54
+            # result.write(num_to_encode, 'n')
+            # counter = 0
             tables.encode_to(result) do |table|
-              next if counter >= num_to_encode
-              [ph(:common, table.id, length: 2)].tap { counter += 1 }
+              # next if counter >= num_to_encode
+              [ph(:common, table.id, length: 2)] #.tap { counter += 1 }
             end
 
             tables.each.with_index do |table, idx|
-              next if idx >= num_to_encode
+              # next if idx >= num_to_encode
               result.resolve_placeholders(:common, table.id, [result.length].pack('n'))
               result << table.encode
             end
@@ -64,6 +64,7 @@ module TTFunk
           # end
 
           tables.each { |table| table.finalize(data) }
+          tables.each { |table| table.finalize_sub_tables(data) }
         end
 
         def length
