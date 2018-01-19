@@ -6,6 +6,7 @@ module TTFunk
         autoload :LookupTable,     'ttfunk/table/gpos/lookup/lookup_table'
         autoload :MarkToBase,      'ttfunk/table/gpos/lookup/mark_to_base'
         autoload :MarkToLigature,  'ttfunk/table/gpos/lookup/mark_to_ligature'
+        autoload :MarkToMark,      'ttfunk/table/gpos/lookup/mark_to_mark'
         autoload :PairAdjustment,  'ttfunk/table/gpos/lookup/pair_adjustment'
         autoload :PairAdjustment1, 'ttfunk/table/gpos/lookup/pair_adjustment1'
         autoload :PairAdjustment2, 'ttfunk/table/gpos/lookup/pair_adjustment2'

@@ -14,7 +14,7 @@ module TTFunk
 
         def parse!
           @ligature_anchor_offsets = Sequence.from(io, mark_class_count, 'n') do |lig_anchor_offset|
-            CompoentTable.new(file, lig_attach_offset + lig_anchor_offset)
+            ComponentTable.new(file, lig_attach_offset + lig_anchor_offset)
           end
 
           @length = ligature_anchor_offsets.length
