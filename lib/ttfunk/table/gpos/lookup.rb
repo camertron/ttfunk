@@ -2,6 +2,9 @@ module TTFunk
   class Table
     class Gpos
       module Lookup
+        autoload :Contextual,      'ttfunk/table/gpos/lookup/contextual'
+        autoload :Contextual2,     'ttfunk/table/gpos/lookup/contextual2'
+        autoload :Contextual3,     'ttfunk/table/gpos/lookup/contextual3'
         autoload :Cursive,         'ttfunk/table/gpos/lookup/cursive'
         autoload :LookupTable,     'ttfunk/table/gpos/lookup/lookup_table'
         autoload :MarkToBase,      'ttfunk/table/gpos/lookup/mark_to_base'

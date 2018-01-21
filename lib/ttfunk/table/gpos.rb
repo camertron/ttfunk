@@ -20,6 +20,11 @@ module TTFunk
       autoload :Mark2Table,          'ttfunk/table/gpos/mark2_table'
       autoload :PairSet,             'ttfunk/table/gpos/pair_set'
       autoload :PairValueTable,      'ttfunk/table/gpos/pair_value_table'
+      autoload :PosClassRule,        'ttfunk/table/gpos/pos_class_rule'
+      autoload :PosClassSet,         'ttfunk/table/gpos/pos_class_set'
+      autoload :PosLookupTable,      'ttfunk/table/gpos/pos_lookup_table'
+      autoload :PosRule,             'ttfunk/table/gpos/pos_rule'
+      autoload :PosRuleSet,          'ttfunk/table/gpos/pos_rule_set'
       autoload :ValueTable,          'ttfunk/table/gpos/value_table'
 
       TAG = 'GPOS'.freeze

@@ -10,6 +10,7 @@ module TTFunk
             4 => MarkToBase,
             5 => MarkToLigature,
             6 => MarkToMark,
+            7 => Contextual,
           }
 
           # @TODO
