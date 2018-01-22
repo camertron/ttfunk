@@ -12,6 +12,7 @@ module TTFunk
       autoload :ChainPosClassSet,    'ttfunk/table/gpos/chain_pos_class_set'
       autoload :ChainPosRule,        'ttfunk/table/gpos/chain_pos_rule'
       autoload :ChainPosRuleSet,     'ttfunk/table/gpos/chain_pos_rule_set'
+      autoload :Class2,              'ttfunk/table/gpos/class2'
       autoload :ComponentTable,      'ttfunk/table/gpos/component_table'
       autoload :BaseArray,           'ttfunk/table/gpos/base_array'
       autoload :BaseTable,           'ttfunk/table/gpos/base_table'
@@ -39,13 +40,12 @@ module TTFunk
         TAG
       end
 
-      def self.encode(gpos)
-        gpos.raw
+      def lookup_table
+        LOOKUP_TABLE
       end
 
-      private
-
-      def parse!
+      def self.encode(gpos)
+        gpos.raw
       end
     end
   end
