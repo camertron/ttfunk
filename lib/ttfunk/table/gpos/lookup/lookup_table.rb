@@ -12,6 +12,7 @@ module TTFunk
             6 => MarkToMark,
             7 => Contextual,
             8 => Chaining,
+            9 => Extension
           }
 
           # @TODO

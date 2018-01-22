@@ -10,6 +10,7 @@ module TTFunk
         autoload :Contextual2,     'ttfunk/table/gpos/lookup/contextual2'
         autoload :Contextual3,     'ttfunk/table/gpos/lookup/contextual3'
         autoload :Cursive,         'ttfunk/table/gpos/lookup/cursive'
+        autoload :Extension,       'ttfunk/table/gpos/lookup/extension'
         autoload :LookupTable,     'ttfunk/table/gpos/lookup/lookup_table'
         autoload :MarkToBase,      'ttfunk/table/gpos/lookup/mark_to_base'
         autoload :MarkToLigature,  'ttfunk/table/gpos/lookup/mark_to_ligature'
