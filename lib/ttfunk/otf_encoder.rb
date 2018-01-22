@@ -48,8 +48,6 @@ module TTFunk
 
     def tables
       @tables ||= super.tap do |tb|
-        tb['GPOS'] = gpos_table
-        tb['GSUB'] = gsub_table
         tb['BASE'] = base_table
         tb['DSIG'] = dsig_table
         tb['VORG'] = vorg_table

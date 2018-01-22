@@ -13,7 +13,7 @@ module TTFunk
             @format, @coverage_offset, count = read(6, 'nnn')
 
             @chain_pos_rule_sets = Sequence.from(io, count, 'n') do |chain_pos_rule_set_offset|
-              ChainPosRuleSet.new(table_offset + chain_pos_rule_set_offset)
+              ChainPosRuleSet.new(file, table_offset + chain_pos_rule_set_offset)
             end
 
             @length = 6 + chain_pos_rule_sets.length

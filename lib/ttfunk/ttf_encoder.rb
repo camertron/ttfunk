@@ -167,6 +167,14 @@ module TTFunk
       end
     end
 
+    def gpos_table
+      @gpos_table ||= TTFunk::Table::Gpos.encode(original.glyph_positioning)
+    end
+
+    def gsub_table
+      @gsub_table ||= TTFunk::Table::Gsub.encode(original.glyph_substitution)
+    end
+
     def tables
       @tables ||= {
         'cmap' => cmap_table[:table],
@@ -182,7 +190,9 @@ module TTFunk
         'head' => head_table,
         'prep' => prep_table,
         'fpgm' => fpgm_table,
-        'cvt ' => cvt_table
+        'cvt ' => cvt_table,
+        'GPOS' => gpos_table,
+        'GSUB' => gsub_table
       }.reject { |_tag, table| table.nil? }
     end
 

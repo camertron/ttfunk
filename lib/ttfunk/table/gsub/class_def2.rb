@@ -28,10 +28,10 @@ module TTFunk
         private
 
         def parse!
-          @format, count = read(4, 'n')
+          @format, count = read(4, 'nn')
 
-          @class_range_tables = Sequence.new(io, count, 'n') do |class_range_offset|
-            ClassRangeTable.new(table_offset + class_range_offset)
+          @class_range_tables = Sequence.from(io, count, 'n') do |class_range_offset|
+            ClassRangeTable.new(file, table_offset + class_range_offset)
           end
 
           @length = 4 + class_range_tables.length

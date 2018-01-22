@@ -6,7 +6,8 @@ module TTFunk
           include Common::CoverageTableMixin
 
           attr_reader :lookup_type
-          attr_reader :format, :coverage_offset, :class_def_offset, :sub_class_sets
+          attr_reader :format, :coverage_offset, :class_def_offset
+          attr_reader :sub_class_sets
 
           def initialize(file, offset, lookup_type)
             @lookup_type = lookup_type
@@ -14,7 +15,7 @@ module TTFunk
           end
 
           def class_def
-            @class_def ||= Gsub::ClassDef.create(self, class_def_offset)
+            @class_def ||= Gsub::ClassDef.create(self, table_offset + class_def_offset)
           end
 
           def max_context
@@ -38,6 +39,12 @@ module TTFunk
               result << sub_class_sets.each do |sub_class_set|
                 [ph(:gsub, sub_class_set.id, length: 2)]
               end
+
+              result.resolve_placeholders(
+                :gsub, class_def.id, [result.length].pack('n')
+              )
+
+              result << class_def.encode
 
               sub_class_sets.each do |sub_class_set|
                 result.resolve_placeholders(

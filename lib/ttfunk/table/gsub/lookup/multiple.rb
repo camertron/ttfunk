@@ -28,7 +28,7 @@ module TTFunk
             EncodedString.create do |result|
               result.write(format, 'n')
               result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
-              result << sequences.encode do |sequence|
+              result << sequences.encode_to(result) do |sequence|
                 [ph(:gsub, sequence.id, length: 2)]
               end
 
@@ -59,7 +59,7 @@ module TTFunk
           private
 
           def parse!
-            @format, @coverage_offset, count = read(6, 'n')
+            @format, @coverage_offset, count = read(6, 'nnn')
 
             @sequences = Sequence.from(io, count, 'n') do |sequence_table_offset|
               Gsub::SequenceTable.new(file, table_offset + sequence_table_offset)

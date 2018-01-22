@@ -28,10 +28,10 @@ module TTFunk
         private
 
         def parse!
-          count = read(2, 'n')
+          count = read(2, 'n').first
 
           @sub_class_rules = Sequence.from(io, count, 'n') do |sub_class_rule_offset|
-            SubClassRule.new(table_offset + sub_class_rule_offset)
+            SubClassRule.new(file, table_offset + sub_class_rule_offset)
           end
 
           @length = 2 + sub_class_rules.length

@@ -11,7 +11,7 @@ module TTFunk
               [ph(:gsub, chain_sub_rule.id, length: 2)]
             end
 
-            chain_sub_rule.each do |chain_sub_rule|
+            chain_sub_rules.each do |chain_sub_rule|
               result.resolve_placeholders(
                 :gsub, chain_sub_rule.id, [result.length].pack('n')
               )

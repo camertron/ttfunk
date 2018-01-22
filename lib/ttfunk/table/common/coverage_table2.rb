@@ -8,7 +8,7 @@ module TTFunk
           EncodedString.create do |result|
             result.write([format, range_tables.count], 'nn')
             range_tables.encode_to(result) do |range_table|
-              [ph(:common, range_table.id, length: 2, relative_to: 0)]
+              [ph(:common, range_table.id, length: 2)]
             end
 
             range_tables.each do |range_table|
