@@ -2,6 +2,10 @@ module TTFunk
   class Table
     class Gpos
       module Lookup
+        autoload :Chaining,        'ttfunk/table/gpos/lookup/chaining'
+        autoload :Chaining1,       'ttfunk/table/gpos/lookup/chaining1'
+        autoload :Chaining2,       'ttfunk/table/gpos/lookup/chaining2'
+        autoload :Chaining3,       'ttfunk/table/gpos/lookup/chaining3'
         autoload :Contextual,      'ttfunk/table/gpos/lookup/contextual'
         autoload :Contextual2,     'ttfunk/table/gpos/lookup/contextual2'
         autoload :Contextual3,     'ttfunk/table/gpos/lookup/contextual3'

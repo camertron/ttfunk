@@ -11,6 +11,7 @@ module TTFunk
             5 => MarkToLigature,
             6 => MarkToMark,
             7 => Contextual,
+            8 => Chaining,
           }
 
           # @TODO
