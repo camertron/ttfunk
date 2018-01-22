@@ -3,6 +3,8 @@ module TTFunk
     class Gsub
       module Lookup
         class Alternate < TTFunk::SubTable
+          include Common::CoverageTableMixin
+
           attr_reader :lookup_type, :format, :coverage_offset, :alternate_sets
 
           def self.create(file, _parent_table, offset, lookup_type)
@@ -12,12 +14,6 @@ module TTFunk
           def initialize(file, offset, lookup_type)
             @lookup_type = lookup_type
             super(file, offset)
-          end
-
-          def coverage_table
-            @coverage_table ||= Common::CoverageTable.create(
-              file, self, table_offset + coverage_offset
-            )
           end
 
           def max_context

@@ -3,6 +3,8 @@ module TTFunk
     class Gpos
       module Lookup
         class PairAdjustment1 < TTFunk::SubTable
+          include Common::CoverageTableMixin
+
           attr_reader :format, :coverage_offset, :value_format1, :value_format2
           attr_reader :pair_sets
 

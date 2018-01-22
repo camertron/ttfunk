@@ -1,4 +1,5 @@
 require_relative './layout'
+require_relative './common'
 
 module TTFunk
   class Table
@@ -36,6 +37,15 @@ module TTFunk
 
       def tag
         TAG
+      end
+
+      def self.encode(gpos)
+        gpos.raw
+      end
+
+      private
+
+      def parse!
       end
     end
   end

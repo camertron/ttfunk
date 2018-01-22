@@ -15,9 +15,8 @@ module TTFunk
             9 => Extension
           }
 
-          # @TODO
-          # EXTENSION_LOOKUP_TYPE = Extension::LOOKUP_TYPE
-          # EXTENSION_CLASS = SUB_TABLE_MAP[EXTENSION_LOOKUP_TYPE]
+          EXTENSION_LOOKUP_TYPE = Extension::LOOKUP_TYPE
+          EXTENSION_CLASS = SUB_TABLE_MAP[EXTENSION_LOOKUP_TYPE]
         end
       end
     end

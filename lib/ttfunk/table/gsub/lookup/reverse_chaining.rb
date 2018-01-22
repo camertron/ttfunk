@@ -3,6 +3,8 @@ module TTFunk
     class Gsub
       module Lookup
         class ReverseChaining < TTFunk::SubTable
+          include Common::CoverageTableMixin
+
           def self.create(file, _parent_table, offset, lookup_type)
             new(file, offset, lookup_type)
           end
@@ -14,12 +16,6 @@ module TTFunk
           def initialize(file, offset, lookup_type)
             @lookup_type = lookup_type
             super(file, offset)
-          end
-
-          def coverage_table
-            @coverage_table ||= Common::CoverageTable.create(
-              file, self, table_offset + coverage_offset
-            )
           end
 
           def max_context

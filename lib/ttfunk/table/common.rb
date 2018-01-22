@@ -4,6 +4,7 @@ module TTFunk
       autoload :CoverageTable,                 'ttfunk/table/common/coverage_table'
       autoload :CoverageTable1,                'ttfunk/table/common/coverage_table1'
       autoload :CoverageTable2,                'ttfunk/table/common/coverage_table2'
+      autoload :CoverageTableMixin,            'ttfunk/table/common/coverage_table_mixin'
       autoload :FeatureList,                   'ttfunk/table/common/feature_list'
       autoload :FeatureTable,                  'ttfunk/table/common/feature_table'
       autoload :FeatureTableSubstitutionList,  'ttfunk/table/common/feature_table_substitution_list'

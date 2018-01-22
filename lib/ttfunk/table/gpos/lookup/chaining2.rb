@@ -3,6 +3,8 @@ module TTFunk
     class Gpos
       module Lookup
         class Chaining2 < TTFunk::SubTable
+          include Common::CoverageTableMixin
+
           attr_reader :format, :coverage_offset, :backtrack_class_def_offset
           attr_reader :input_class_def_offset, :lookahead_class_def_offset
           attr_reader :chain_pos_class_sets

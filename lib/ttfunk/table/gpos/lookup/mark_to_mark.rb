@@ -3,6 +3,10 @@ module TTFunk
     class Gpos
       module Lookup
         class MarkToMark < TTFunk::SubTable
+          attr_reader :mark1_coverage_offset, :mark2_coverage_offset
+          attr_reader :mark_class_count, :mark1_array_offset
+          attr_reader :mark2_array_offset
+
           private
 
           def parse!

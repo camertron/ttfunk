@@ -7,6 +7,7 @@ module TTFunk
         autoload :Chaining2,       'ttfunk/table/gpos/lookup/chaining2'
         autoload :Chaining3,       'ttfunk/table/gpos/lookup/chaining3'
         autoload :Contextual,      'ttfunk/table/gpos/lookup/contextual'
+        autoload :Contextual1,     'ttfunk/table/gpos/lookup/contextual1'
         autoload :Contextual2,     'ttfunk/table/gpos/lookup/contextual2'
         autoload :Contextual3,     'ttfunk/table/gpos/lookup/contextual3'
         autoload :Cursive,         'ttfunk/table/gpos/lookup/cursive'

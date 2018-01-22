@@ -3,18 +3,14 @@ module TTFunk
     class Gsub
       module Lookup
         class Contextual2 < TTFunk::SubTable
+          include Common::CoverageTableMixin
+
           attr_reader :lookup_type
           attr_reader :format, :coverage_offset, :class_def_offset, :sub_class_sets
 
           def initialize(file, offset, lookup_type)
             @lookup_type = lookup_type
             super(file, offset)
-          end
-
-          def coverage_table
-            @coverage_table ||= Gsub::CoverageTable.create(
-              file, self, table_offset + coverage_offset
-            )
           end
 
           def class_def

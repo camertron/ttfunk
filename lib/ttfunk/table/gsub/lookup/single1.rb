@@ -3,17 +3,13 @@ module TTFunk
     class Gsub
       module Lookup
         class Single1 < TTFunk::SubTable
+          include Common::CoverageTableMixin
+
           attr_reader :lookup_type, :format, :coverage_offset, :delta_glyph_id
 
           def initialize(file, offset, lookup_type)
             @lookup_type = lookup_type
             super(file, offset)
-          end
-
-          def coverage_table
-            @coverage_table ||= Common::CoverageTable.create(
-              file, self, table_offset + coverage_offset
-            )
           end
 
           def max_context

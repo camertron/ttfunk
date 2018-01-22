@@ -3,7 +3,10 @@ module TTFunk
     class Gpos
       module Lookup
         class Contextual2 < TTFunk::SubTable
-          attr_reader :format, :coverage_offset, :class_def_offset, :pos_class_sets
+          include Common::CoverageTableMixin
+
+          attr_reader :format, :coverage_offset, :class_def_offset
+          attr_reader :pos_class_sets
 
           private
 

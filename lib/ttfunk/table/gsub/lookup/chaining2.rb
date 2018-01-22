@@ -3,6 +3,8 @@ module TTFunk
     class Gsub
       module Lookup
         class Chaining2 < TTFunk::SubTable
+          include Common::CoverageTableMixin
+
           attr_reader :lookup_type
           attr_reader :format, :coverage_offset, :backtrack_class_def_offset
           attr_reader :input_class_def_offset, :lookahead_class_def_offset
@@ -11,12 +13,6 @@ module TTFunk
           def initialize(file, offset, lookup_type)
             @lookup_type = lookup_type
             super(file, offset)
-          end
-
-          def coverage_table
-            @coverage_table ||= Common::CoverageTable.create(
-              file, self, table_offset + coverage_offset
-            )
           end
 
           def backtrack_class_def

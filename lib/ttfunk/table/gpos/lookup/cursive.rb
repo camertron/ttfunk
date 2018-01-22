@@ -3,6 +3,8 @@ module TTFunk
     class Gpos
       module Lookup
         class Cursive < TTFunk::SubTable
+          include Common::CoverageTableMixin
+
           attr_reader :format, :coverage_offset, :entry_exits
 
           private
