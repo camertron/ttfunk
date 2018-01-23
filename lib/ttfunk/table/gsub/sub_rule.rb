@@ -8,9 +8,8 @@ module TTFunk
 
         def encode
           EncodedString.create do |result|
-            result.write([input_sequence.count, subst_lookup_tables.count], 'nn')
+            result.write([input_sequence.count + 1, subst_lookup_tables.count], 'nn')
             input_sequence.encode_to(result)
-            result.write(subst_lookup_tables.count, 'n')
             subst_lookup_tables.encode_to(result) do |subst_lookup_table|
               [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
             end
