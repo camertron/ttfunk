@@ -15,7 +15,7 @@ module TTFunk
 
         def parse!
           @format, @start_glyph_id, count = read(6, 'nnn')
-          @class_values = Sequence.new(io, count, 'n')
+          @class_values = Sequence.from(io, count, 'n')
           @length = 6 + class_values.length
         end
       end

@@ -28,6 +28,7 @@ module TTFunk
             EncodedString.create do |result|
               result.write(format, 'n')
               result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
+              result.write(sequences.count, 'n')
               result << sequences.encode_to(result) do |sequence|
                 [ph(:gsub, sequence.id, length: 2)]
               end

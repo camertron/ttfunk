@@ -54,7 +54,11 @@ module TTFunk
               result << ph(:gsub, input_class_def.id, 2)
               result << ph(:gsub, lookahead_class_def.id, 2)
               result << chain_sub_class_sets.encode do |chain_sub_class_set|
-                [ph(:gsub, chain_sub_class_set.id, 2)]
+                if chain_sub_class_set
+                  [ph(:gsub, chain_sub_class_set.id, 2)]
+                else
+                  [0]
+                end
               end
 
               result.resolve_placeholders(:gsub, backtrack_class_def.id, [result.length].pack('n'))
@@ -65,6 +69,8 @@ module TTFunk
               result << lookahead_class_def.encode
 
               chain_sub_class_sets.each do |chain_sub_class_set|
+                next unless chain_sub_class_set
+
                 result.resolve_placeholders(
                   :gsub, chain_sub_class_set.id, [result.length].pack('n')
                 )
@@ -85,7 +91,7 @@ module TTFunk
           end
 
           def length
-            @length + sum(chain_sub_class_sets, &:length)
+            @length + sum(chain_sub_class_sets) { |cscs| cscs&.length || 0 }
           end
 
           private
@@ -96,7 +102,9 @@ module TTFunk
               count = read(12, 'n6')
 
             @chain_sub_class_sets = Sequence.from(io, count, 'n') do |chain_sub_class_set_offset|
-              Gsub::ChainSubClassSet.new(file, table_offset + chain_sub_class_set_offset)
+              if chain_sub_class_set_offset > 0  # can be nil
+                Gsub::ChainSubClassSet.new(file, table_offset + chain_sub_class_set_offset)
+              end
             end
 
             @length = 12 + chain_sub_class_sets.length

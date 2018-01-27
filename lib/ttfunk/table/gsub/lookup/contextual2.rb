@@ -37,7 +37,11 @@ module TTFunk
               result << ph(:gsub, class_def.id, length: 2)
               result.write(sub_class_sets.count, 'n')
               sub_class_sets.encode_to(result) do |sub_class_set|
-                [ph(:gsub, sub_class_set.id, length: 2)]
+                if sub_class_set
+                  [ph(:gsub, sub_class_set.id, length: 2)]
+                else
+                  [0]
+                end
               end
 
               result.resolve_placeholders(
@@ -47,6 +51,8 @@ module TTFunk
               result << class_def.encode
 
               sub_class_sets.each do |sub_class_set|
+                next unless sub_class_set
+
                 result.resolve_placeholders(
                   :gsub, sub_class_set.id, [result.length].pack('n')
                 )
@@ -67,7 +73,7 @@ module TTFunk
           end
 
           def length
-            @length + sum(sub_class_sets, &:length)
+            @length + sum(sub_class_sets) { |scs| scs&.length || 0 }
           end
 
           private
@@ -76,7 +82,9 @@ module TTFunk
             @format, @coverage_offset, @class_def_offset, count = read(8, 'n4')
 
             @sub_class_sets = Sequence.from(io, count, 'n') do |sub_class_set_offset|
-              Gsub::SubClassSet.new(file, table_offset + sub_class_set_offset)
+              if sub_class_set_offset > 0  # can be nil
+                Gsub::SubClassSet.new(file, table_offset + sub_class_set_offset)
+              end
             end
 
             @length = 8 + sub_class_sets.length

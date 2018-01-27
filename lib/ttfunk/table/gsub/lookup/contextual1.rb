@@ -28,6 +28,7 @@ module TTFunk
             EncodedString.create do |result|
               result.write(format, 'n')
               result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
+              result.write(sub_rule_sets.count, 'n')
               result << sub_rule_sets.encode_to(result) do |sub_rule_set|
                 [ph(:gsub, sub_rule_set.id, length: 2)]
               end
