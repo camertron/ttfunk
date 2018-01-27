@@ -1,6 +1,6 @@
 module TTFunk
   class Table
-    class Gsub
+    module Common
       class ClassDef1 < TTFunk::SubTable
         attr_reader :format, :start_glyph_id, :class_values
 

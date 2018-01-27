@@ -7,6 +7,22 @@ module TTFunk
           attr_reader :mark_class_count, :mark_array_offset, :base_array_offset
           attr_reader :mark_array, :base_array
 
+          def self.create(file, _parent_table, offset, lookup_type)
+            new(file, offset, lookup_type)
+          end
+
+          def mark_coverage_table
+            @mark_coverage_table ||= Common::CoverageTable.create(
+              file, self, table_offset + mark_coverage_offset
+            )
+          end
+
+          def base_coverage_table
+            @base_coverage_table ||= Common::CoverageTable.create(
+              file, self, table_offset + base_coverage_offset
+            )
+          end
+
           private
 
           def parse!

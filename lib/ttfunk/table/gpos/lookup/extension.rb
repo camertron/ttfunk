@@ -8,6 +8,10 @@ module TTFunk
 
           attr_reader :format, :extension_lookup_type, :extension_offset
 
+          def self.create(file, _parent_table, offset, lookup_type)
+            new(file, offset, lookup_type)
+          end
+
           private
 
           def parse!

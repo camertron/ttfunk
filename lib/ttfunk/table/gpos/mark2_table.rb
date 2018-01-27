@@ -13,7 +13,7 @@ module TTFunk
         private
 
         def parse!
-          @anchor_offsets = Sequence.new(io, mark_class_count, 'n') do |anchor_offset|
+          @anchor_offsets = Sequence.from(io, mark_class_count, 'n') do |anchor_offset|
             AnchorTable.new(file, mark2_array_offset + anchor_offset)
           end
         end

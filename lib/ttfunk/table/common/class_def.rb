@@ -1,6 +1,6 @@
 module TTFunk
   class Table
-    class Gsub
+    module Common
       class ClassDef
         FORMAT_MAP = {
           1 => ClassDef1, 2 => ClassDef2

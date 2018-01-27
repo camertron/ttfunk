@@ -15,15 +15,13 @@ module TTFunk
           lookahead_glyph_count = read(2, 'n').first
           @lookahead_sequence = Sequence.from(io, lookahead_glyph_count, 'n')
           pos_count = read(2, 'n').first
-          @pos_lookups = Array.new(pos_count) do
-            PosLookupTable.new(file, io.pos)
-          end
+          @pos_lookups = PosLookupTable.create_sequence(io, pos_count)
 
           @length = 8 +
             backtrack_sequence.length +
             input_sequence.length +
             lookahead_sequence.length +
-            pos_lookups.inject(0) { |ret, pl| ret + pl.length }
+            pos_lookups.length
         end
       end
     end

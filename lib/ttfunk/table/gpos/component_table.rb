@@ -2,22 +2,26 @@ module TTFunk
   class Table
     class Gpos
       class ComponentTable < TTFunk::SubTable
-        attr_reader :mark_class_count, :ligature_anchor_offsets
+        attr_reader :ligature_anchor_offsetsm :ligature_attach_offset
 
-        def initialize(file, offset, mark_class_count, lig_attach_offset)
-          @mark_class_count = mark_class_count
-          @lig_attach_offset = lig_attach_offset
+        def initialize(file, ligature_anchor_offsets, ligature_attach_offset)
+          @ligature_anchor_offsets = ligature_anchor_offsets
+          @ligature_attach_offset = ligature_attach_offset
+          @length = ligature_anchor_offsets.length * 2
+
           super(file, offset)
+        end
+
+        def anchor_tables
+          @anchor_tables ||= Array.new(ligature_anchor_offsets.length) do |i|
+            AnchorTable.create(file, self, ligature_attach_offset + ligature_anchor_offsets[i])
+          end
         end
 
         private
 
         def parse!
-          @ligature_anchor_offsets = Sequence.from(io, mark_class_count, 'n') do |lig_anchor_offset|
-            ComponentTable.new(file, lig_attach_offset + lig_anchor_offset)
-          end
-
-          @length = ligature_anchor_offsets.length
+          # no-op
         end
       end
     end

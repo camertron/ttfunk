@@ -15,7 +15,7 @@ module TTFunk
           end
 
           def class_def
-            @class_def ||= Gsub::ClassDef.create(self, table_offset + class_def_offset)
+            @class_def ||= Common::ClassDef.create(self, table_offset + class_def_offset)
           end
 
           def max_context

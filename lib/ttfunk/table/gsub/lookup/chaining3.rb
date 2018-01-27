@@ -55,10 +55,10 @@ module TTFunk
           end
 
           def length
-            @length
-              + sum(backtrack_coverage_tables, &:length)
-              + sum(input_coverage_tables, &:length)
-              + sum(lookahead_coverage_tables, &:length)
+            @length +
+              sum(backtrack_coverage_tables, &:length) +
+              sum(input_coverage_tables, &:length) +
+              sum(lookahead_coverage_tables, &:length)
           end
 
           private

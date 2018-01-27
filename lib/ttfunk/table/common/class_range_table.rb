@@ -1,6 +1,6 @@
 module TTFunk
   class Table
-    class Gsub
+    module Common
       class ClassRangeTable
         FORMAT = 'nnn'
 

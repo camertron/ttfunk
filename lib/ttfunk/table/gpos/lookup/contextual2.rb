@@ -8,6 +8,12 @@ module TTFunk
           attr_reader :format, :coverage_offset, :class_def_offset
           attr_reader :pos_class_sets
 
+          def class_def
+            @class_def ||= Common::ClassDef.new(
+              file, table_offset + class_def_offset
+            )
+          end
+
           private
 
           def parse!

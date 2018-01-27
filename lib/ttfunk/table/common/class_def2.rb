@@ -1,6 +1,6 @@
 module TTFunk
   class Table
-    class Gsub
+    module Common
       class ClassDef2 < TTFunk::SubTable
         attr_reader :format, :class_range_tables
 
