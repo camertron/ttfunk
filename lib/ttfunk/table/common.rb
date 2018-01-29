@@ -9,6 +9,7 @@ module TTFunk
       autoload :CoverageTable1,                'ttfunk/table/common/coverage_table1'
       autoload :CoverageTable2,                'ttfunk/table/common/coverage_table2'
       autoload :CoverageTableMixin,            'ttfunk/table/common/coverage_table_mixin'
+      autoload :DeviceTable,                   'ttfunk/table/common/device_table'
       autoload :FeatureList,                   'ttfunk/table/common/feature_list'
       autoload :FeatureTable,                  'ttfunk/table/common/feature_table'
       autoload :FeatureTableSubstitutionList,  'ttfunk/table/common/feature_table_substitution_list'
@@ -21,6 +22,7 @@ module TTFunk
       autoload :RangeTable,                    'ttfunk/table/common/range_table'
       autoload :ScriptList,                    'ttfunk/table/common/script_list'
       autoload :ScriptTable,                   'ttfunk/table/common/script_table'
+      autoload :VariationIndex,                'ttfunk/table/common/variation_index'
     end
   end
 end

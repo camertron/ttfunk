@@ -1,17 +1,13 @@
 module TTFunk
   class Table
     class Gpos
-      class PosLookupTable
-        FORMAT = 'nn'
+      class PosLookupTable < TTFunk::SubTable
+        attr_reader :sequence_index, :lookup_list_index
 
-        attr_reader :length, :sequence_index, :lookup_list_index
+        private
 
-        def self.create_sequence(io, count)
-          Sequence.from(io, count, FORMAT) { |*args| new(*args) }
-        end
-
-        def initialize(*args)
-          @sequence_index, @lookup_list_index = args
+        def parse!
+          @sequence_index, @lookup_list_index = read(4, 'nn')
           @length = 4
         end
       end

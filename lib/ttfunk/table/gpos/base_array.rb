@@ -14,8 +14,8 @@ module TTFunk
         def parse!
           count = read(2, 'n').first
 
-          @bases = Sequence.from(io, count, "n#{mark_class_count}") do |anchor_offsets|
-            BaseTable.new(file, anchor_offsets)
+          @bases = ArraySequence.new(io, count) do
+            BaseTable.new(file, io.pos, table_offset, mark_class_count)
           end
 
           @length = 2 + bases.length

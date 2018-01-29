@@ -8,7 +8,11 @@ module TTFunk
 
         def parse!
           count = read(2, 'n').first
-          @marks = Array.new(count) { MarkTable.new(file, io.pos) }
+
+          @marks = ArraySequence.new(io, count) do
+            MarkTable.new(file, io.pos, table_offset)
+          end
+
           @length = 2 + marks.length
         end
       end

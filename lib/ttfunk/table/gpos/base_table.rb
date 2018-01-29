@@ -2,26 +2,23 @@ module TTFunk
   class Table
     class Gpos
       class BaseTable < TTFunk::SubTable
-        attr_reader :base_anchor_offsets, :base_array_offset
+        attr_reader :base_array_offset, :mark_class_count
+        attr_reader :anchor_tables
 
-        def initialize(file, base_array_offset, base_anchor_offsets)
+        def initialize(file, offset, base_array_offset, mark_class_count)
           @base_array_offset = base_array_offset
-          @base_anchor_offsets = base_anchor_offsets
-          @length = base_anchor_offsets.length * 2
-
-          super(file, base_array_offset)
-        end
-
-        def anchor_tables
-          @anchor_tables ||= Array.new(base_anchor_offsets.length) do |i|
-            AnchorTable.create(file, self, base_array_offset + base_anchor_offsets[i])
-          end
+          @mark_class_count = mark_class_count
+          super(file, offset)
         end
 
         private
 
         def parse!
-          # no-op
+          @anchor_tables = Sequence.from(io, mark_class_count, 'n') do |anchor_offset|
+            AnchorTable.create(file, self, table_offset + anchor_offset)
+          end
+
+          @length = anchor_tables.length
         end
       end
     end

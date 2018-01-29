@@ -14,7 +14,10 @@ module TTFunk
               CoverageTable.create(file, self, table_offset + coverage_offset)
             end
 
-            @pos_lookups = PosLookupTable.create_sequence(io, pos_count)
+            @pos_lookups = ArraySequence.new(io, pos_count) do
+              PosLookupTable.new(file, io.pos)
+            end
+
             @length = 6 + coverage_offsets.length + pos_lookups.length
           end
         end

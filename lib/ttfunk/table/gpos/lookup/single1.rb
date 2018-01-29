@@ -11,7 +11,7 @@ module TTFunk
 
           def parse!
             @format, @coverage_offset, @value_format = read(6, 'nnn')
-            @value_table = ValueTable.new(file, io.pos)
+            @value_table = ValueTable.new(file, io.pos, value_format, table_offset)
             @length = 6 + value_table.length
           end
         end

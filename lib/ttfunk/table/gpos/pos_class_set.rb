@@ -9,7 +9,7 @@ module TTFunk
         def parse!
           count = read(2, 'n').first
 
-          @pos_class_rules = Sequence.new(io, count, 'n') do |pos_class_rule_offset|
+          @pos_class_rules = Sequence.from(io, count, 'n') do |pos_class_rule_offset|
             PosClassRule.new(file, table_offset + pos_class_rule_offset)
           end
 

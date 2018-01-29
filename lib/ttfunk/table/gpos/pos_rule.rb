@@ -10,7 +10,7 @@ module TTFunk
           glyph_count, pos_count = read(4, 'nn')
 
           @input_sequence = Sequence.from(io, glyph_count - 1, 'n')
-          @pos_lookup_tables = Array.new(pos_count) do
+          @pos_lookup_tables = ArraySequence.new(io, pos_count) do
             PosLookupTable.new(file, io.pos)
           end
 

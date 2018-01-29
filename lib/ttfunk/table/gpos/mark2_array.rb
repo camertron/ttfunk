@@ -14,7 +14,7 @@ module TTFunk
 
         def parse!
           count = read(2, 'n').first
-          @mark2s = Array.new(count) do
+          @mark2s = ArraySequence.new(io, count) do
             Mark2Table.new(file, io.pos, mark_class_count, mark2_array_offset)
           end
           @length = 2 + mark2s.length

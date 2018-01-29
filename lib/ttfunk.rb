@@ -9,6 +9,7 @@ require_relative 'ttfunk/otf_encoder'
 require_relative 'ttfunk/real'
 require_relative 'ttfunk/encoded_string'
 require_relative 'ttfunk/bit_field'
+require_relative 'ttfunk/array_sequence'
 require_relative 'ttfunk/sequence'
 require_relative 'ttfunk/bin_utils'
 require_relative 'ttfunk/pack_format'
@@ -141,6 +142,12 @@ module TTFunk
 
     def glyph_substitution
       @glyph_substitution ||= TTFunk::Table::Gsub.new(self)
+    end
+
+    def variable?
+      # presence of an 'fvar' table indicates this is a variable font
+      # https://www.microsoft.com/typography/otspec/otvaroverview.htm
+      directory.tables.include?('fvar')
     end
   end
 end

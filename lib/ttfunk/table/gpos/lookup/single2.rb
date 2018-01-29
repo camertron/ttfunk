@@ -11,7 +11,11 @@ module TTFunk
 
           def parse!
             @format, @coverage_offset, @value_format, count = read(8, 'nnnn')
-            @value_tables = Gpos::ValueTable.create_sequence(io, count)
+
+            @value_tables = ArraySequence.new(io, count) do
+              ValueTable.new(file, io.pos, value_format, table_offset)
+            end
+
             @length = 8 + value_tables.length
           end
         end

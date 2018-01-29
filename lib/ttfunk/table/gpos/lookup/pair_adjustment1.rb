@@ -15,7 +15,13 @@ module TTFunk
               @value_format2, count = read(10, 'n5')
 
             @pair_sets = Sequence.from(io, count, 'n') do |pair_set_offset|
-              PairSet.new(file, table_offset + pair_set_offset)
+              PairSet.new(
+                file,
+                table_offset + pair_set_offset,
+                value_format1,
+                value_format2,
+                table_offset
+              )
             end
 
             @length = 10 + pair_sets.length

@@ -2,7 +2,18 @@ module TTFunk
   class Table
     class Gpos
       class MarkTable < TTFunk::SubTable
-        attr_reader :mark_class, :mark_anchor_offset
+        attr_reader :mark_array_offset, :mark_class, :mark_anchor_offset
+
+        def initialize(file, offset, mark_array_offset)
+          @mark_array_offset = mark_array_offset
+          super(file, offset)
+        end
+
+        def anchor_table
+          @anchor_table ||= AnchorTable.create(
+            file, self, mark_array_offset + mark_anchor_offset
+          )
+        end
 
         private
 
