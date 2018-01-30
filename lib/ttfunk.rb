@@ -10,6 +10,7 @@ require_relative 'ttfunk/real'
 require_relative 'ttfunk/encoded_string'
 require_relative 'ttfunk/bin_utils'
 require_relative 'ttfunk/placeholder'
+require_relative 'ttfunk/sub_table'
 
 module TTFunk
   class File
