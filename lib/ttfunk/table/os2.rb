@@ -214,6 +214,11 @@ module TTFunk
           if @version > 1
             @x_height, @cap_height = read_signed(2)
             @default_char, @break_char, @max_context = read(6, 'nnn')
+
+            # Set this to zero until GSUB/GPOS support has been implemented. This value
+            # is calculated via those tables, and should be set to zero if the data is
+            # not available.
+            @max_context = 0
           end
         end
       end

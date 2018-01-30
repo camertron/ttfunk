@@ -2,7 +2,7 @@ module TTFunk
   class TtfEncoder
     OPTIMAL_TABLE_ORDER = %w(
       head hhea maxp OS/2 hmtx LTSH VDMX hdmx cmap fpgm
-      prep cvt loca glyfkern name post gasp PCLT
+      prep cvt loca glyf kern name post gasp PCLT
     )
 
     attr_reader :original, :subset, :options
@@ -154,6 +154,10 @@ module TTFunk
       @prep_table ||= TTFunk::Table::Simple.new(original, 'prep').raw
     end
 
+    def dsig_table
+      @dsig_table ||= TTFunk::Table::Dsig.encode(original.digital_signature)
+    end
+
     def kern_table
       # for PDF's, the kerning info is all included in the PDF as the text is
       # drawn. Thus, the PDF readers do not actually use the kerning info in
@@ -165,14 +169,6 @@ module TTFunk
           original.kerning, old2new_glyph
         )
       end
-    end
-
-    def gpos_table
-      @gpos_table ||= TTFunk::Table::Gpos.encode(original.glyph_positioning)
-    end
-
-    def gsub_table
-      @gsub_table ||= TTFunk::Table::Gsub.encode(original.glyph_substitution)
     end
 
     def tables
@@ -191,8 +187,7 @@ module TTFunk
         'prep' => prep_table,
         'fpgm' => fpgm_table,
         'cvt ' => cvt_table,
-        'GPOS' => gpos_table,
-        'GSUB' => gsub_table
+        'DSIG' => dsig_table
       }.reject { |_tag, table| table.nil? }
     end
 
