@@ -21,10 +21,10 @@ module TTFunk
       attr_reader :index_to_loc_format
       attr_reader :glyph_data_format
 
-      def self.encode(head, loca)
+      def self.encode(head, loca = {})
         table = head.raw
         table[8, 4] = "\0\0\0\0" # set checksum adjustment to 0 initially
-        table[-4, 2] = [loca[:type]].pack('n') # set index_to_loc_format
+        table[-4, 2] = [loca.fetch(:type, head.index_to_loc_format)].pack('n') # set index_to_loc_format
         table
       end
 

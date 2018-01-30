@@ -4,6 +4,12 @@ require 'pathname'
 require_relative 'ttfunk/directory'
 require_relative 'ttfunk/resource_file'
 require_relative 'ttfunk/collection'
+require_relative 'ttfunk/ttf_encoder'
+require_relative 'ttfunk/otf_encoder'
+require_relative 'ttfunk/real'
+require_relative 'ttfunk/encoded_string'
+require_relative 'ttfunk/bin_utils'
+require_relative 'ttfunk/placeholder'
 
 module TTFunk
   class File
@@ -116,9 +122,18 @@ module TTFunk
     def sbix
       @sbix ||= TTFunk::Table::Sbix.new(self)
     end
+
+    def cff
+      @cff ||= TTFunk::Table::Cff.new(self)
+    end
+
+    def vertical_origins
+      @vertical_origins ||= TTFunk::Table::Vorg.new(self)
+    end
   end
 end
 
+require_relative 'ttfunk/table/cff'
 require_relative 'ttfunk/table/cmap'
 require_relative 'ttfunk/table/glyf'
 require_relative 'ttfunk/table/head'
@@ -131,3 +146,4 @@ require_relative 'ttfunk/table/name'
 require_relative 'ttfunk/table/os2'
 require_relative 'ttfunk/table/post'
 require_relative 'ttfunk/table/sbix'
+require_relative 'ttfunk/table/vorg'

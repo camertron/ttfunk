@@ -116,7 +116,7 @@ module TTFunk
               else
                 index = id_range_offset[i] / 2 +
                   (code - start_code[i]) - (segcount - i)
-                # Decause some TTF fonts are broken
+                # Because some TTF fonts are broken
                 glyph_id = glyph_ids[index] || 0
                 glyph_id += id_delta[i] if glyph_id != 0
               end

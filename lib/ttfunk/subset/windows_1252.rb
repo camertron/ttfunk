@@ -32,20 +32,21 @@ module TTFunk
         Encoding::Windows1252::FROM_UNICODE[character]
       end
 
-      protected
+      def new_cmap_table
+        @new_cmap_table ||= begin
+          mapping = {}
 
-      def new_cmap_table(_options)
-        mapping = {}
-        @subset.each_with_index do |unicode, cp1252|
-          mapping[cp1252] = unicode_cmap[unicode] if cp1252
+          @subset.each_with_index do |unicode, cp1252|
+            mapping[cp1252] = unicode_cmap[unicode] if cp1252
+          end
+
+          # yes, I really mean "mac roman". TTF has no cp1252 encoding, and the
+          # alternative would be to encode it using a format 4 unicode table,
+          # which is overkill. for our purposes, mac-roman suffices. (If we were
+          # building a _real_ font, instead of a PDF-embeddable subset, things
+          # would probably be different.)
+          TTFunk::Table::Cmap.encode(mapping, :mac_roman)
         end
-
-        # yes, I really mean "mac roman". TTF has no cp1252 encoding, and the
-        # alternative would be to encode it using a format 4 unicode table,
-        # which is overkill. for our purposes, mac-roman suffices. (If we were
-        # building a _real_ font, instead of a PDF-embeddable subset, things
-        # would probably be different.)
-        TTFunk::Table::Cmap.encode(mapping, :mac_roman)
       end
 
       def original_glyph_ids

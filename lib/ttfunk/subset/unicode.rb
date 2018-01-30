@@ -33,13 +33,14 @@ module TTFunk
         character
       end
 
-      protected
+      def new_cmap_table
+        @new_cmap_table ||= begin
+          mapping = @subset.each_with_object({}) do |code, map|
+            map[code] = unicode_cmap[code]
+          end
 
-      def new_cmap_table(_options)
-        mapping = @subset.each_with_object({}) do |code, map|
-          map[code] = unicode_cmap[code]
+          TTFunk::Table::Cmap.encode(mapping, :unicode)
         end
-        TTFunk::Table::Cmap.encode(mapping, :unicode)
       end
 
       def original_glyph_ids
