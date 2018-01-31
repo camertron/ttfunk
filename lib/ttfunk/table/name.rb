@@ -4,9 +4,11 @@ require 'digest/sha1'
 module TTFunk
   class Table
     class Name < Table
-      POST_SCRIPT_NAME_ID = 6
-
       class NameString
+        POST_SCRIPT_NAME = 6
+        MAC_PLATFORM = 1
+        WINDOWS_PLATFORM = 3
+
         attr_reader :text, :platform_id, :encoding_id, :language_id, :name_id
 
         def initialize(text, platform_id, encoding_id, language_id, name_id)
@@ -25,6 +27,18 @@ module TTFunk
 
         def length
           text.length
+        end
+
+        def mac?
+          platform_id == MAC_PLATFORM
+        end
+
+        def windows?
+          platform_id == WINDOWS_PLATFORM
+        end
+
+        def post_script?
+          name_id == POST_SCRIPT_NAME
         end
       end
 
@@ -53,10 +67,24 @@ module TTFunk
         def encode(names, key = '')
           tag = Digest::SHA1.hexdigest(key)[0, 6]
 
-          strings = names.strings.reject { |str| str.name_id == POST_SCRIPT_NAME_ID }
-          strings << NameString.new(
-            "#{tag}+#{names.postscript_name}", 1, 0, 0, POST_SCRIPT_NAME_ID
-          )
+          strings = names.strings.dup
+          has_ps_mac_string = strings.any? { |str| str.post_script? && str.mac? }
+
+          unless has_ps_mac_string
+            strings << NameString.new(
+              "#{tag}+#{names.postscript_name}",
+              NameString::MAC_PLATFORM, 0, 0, NameString::POST_SCRIPT_NAME
+            )
+          end
+
+          has_ps_win_string = strings.any? { |str| str.post_script? && str.windows? }
+
+          unless has_ps_win_string
+            strings << NameString.new(
+              "#{tag}+#{names.postscript_name}",
+              NameString::WINDOWS_PLATFORM, 0, 0, NameString::POST_SCRIPT_NAME
+            )
+          end
 
           table = [0, strings.size, 6 + 12 * strings.size].pack('n*')
           strtable = ''
@@ -66,6 +94,7 @@ module TTFunk
               string.platform_id, string.encoding_id, string.language_id, string.name_id,
               string.length, strtable.length
             ].pack('n*')
+
             strtable << string.text
           end
 
@@ -145,7 +174,7 @@ module TTFunk
         @font_name = strings_by_name_id[4]
         @version = strings_by_name_id[5]
         # should only be ONE postscript name
-        @postscript_name = strings_by_name_id[POST_SCRIPT_NAME_ID]  # 6
+        @postscript_name = strings_by_name_id[NameString::POST_SCRIPT_NAME]  # 6
           .first.strip_extended
         @trademark = strings_by_name_id[7]
         @manufacturer = strings_by_name_id[8]

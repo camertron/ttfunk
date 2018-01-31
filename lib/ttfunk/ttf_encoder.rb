@@ -49,14 +49,9 @@ module TTFunk
 
         if tables.include?(optimal_tag)
           newfont.resolve_placeholders(:tables, optimal_tag, [offset].pack('N'))
-          data = tables[optimal_tag]
+          data = align(tables[optimal_tag])
           newfont << data
-
           offset += data.length
-
-          # align to 4 bytes
-          newfont << "\0" * (offset % 4)
-          offset += offset % 4
         end
       end
 
@@ -253,12 +248,6 @@ module TTFunk
     end
 
     def checksum(data)
-      # For some reason, 32-bit alignment is only important when checksumming.
-      # Microsoft's FontValidator tool will complain if the table data itself
-      # is padded with null (i.e. \0) alignment bytes (reports the table is
-      # too long), but will also complain if the checksum is calculated with
-      # unaligned data. I guess the solution is to calculate the checksum on
-      # aligned data but encode the table unaligned. Weird but it works.
       data = data.respond_to?(:string) ? data.string : data
       align(data).unpack('N*').reduce(0, :+) & 0xFFFF_FFFF
     end
