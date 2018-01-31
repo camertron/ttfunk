@@ -44,24 +44,17 @@ module TTFunk
           range_offsets = []
           glyph_indices = []
 
-          offset = 0
           start_codes.zip(end_codes).each_with_index do |(a, b), segment|
-            if a == 0xFFFF
-              deltas << 0
-              range_offsets << 0
-              break
-            end
+            start_glyph_id = new_map.fetch(a, new: 0)[:new]
 
-            start_glyph_id = new_map[a][:new]
             if a - start_glyph_id >= 0x8000
               deltas << 0
               range_offsets << 2 * (glyph_indices.length + segcount - segment)
-              a.upto(b) { |code| glyph_indices << new_map[code][:new] }
+              a.upto(b) { |code| glyph_indices << new_map.fetch(code, new: 0)[:new] }
             else
               deltas << -a + start_glyph_id
               range_offsets << 0
             end
-            offset += 2
           end
 
           # format, length, language
