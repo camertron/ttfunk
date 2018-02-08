@@ -133,8 +133,7 @@ module TTFunk
     # modification, if they exist.
 
     def os2_table
-      # @os2_table ||= original.os2.raw
-      @os2_table ||= TTFunk::Table::OS2.encode(original.os2, subset)
+      @os2_table ||= original.os2.raw
     end
 
     def cvt_table
