@@ -32,7 +32,6 @@ module TTFunk
           result << [entries.size].pack('n')
           return result if entries.size == 0
 
-          # @TODO: is #round really the right answer here? Seems to work...
           offset_size = (Math.log2(entries.size) / 8.0).round + 1
           result << [offset_size].pack('c')
           data_offset = 1
