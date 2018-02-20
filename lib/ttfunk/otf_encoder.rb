@@ -37,7 +37,7 @@ module TTFunk
         tb['BASE'] = base_table
         tb['VORG'] = vorg_table
         tb['CFF '] = cff_table
-      end
+      end.reject { |_tag, table| table.nil? }
     end
 
     def optimal_table_order

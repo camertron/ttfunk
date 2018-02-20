@@ -133,10 +133,7 @@ module TTFunk
           operands = []
           operator = nil
 
-          # @length can be set via the constructor, so only read a length if @length
-          # hasn't already been set
-          @length ||= read(1, 'C').first
-
+          # @length must be set via the constructor
           while io.pos < table_offset + length
             case b_zero = read(1, 'C').first
               when 12

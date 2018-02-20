@@ -5,6 +5,8 @@ module TTFunk
         DEFAULT_CHARSTRING_TYPE = 2
         POINTER_PLACEHOLDER_LENGTH = 5
         POINTER_PLACEHOLDER = ("\0" * POINTER_PLACEHOLDER_LENGTH).freeze
+        PLACEHOLDER_LENGTH = 5
+        PLACEHOLDER = ("\0" * PLACEHOLDER_LENGTH).freeze
 
         # operators whose values are offsets that point to other parts
         # of the file
@@ -12,6 +14,7 @@ module TTFunk
           charset: 15,
           encoding: 16,
           charstrings_index: 17,
+          private: 18,
           font_index: 1236,
           font_dict_selector: 1237
         }
@@ -34,10 +37,12 @@ module TTFunk
 
         def encode
           EncodedString.new.tap do |result|
-            result << [length].pack('C')
+            # result << [length].pack('C')
 
             each_with_index do |(operator, operands), idx|
-              if pointer_operator?(operator)
+              if operator == OPERATORS[:private]
+                result << encode_private
+              elsif pointer_operator?(operator)
                 result.add_placeholder(
                   :cff_top_dict, OPERATOR_CODES[operator],
                   position: result.pos, length: POINTER_PLACEHOLDER_LENGTH
@@ -75,6 +80,39 @@ module TTFunk
 
           if font_dict_selector
             finalize_subtable(new_cff_data, :font_dict_selector, font_dict_selector.encode)
+          end
+
+          encoded_private_dict = private_dict.encode
+          encoded_offset = encode_integer32(new_cff_data.length)
+          encoded_length = encode_integer32(encoded_private_dict.bytesize)
+
+          new_cff_data.resolve_placeholders(
+            :cff_top_dict, :"private_length_#{@table_offset}", encoded_length.pack('C*')
+          )
+
+          new_cff_data.resolve_placeholders(
+            :cff_top_dict, :"private_offset_#{@table_offset}", encoded_offset.pack('C*')
+          )
+
+          private_dict.finalize(encoded_private_dict)
+          new_cff_data << encoded_private_dict
+        end
+
+        def encode_private
+          EncodedString.new.tap do |result|
+            result.add_placeholder(
+              :cff_top_dict, :"private_length_#{@table_offset}",
+              position: result.pos, length: PLACEHOLDER_LENGTH
+            )
+
+            result << PLACEHOLDER
+
+            result.add_placeholder(
+              :cff_top_dict, :"private_offset_#{@table_offset}",
+              position: result.pos, length: PLACEHOLDER_LENGTH
+            )
+
+            result << PLACEHOLDER
           end
         end
 
@@ -146,6 +184,17 @@ module TTFunk
           @font_dict_selector ||=
             if fd_select_offset = self[OPERATORS[:font_dict_selector]]
               FdSelector.new(self, file, cff_offset + fd_select_offset.first)
+            end
+        end
+
+        def private_dict
+          @private_dict ||=
+            if info = self[OPERATORS[:private]]
+              private_dict_length, private_dict_offset = info
+
+              PrivateDict.new(
+                file, cff_offset + private_dict_offset, private_dict_length
+              )
             end
         end
 

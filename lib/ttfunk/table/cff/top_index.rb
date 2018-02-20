@@ -11,8 +11,8 @@ module TTFunk
 
         def [](index)
           data[index] ||= begin
-            start, finish = relative_data_offsets_for(index)  # @TODO is this wrong?
-            TTFunk::Table::Cff::TopDict.new(cff, file, table_offset + start + 4)
+            start, finish = absolute_data_offsets_for(index)
+            TTFunk::Table::Cff::TopDict.new(cff, file, start, finish - start)
           end
         end
       end

@@ -52,7 +52,7 @@ module TTFunk
         private
 
         def parse!
-          @format, @count = read(2, 'C')
+          @format, @count = read(2, 'C*')
           @length = @count * element_length
           @array = parse_array(io.read(@length))
         end

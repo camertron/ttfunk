@@ -51,9 +51,6 @@ module TTFunk
         437  => 63
       }
 
-      COMMON_CODE_PAGE_CHARACTERS = (0..25).to_a + (27..36).to_a + (38..127).to_a
-      LATIN_1_CODE_PAGE = 1252
-
       UNICODE_BLOCK_BITS = {
         (0x0000..0x007F) => 0,     (0x0080..0x00FF) => 1,      (0x0100..0x017F) => 2,     (0x0180..0x024F) => 3,
         (0x0250..0x02AF) => 4,     (0x1D00..0x1D7F) => 4,      (0x1D80..0x1DBF) => 4,     (0x02B0..0x02FF) => 5,
@@ -123,9 +120,13 @@ module TTFunk
             result << BinUtils.unpack_int(unicode_blocks_for(subset).value, 32).pack('N*').ljust(16, "\0")
             result << os2.vendor_id
 
-            code_points = subset.new_cmap_table[:charmap].keys.sort
-            first_char_index = code_points.min || 0
-            last_char_index = code_points.max || 0
+            new_cmap_table = subset.new_cmap_table[:charmap]
+            code_points = new_cmap_table.keys
+              .select { |k| new_cmap_table[k][:new] > 0 }
+              .sort
+
+            first_char_index = code_points.first || 0
+            last_char_index = code_points.last || 0
             result << [os2.selection, first_char_index, last_char_index].pack('n*')
 
             if os2.version > 0
@@ -144,24 +145,12 @@ module TTFunk
         private
 
         def code_pages_for(subset)
-          BitField.new(0).tap do |bits|
-            code_points = subset.new_cmap_table[:charmap].keys
+          field = BitField.new(0)
+          return field if subset.unicode?
 
-            CodePages.all.each do |id, code_page|
-              bit = CODE_PAGE_BITS[id]
-              next unless bit
-
-              if (code_page.unicode_mapping.values - COMMON_CODE_PAGE_CHARACTERS & code_points).any?
-                bits.on(bit)
-              else
-                bits.off(bit)
-              end
-            end
-
-            if (CodePages[LATIN_1_CODE_PAGE].unicode_mapping.values & code_points).any?
-              bits.on(CODE_PAGE_BITS[LATIN_1_CODE_PAGE])
-            end
-          end
+          code_page = CodePages[subset.code_page]
+          field.on(CODE_PAGE_BITS[code_page.id])
+          field
         end
 
         def unicode_blocks_for(subset)

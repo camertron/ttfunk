@@ -27,9 +27,14 @@ module TTFunk
             ret << new_entry if new_entry
           end
 
+          # "An empty INDEX is represented by a count field with a 0 value and no
+          # additional fields. Thus, the total size of an empty INDEX is 2 bytes."
+          result << [entries.size].pack('n')
+          return result if entries.size == 0
+
           # @TODO: is #round really the right answer here? Seems to work...
           offset_size = (Math.log2(entries.size) / 8.0).round + 1
-          result << [entries.size, offset_size].pack('nc')
+          result << [offset_size].pack('c')
           data_offset = 1
 
           data = EncodedString.new
@@ -76,6 +81,13 @@ module TTFunk
         def parse!
           @count, @offset_size = read(3, 'nc')
           @raw_offset_array = io.read((count + 1) * offset_size)
+
+          if @raw_offset_array.length == 0
+            @raw_data_array = ''
+            @length = 3
+            return
+          end
+
           last_start, last_finish = relative_data_offsets_for(count - 1)
           @raw_data_array = io.read(last_finish)
           @length = 3 + @raw_offset_array.size + @raw_data_array.size

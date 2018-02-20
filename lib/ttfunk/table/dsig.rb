@@ -19,7 +19,7 @@ module TTFunk
       def self.encode(dsig)
         # Don't attempt to re-sign or anything - just use dummy values.
         # Since we're subsetting that should be permissible.
-        [dsig.version, 0, 0].pack('Nnn')
+        [dsig.version || 1, 0, 0].pack('Nnn')
       end
 
       def tag
