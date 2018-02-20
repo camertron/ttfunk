@@ -15,7 +15,7 @@ module TTFunk
           # Use microsoft unicode, instead of generic unicode, for optimal
           # Windows support
           unicode: { platform_id: 3, encoding_id: 1 }.freeze,
-          unicode_utf32: { platform_id: 3, encoding_id: 10 }.freeze
+          unicode_ucs4: { platform_id: 3, encoding_id: 10 }.freeze
         }.freeze
 
         def self.encode(charmap, encoding)
@@ -24,7 +24,7 @@ module TTFunk
             result = Format00.encode(charmap)
           when :unicode
             result = Format04.encode(charmap)
-          when :unicode_utf32
+          when :unicode_ucs4
             result = Format12.encode(charmap)
           else
             raise NotImplementedError,
