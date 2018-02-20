@@ -12,7 +12,6 @@ module TTFunk
       autoload :Header,           'ttfunk/table/cff/header'
       autoload :Index,            'ttfunk/table/cff/index'
       autoload :Path,             'ttfunk/table/cff/path'
-      autoload :Predefined,       'ttfunk/table/cff/predefined'
       autoload :PrivateDict,      'ttfunk/table/cff/private_dict'
       autoload :SubrIndex,        'ttfunk/table/cff/subr_index'
       autoload :TopDict,          'ttfunk/table/cff/top_dict'

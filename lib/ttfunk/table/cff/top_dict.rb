@@ -37,8 +37,6 @@ module TTFunk
 
         def encode
           EncodedString.new.tap do |result|
-            # result << [length].pack('C')
-
             each_with_index do |(operator, operands), idx|
               if operator == OPERATORS[:private]
                 result << encode_private
