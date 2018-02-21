@@ -1,4 +1,5 @@
 AllCops:
+  TargetRubyVersion: 2.2
   Include:
     - '**/Rakefile'
     - '**/Gemfile'
@@ -27,9 +28,11 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-
-Style/AlignParameters:
+Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
+
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
 
 Style/Documentation:
   Enabled: false
@@ -41,9 +44,6 @@ Style/GuardClause:
 # a line.
 Style/IfUnlessModifier:
   Enabled: false
-
-Style/MultilineOperationIndentation:
-  EnforcedStyle: indented
 
 Style/NumericPredicate:
   EnforcedStyle: comparison
@@ -62,4 +62,7 @@ Style/PercentLiteralDelimiters:
     '%x': '()'
 
 Style/WhileUntilModifier:
+  Enabled: false
+
+Style/FormatStringToken:
   Enabled: false
