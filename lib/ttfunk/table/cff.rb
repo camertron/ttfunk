@@ -1,6 +1,7 @@
 module TTFunk
   class Table
     class Cff < TTFunk::Table
+      autoload :Charset,          'ttfunk/table/cff/charset'
       autoload :Dict,             'ttfunk/table/cff/dict'
       autoload :Header,           'ttfunk/table/cff/header'
       autoload :Index,            'ttfunk/table/cff/index'
