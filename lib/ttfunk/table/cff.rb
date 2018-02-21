@@ -14,6 +14,8 @@ module TTFunk
       autoload :Path,             'ttfunk/table/cff/path'
       autoload :PrivateDict,      'ttfunk/table/cff/private_dict'
       autoload :SubrIndex,        'ttfunk/table/cff/subr_index'
+      autoload :TopDict,          'ttfunk/table/cff/top_dict'
+      autoload :TopIndex,         'ttfunk/table/cff/top_index'
 
       TAG = 'CFF '.freeze  # extra space is important
 
