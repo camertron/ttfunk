@@ -42,6 +42,7 @@ module TTFunk
         end
       end
 
+      attr_reader :entries
       attr_reader :strings
 
       attr_reader :copyright
@@ -100,6 +101,16 @@ module TTFunk
 
           table << strtable
         end
+        items = items.sort_by do |id, string|
+          [string.platform_id, string.encoding_id, string.language_id, id]
+        end
+        items.each do |id, string|
+          table << [
+            string.platform_id, string.encoding_id, string.language_id, id,
+            string.length, strtable.length
+          ].pack('n*')
+          strtable << string
+        end
 
         private
 
@@ -143,7 +154,8 @@ module TTFunk
             language_id: language,
             name_id: name_id,
             length: length,
-            offset: offset + string_offset + start_offset
+            offset: offset + string_offset + start_offset,
+            text: nil
           }
         end
 

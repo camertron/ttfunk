@@ -47,6 +47,16 @@ module TTFunk
           start_codes.zip(end_codes).each_with_index do |(a, b), segment|
             start_glyph_id = new_map.fetch(a, new: 0)[:new]
 
+            if a == 0xFFFF
+              # We want the final 0xFFFF code to map to glyph 0.
+              # The glyph index is calculated as glyph = charcode + delta,
+              # which means that delta must be -0xFFFF to map character code
+              # 0xFFFF to glyph 0.
+              deltas << -0xFFFF
+              range_offsets << 0
+              break
+            end
+
             if a - start_glyph_id >= 0x8000
               deltas << 0
               range_offsets << 2 * (glyph_indices.length + segcount - segment)

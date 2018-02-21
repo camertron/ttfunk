@@ -1,7 +1,7 @@
 module TTFunk
   module Encoding
     class MacRoman
-      # rubocop: disable Style/ExtraSpacing
+      # rubocop: disable Layout/ExtraSpacing
 
       TO_UNICODE =
         Hash[*(0..255).zip(0..255).flatten]
@@ -40,8 +40,6 @@ module TTFunk
         ).freeze
 
       FROM_UNICODE = TO_UNICODE.invert.freeze
-
-      # rubocop: enable Style/AlignArray,Metrics/LineLength,Style/ExtraSpacing,Style/IndentArray
 
       def self.covers?(character)
         !FROM_UNICODE[character].nil?
