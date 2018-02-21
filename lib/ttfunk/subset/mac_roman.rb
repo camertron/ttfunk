@@ -11,6 +11,10 @@ module TTFunk
         @subset = Array.new(256)
       end
 
+      def code_page
+        :mac_roman
+      end
+
       def to_unicode_map
         Encoding::MacRoman::TO_UNICODE
       end
@@ -32,15 +36,16 @@ module TTFunk
         Encoding::MacRoman::FROM_UNICODE[character]
       end
 
-      protected
+      def new_cmap_table
+        @new_cmap_table ||= begin
+          mapping = {}
 
-      def new_cmap_table(_options)
-        mapping = {}
-        @subset.each_with_index do |unicode, roman|
-          mapping[roman] = unicode_cmap[unicode] if roman
+          @subset.each_with_index do |unicode, roman|
+            mapping[roman] = unicode_cmap[unicode] if roman
+          end
+
+          TTFunk::Table::Cmap.encode(mapping, :mac_roman)
         end
-
-        TTFunk::Table::Cmap.encode(mapping, :mac_roman)
       end
 
       def original_glyph_ids
