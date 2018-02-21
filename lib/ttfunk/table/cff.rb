@@ -19,7 +19,8 @@ module TTFunk
 
       TAG = 'CFF '.freeze  # extra space is important
 
-      attr_reader :header, :name_index
+      attr_reader :header, :name_index, :top_index, :string_index
+      attr_reader :global_subr_index
 
       def tag
         TAG
@@ -29,8 +30,12 @@ module TTFunk
         result = EncodedString.new.tap do |result|
           result << header.encode
           result << name_index.encode
+          result << top_index.encode { |top_dict| top_dict.encode }
+          result << string_index.encode
+          result << global_subr_index.encode
         end
 
+        top_index[0].finalize(result, mapping)
         result.string
       end
 
@@ -39,6 +44,9 @@ module TTFunk
       def parse!
         @header = Header.new(file, offset)
         @name_index = Index.new(file, @header.table_offset + @header.length)
+        @top_index = TopIndex.new(self, file, @name_index.table_offset + @name_index.length)
+        @string_index = Index.new(file, @top_index.table_offset + @top_index.length)
+        @global_subr_index = SubrIndex.new(file, @string_index.table_offset + @string_index.length)
       end
     end
   end
