@@ -125,10 +125,15 @@ module TTFunk
     def vertical_origins
       @vertical_origins ||= TTFunk::Table::Vorg.new(self)
     end
+
+    def digital_signature
+      @digital_signature ||= TTFunk::Table::Dsig.new(self)
+    end
   end
 end
 
 require_relative 'ttfunk/table/cmap'
+require_relative 'ttfunk/table/dsig'
 require_relative 'ttfunk/table/glyf'
 require_relative 'ttfunk/table/head'
 require_relative 'ttfunk/table/hhea'
