@@ -44,9 +44,9 @@ module TTFunk
           @font_dict = font_dict
           @raw = raw
 
-          @default_width_x = @font_dict.private_dict.default_width_x
-          @nominal_width_x = @font_dict.private_dict.nominal_width_x
-          @subrs = @font_dict.private_dict.subr_index
+          @default_width_x = (@font_dict || @top_dict).private_dict.default_width_x
+          @nominal_width_x = (@font_dict || @top_dict).private_dict.nominal_width_x
+          @subrs = (@font_dict || @top_dict).private_dict.subr_index
           @gsubrs = @top_dict.cff.global_subr_index
           @subrs_bias = @subrs.bias if @subrs
           @gsubrs_bias = @gsubrs.bias if @gsubrs

@@ -24,22 +24,8 @@ module TTFunk
       @base_table ||= TTFunk::Table::Simple.new(original, 'BASE').raw
     end
 
-    # @TODO pass desired glyphs
     def cff_table
       @cff_table ||= original.cff.encode(new2old_glyph)
-    end
-
-    # @TODO sign fonts correctly. But how??
-    def dsig_table
-      @dsig_table ||= TTFunk::Table::Simple.new(original, 'DSIG').raw
-    end
-
-    def gpos_table
-      @gpos_table ||= TTFunk::Table::Gpos.encode(original.glyph_positioning)
-    end
-
-    def gsub_table
-      @gsub_table ||= TTFunk::Table::Gsub.encode(original.glyph_substitution)
     end
 
     def vorg_table
@@ -49,10 +35,9 @@ module TTFunk
     def tables
       @tables ||= super.tap do |tb|
         tb['BASE'] = base_table
-        tb['DSIG'] = dsig_table
         tb['VORG'] = vorg_table
         tb['CFF '] = cff_table
-      end
+      end.reject { |_tag, table| table.nil? }
     end
 
     def optimal_table_order

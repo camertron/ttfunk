@@ -13,6 +13,10 @@ module TTFunk
         end
 
         def [](glyph_id)
+          # rather than validating the glyph as part of one of the predefined encodings,
+          # just pass it through
+          return glyph_id unless offset
+
           case format_sym
             when :array_format
               @entries[glyph_id]
@@ -44,8 +48,8 @@ module TTFunk
         end
 
         def encode
-          # no offset means no charset was specified (i.e. we're supposed to use the default one)
-          # and there's nothing to encode
+          # no offset means no charset was specified (i.e. we're supposed to use a
+          # predefined charset) and there's nothing to encode
           return '' unless offset
 
           ''.tap do |result|
@@ -68,6 +72,7 @@ module TTFunk
         private
 
         def parse!
+          return unless offset
           @format = read(1, 'C').first
 
           case format_sym

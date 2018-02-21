@@ -2,7 +2,7 @@ module TTFunk
   class TtfEncoder
     OPTIMAL_TABLE_ORDER = %w(
       head hhea maxp OS/2 hmtx LTSH VDMX hdmx cmap fpgm
-      prep cvt loca glyfkern name post gasp PCLT
+      prep cvt loca glyf kern name post gasp PCLT
     )
 
     attr_reader :original, :subset, :options
@@ -49,14 +49,9 @@ module TTFunk
 
         if tables.include?(optimal_tag)
           newfont.resolve_placeholders(:tables, optimal_tag, [offset].pack('N'))
-          data = tables[optimal_tag]
+          data = align(tables[optimal_tag])
           newfont << data
-
           offset += data.length
-
-          # align to 4 bytes
-          newfont << "\0" * (offset % 4)
-          offset += offset % 4
         end
       end
 
@@ -154,6 +149,10 @@ module TTFunk
       @prep_table ||= TTFunk::Table::Simple.new(original, 'prep').raw
     end
 
+    def dsig_table
+      @dsig_table ||= TTFunk::Table::Dsig.encode(original.digital_signature)
+    end
+
     def kern_table
       # for PDF's, the kerning info is all included in the PDF as the text is
       # drawn. Thus, the PDF readers do not actually use the kerning info in
@@ -165,14 +164,6 @@ module TTFunk
           original.kerning, old2new_glyph
         )
       end
-    end
-
-    def gpos_table
-      @gpos_table ||= TTFunk::Table::Gpos.encode(original.glyph_positioning)
-    end
-
-    def gsub_table
-      @gsub_table ||= TTFunk::Table::Gsub.encode(original.glyph_substitution)
     end
 
     def tables
@@ -191,8 +182,7 @@ module TTFunk
         'prep' => prep_table,
         'fpgm' => fpgm_table,
         'cvt ' => cvt_table,
-        'GPOS' => gpos_table,
-        'GSUB' => gsub_table
+        'DSIG' => dsig_table
       }.reject { |_tag, table| table.nil? }
     end
 
@@ -258,12 +248,6 @@ module TTFunk
     end
 
     def checksum(data)
-      # For some reason, 32-bit alignment is only important when checksumming.
-      # Microsoft's FontValidator tool will complain if the table data itself
-      # is padded with null (i.e. \0) alignment bytes (reports the table is
-      # too long), but will also complain if the checksum is calculated with
-      # unaligned data. I guess the solution is to calculate the checksum on
-      # aligned data but encode the table unaligned. Weird but it works.
       data = data.respond_to?(:string) ? data.string : data
       align(data).unpack('N*').reduce(0, :+) & 0xFFFF_FFFF
     end

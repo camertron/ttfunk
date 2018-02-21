@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
     ['CHANGELOG.md', 'README.md', 'COPYING', 'LICENSE', 'GPLv2', 'GPLv3']
   spec.add_dependency('code-pages', '~> 1.0')
   spec.required_ruby_version = '~> 2.2'
+  spec.add_dependency('code-pages', '~> 1.2')
   spec.add_development_dependency('rake', '~> 12')
   spec.add_development_dependency('rspec', '~> 3.5')
   spec.add_development_dependency('rubocop', '~> 0.46')

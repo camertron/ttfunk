@@ -4,7 +4,6 @@ module TTFunk
     attr_reader :category, :name, :length
 
     def initialize(category, name, position: nil, length: 1, relative_to: nil)
-      # binding.pry if name.start_with?('coverage_table') && position
       @category = category
       @name = name
       @length = length

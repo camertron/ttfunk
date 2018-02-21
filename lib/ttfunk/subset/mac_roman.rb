@@ -11,6 +11,10 @@ module TTFunk
         @subset = Array.new(256)
       end
 
+      def code_page
+        :mac_roman
+      end
+
       def to_unicode_map
         Encoding::MacRoman::TO_UNICODE
       end

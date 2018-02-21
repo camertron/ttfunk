@@ -63,12 +63,8 @@ module TTFunk
               int = -int - 108
               [(int >> 8) + 251, int & 0xFF]
 
-            # @TODO
-            # For some reason none of the integers in noto sans have been encoded using three
-            # bytes. Feel free to uncomment this code when otf support is stable.
-
-          #   when -32768..32767
-          #     [28, (int >> 8) & 0xFF, int & 0xFF]
+            when -32768..32767
+              [28, (int >> 8) & 0xFF, int & 0xFF]
 
             else
               encode_integer32(int)
@@ -133,10 +129,7 @@ module TTFunk
           operands = []
           operator = nil
 
-          # @length can be set via the constructor, so only read a length if @length
-          # hasn't already been set
-          @length ||= read(1, 'C').first
-
+          # @length must be set via the constructor
           while io.pos < table_offset + length
             case b_zero = read(1, 'C').first
               when 12
