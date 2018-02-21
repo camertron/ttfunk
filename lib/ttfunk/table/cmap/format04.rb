@@ -44,7 +44,6 @@ module TTFunk
           range_offsets = []
           glyph_indices = []
 
-          offset = 0
           start_codes.zip(end_codes).each_with_index do |(a, b), segment|
             if a == 0xFFFF
               # We want the final 0xFFFF code to map to glyph 0.
@@ -56,15 +55,17 @@ module TTFunk
               break
             end
 
-            start_glyph_id = new_map[a][:new]
+            start_glyph_id = new_map.fetch(a, new: 0)[:new]
+
             if a - start_glyph_id >= 0x8000
               deltas << 0
               range_offsets << 2 * (glyph_indices.length + segcount - segment)
-              a.upto(b) { |code| glyph_indices << new_map[code][:new] }
+              a.upto(b) { |code| glyph_indices << new_map.fetch(code, new: 0)[:new] }
             else
               deltas << -a + start_glyph_id
               range_offsets << 0
             end
+
             offset += 2
           end
 
@@ -120,7 +121,7 @@ module TTFunk
               else
                 index = id_range_offset[i] / 2 +
                   (code - start_code[i]) - (segcount - i)
-                # Decause some TTF fonts are broken
+                # Because some TTF fonts are broken
                 glyph_id = glyph_ids[index] || 0
                 glyph_id += id_delta[i] if glyph_id != 0
               end

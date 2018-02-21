@@ -22,7 +22,7 @@ module TTFunk
       HorizontalMetric = Struct.new(:advance_width, :left_side_bearing)
 
       def for(glyph_id)
-        @metrics[glyph_id] ||
+        @metrics[glyph_id] ||=
           HorizontalMetric.new(
             @metrics.last.advance_width,
             @left_side_bearings[glyph_id - @metrics.length]
