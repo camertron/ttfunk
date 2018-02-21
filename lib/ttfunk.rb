@@ -4,6 +4,9 @@ require 'pathname'
 require_relative 'ttfunk/directory'
 require_relative 'ttfunk/resource_file'
 require_relative 'ttfunk/collection'
+require_relative 'ttfunk/ttf_encoder'
+require_relative 'ttfunk/encoded_string'
+require_relative 'ttfunk/placeholder'
 
 module TTFunk
   class File
