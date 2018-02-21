@@ -7,8 +7,10 @@ require_relative 'ttfunk/collection'
 require_relative 'ttfunk/ttf_encoder'
 require_relative 'ttfunk/encoded_string'
 require_relative 'ttfunk/placeholder'
+require_relative 'ttfunk/real'
 require_relative 'ttfunk/bit_field'
 require_relative 'ttfunk/bin_utils'
+require_relative 'ttfunk/sub_table'
 
 module TTFunk
   class File
@@ -122,6 +124,10 @@ module TTFunk
       @sbix ||= TTFunk::Table::Sbix.new(self)
     end
 
+    def cff
+      @cff ||= TTFunk::Table::Cff.new(self)
+    end
+
     def vertical_origins
       @vertical_origins ||= TTFunk::Table::Vorg.new(self)
     end
@@ -132,6 +138,7 @@ module TTFunk
   end
 end
 
+require_relative 'ttfunk/table/cff'
 require_relative 'ttfunk/table/cmap'
 require_relative 'ttfunk/table/dsig'
 require_relative 'ttfunk/table/glyf'
