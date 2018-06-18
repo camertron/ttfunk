@@ -196,16 +196,16 @@ module TTFunk
       }.reject { |_tag, table| table.nil? }
     end
 
-    def old2new_glyph
-      subset.old2new_glyph
+    def glyphs
+      subset.glyphs
     end
 
     def new2old_glyph
       subset.new2old_glyph
     end
 
-    def glyphs
-      subset.glyphs
+    def old2new_glyph
+      subset.old2new_glyph
     end
 
     def checksum(data)

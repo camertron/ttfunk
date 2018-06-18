@@ -1,5 +1,5 @@
 module TTFunk
-  class OtfEncoder < TTFEncoder
+  class OTFEncoder < TTFEncoder
     OPTIMAL_TABLE_ORDER = [
       'head', 'hhea', 'maxp', 'OS/2', 'name', 'cmap', 'post', 'CFF '
     ].freeze
