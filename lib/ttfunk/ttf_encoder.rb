@@ -93,7 +93,7 @@ module TTFunk
 
     def maxp_table
       @maxp_table ||= TTFunk::Table::Maxp.encode(
-        original.maximum_profile, old2new_glyph
+        original.maximum_profile, new2old_glyph
       )
     end
 
