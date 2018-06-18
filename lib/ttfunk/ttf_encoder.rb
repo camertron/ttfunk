@@ -87,7 +87,7 @@ module TTFunk
 
     def hhea_table
       @hhea_table = TTFunk::Table::Hhea.encode(
-        original.horizontal_header, hmtx_table
+        original.horizontal_header, hmtx_table, new2old_glyph
       )
     end
 
