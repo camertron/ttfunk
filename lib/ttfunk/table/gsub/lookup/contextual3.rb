@@ -19,15 +19,18 @@ module TTFunk
           end
 
           def encode
-            EncodedString.create do |result|
-              result.write([format, coverage_tables.count, subst_lookup_tables.count], 'nnn')
+            EncodedString.new do |result|
+              result << [format, coverage_tables.count, subst_lookup_tables.count].pack('nnn')
 
               result << coverage_tables.encode do |coverage_table|
-                [ph(:gsub, coverage_table.id, length: 2, relative_to: 0)]
+                [Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)]
               end
 
               result << subst_lookup_tables.encode do |subst_lookup_table|
-                [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
+                [
+                  subst_lookup_table.glyph_sequence_index,
+                  subst_lookup_table.lookup_list_index
+                ]
               end
             end
           end
@@ -41,8 +44,8 @@ module TTFunk
           # @TODO: Move to base class? Other things need this functionality.
           def finalize_coverage_sequence(coverage_sequence, data)
             coverage_sequence.each do |coverage_table|
-              if data.has_placeholders?(:gsub, coverage_table.id)
-                data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+              if data.placeholders.include?("gsub_#{coverage_table.id}")
+                data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
                   [data.length - placeholder.relative_to].pack('n')
                 end
 

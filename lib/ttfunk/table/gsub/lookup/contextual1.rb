@@ -25,17 +25,17 @@ module TTFunk
           end
 
           def encode
-            EncodedString.create do |result|
-              result.write(format, 'n')
-              result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
-              result.write(sub_rule_sets.count, 'n')
+            EncodedString.new do |result|
+              result << [format].pack('n')
+              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << [sub_rule_sets.count].pack('n')
               result << sub_rule_sets.encode_to(result) do |sub_rule_set|
-                [ph(:gsub, sub_rule_set.id, length: 2)]
+                [Placeholder.new("gsub_#{sub_rule_set.id}", length: 2)]
               end
 
               sub_rule_sets.each do |sub_rule_set|
-                result.resolve_placeholders(
-                  :gsub, sub_rule_set.id, [result.length].pack('n')
+                result.resolve_placeholder(
+                  "gsub_#{sub_rule_set.id}", [result.length].pack('n')
                 )
 
                 result << sub_rule_set.encode
@@ -44,8 +44,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.has_placeholders?(:gsub, coverage_table.id)
-              data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+            if data.placeholders.include?("gsub_#{coverage_table.id}")
+              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

@@ -15,7 +15,9 @@ module TTFunk
           end
 
           def class_def
-            @class_def ||= Common::ClassDef.create(self, table_offset + class_def_offset)
+            @class_def ||= Common::ClassDef.create(
+              self, table_offset + class_def_offset
+            )
           end
 
           def max_context
@@ -31,21 +33,21 @@ module TTFunk
           end
 
           def encode
-            EncodedString.create do |result|
-              result.write(format, 'n')
-              result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
-              result << ph(:gsub, class_def.id, length: 2)
-              result.write(sub_class_sets.count, 'n')
+            EncodedString.new do |result|
+              result << [format].pack('n')
+              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << Placeholder.new("gsub_#{class_def.id}", length: 2)
+              result << [sub_class_sets.count].pack('n')
               sub_class_sets.encode_to(result) do |sub_class_set|
                 if sub_class_set
-                  [ph(:gsub, sub_class_set.id, length: 2)]
+                  [Placeholder.new("gsub_#{sub_class_set.id}", length: 2)]
                 else
                   [0]
                 end
               end
 
-              result.resolve_placeholders(
-                :gsub, class_def.id, [result.length].pack('n')
+              result.resolve_placeholder(
+                "gsub_#{class_def.id}", [result.length].pack('n')
               )
 
               result << class_def.encode
@@ -53,8 +55,8 @@ module TTFunk
               sub_class_sets.each do |sub_class_set|
                 next unless sub_class_set
 
-                result.resolve_placeholders(
-                  :gsub, sub_class_set.id, [result.length].pack('n')
+                result.resolve_placeholder(
+                  "gsub_#{sub_class_set.id}", [result.length].pack('n')
                 )
 
                 result << sub_class_set.encode
@@ -63,8 +65,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.has_placeholders?(:gsub, coverage_table.id)
-              data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+            if data.has_placeholders?("gsub_#{coverage_table.id}")
+              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

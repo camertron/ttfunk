@@ -23,22 +23,24 @@ module TTFunk
           end
 
           def dependent_coverage_tables
-            [coverage_table] + backtrack_coverage_tables.to_a + lookahead_coverage_tables.to_a
+            [coverage_table] +
+              backtrack_coverage_tables.to_a +
+              lookahead_coverage_tables.to_a
           end
 
           def encode
-            EncodedString.create do |result|
-              result.write(format, 'n')
-              result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
+            EncodedString.new do |result|
+              result << [format].pack('n')
+              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
 
-              result.write(backtrack_coverage_tables.count, 'n')
+              result << [backtrack_coverage_tables.count].pack('n')
               backtrack_coverage_tables.encode_to(result) do |table|
-                [ph(:gsub, table.id, length: 2, relative_to: 0)]
+                [Placeholder.new("gsub_#{table.id}", length: 2, relative_to: 0)]
               end
 
-              result.write(lookahead_coverage_tables.count, 'n')
+              result << [lookahead_coverage_tables.count].pack('n')
               lookahead_coverage_tables.encode_to(result) do |table|
-                [ph(:gsub, table.id, length: 2, relative_to: 0)]
+                [Placeholder.new("gsub_#{table.id}", length: 2, relative_to: 0)]
               end
 
               substitute_glyph_ids.encode_to(result)
@@ -46,8 +48,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.has_placeholders?(:gsub, coverage_table.id)
-              data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+            if data.placeholders.include?("gsub_#{coverage_table.id}")
+              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 
@@ -63,8 +65,8 @@ module TTFunk
           # @TODO: Move to base class? Other things need this functionality.
           def finalize_coverage_sequence(coverage_sequence, data)
             coverage_sequence.each do |coverage_table|
-              if data.has_placeholders?(:gsub, coverage_table.id)
-                data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+              if data.placeholders.include?("gsub_#{coverage_table.id}")
+                data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
                   [data.length - placeholder.relative_to].pack('n')
                 end
 

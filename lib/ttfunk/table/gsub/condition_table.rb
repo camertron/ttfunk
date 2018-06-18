@@ -6,10 +6,10 @@ module TTFunk
         attr_reader :filter_range_min_value, :filter_range_max_value
 
         def encode
-          EncodedString.create do |result|
-            result.write([format, axis_index], 'nn')
-            result.write_f2dot14(filter_range_min_value)
-            result.write_f2dot14(filter_range_max_value)
+          EncodedString.new do |result|
+            result << [format, axis_index].pack('nn')
+            result << BinUtils.encode_f2dot14(filter_range_min_value)
+            result << BinUtils.encode_f2dot14(filter_range_max_value)
           end
         end
 

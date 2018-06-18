@@ -17,33 +17,56 @@ module TTFunk
           end
 
           def dependent_coverage_tables
-            backtrack_coverage_tables.to_a + input_coverage_tables.to_a + lookahead_coverage_tables.to_a
+            backtrack_coverage_tables.to_a +
+              input_coverage_tables.to_a +
+              lookahead_coverage_tables.to_a
           end
 
           def encode
-            EncodedString.create do |result|
-              result.write([format, backtrack_coverage_tables.count], 'nn')
+            EncodedString.new do |result|
+              result << [format, backtrack_coverage_tables.count].pack('nn')
 
               backtrack_coverage_tables.encode_to(result) do |backtrack_coverage_table|
-                [ph(:gsub, backtrack_coverage_table.id, length: 2, relative_to: 0)]
+                [
+                  Placeholder.new(
+                    "gsub_#{backtrack_coverage_table.id}",
+                    length: 2,
+                    relative_to: 0
+                  )
+                ]
               end
 
-              result.write(input_coverage_tables.count, 'n')
+              result << [input_coverage_tables.count].pack('n')
 
               input_coverage_tables.encode_to(result) do |input_coverage_table|
-                [ph(:gsub, input_coverage_table.id, length: 2, relative_to: 0)]
+                [
+                  Placeholder.new(
+                    "gsub_#{input_coverage_table.id}",
+                    length: 2,
+                    relative_to: 0
+                  )
+                ]
               end
 
-              result.write(lookahead_coverage_tables.count, 'n')
+              result << [lookahead_coverage_tables.count].pack('n')
 
               lookahead_coverage_tables.encode_to(result) do |lookahead_coverage_table|
-                [ph(:gsub, lookahead_coverage_table.id, length: 2, relative_to: 0)]
+                [
+                  Placeholder.new(
+                    "gsub_#{lookahead_coverage_table.id}",
+                    length: 2,
+                    relative_to: 0
+                  )
+                ]
               end
 
-              result.write(subst_lookup_tables.count, 'n')
+              result << [subst_lookup_tables.count].pack('n')
 
               subst_lookup_tables.encode_to(result) do |subst_lookup_table|
-                [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
+                [
+                  subst_lookup_table.glyph_sequence_index,
+                  subst_lookup_table.lookup_list_index
+                ]
               end
             end
           end
@@ -66,8 +89,8 @@ module TTFunk
           # @TODO: Move to base class? Other things need this functionality.
           def finalize_coverage_sequence(coverage_sequence, data)
             coverage_sequence.each do |coverage_table|
-              if data.has_placeholders?(:gsub, coverage_table.id)
-                data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+              if data.placeholders.include?("gsub_#{coverage_table.id}")
+                data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
                   [data.length - placeholder.relative_to].pack('n')
                 end
 

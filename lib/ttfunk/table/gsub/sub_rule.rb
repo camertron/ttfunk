@@ -7,11 +7,14 @@ module TTFunk
         attr_reader :input_sequence, :subst_lookup_tables
 
         def encode
-          EncodedString.create do |result|
-            result.write([input_sequence.count + 1, subst_lookup_tables.count], 'nn')
+          EncodedString.new do |result|
+            result << [input_sequence.count + 1, subst_lookup_tables.count].pack('nn')
             input_sequence.encode_to(result)
             subst_lookup_tables.encode_to(result) do |subst_lookup_table|
-              [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
+              [
+                subst_lookup_table.glyph_sequence_index,
+                subst_lookup_table.lookup_list_index
+              ]
             end
           end
         end

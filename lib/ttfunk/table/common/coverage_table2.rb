@@ -5,16 +5,16 @@ module TTFunk
         attr_reader :format, :range_tables
 
         def encode
-          EncodedString.create do |result|
-            result.write([format, range_tables.count], 'nn')
+          EncodedString.new do |result|
+            result << [format, range_tables.count].pack('nn')
             range_tables.encode_to(result) do |range_table|
-              [ph(:common, range_table.id, length: 2)]
+              [Placeholder.new("common_#{range_table.id}", length: 2)]
             end
 
             range_tables.each do |range_table|
-              result.resolve_placeholders(
-                :common, range_table.id, [result.length].pack('n')
-              )
+              result.resolve_each("common_#{range_table.id}") do |_placeholder|
+                [result.length].pack('n')
+              end
 
               result << range_table.encode
             end

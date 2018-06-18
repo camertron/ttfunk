@@ -12,14 +12,14 @@ module TTFunk
             end
 
             def encode(sub_table)
-              EncodedString.create do |result|
-                result.write([FORMAT, sub_table.lookup_type], 'nn')
-                result << Placeholder.new(:gsub, sub_table.id, length: 4, relative_to: 0)
+              EncodedString.new do |result|
+                result << [FORMAT, sub_table.lookup_type].pack('nn')
+                result << Placeholder.new("gsub_#{sub_table.id}", length: 4, relative_to: 0)
               end
             end
 
             def finalize(sub_table, data)
-              data.resolve_each(:gsub, sub_table.id) do |placeholder|
+              data.resolve_each("gsub_#{sub_table.id}") do |placeholder|
                 [data.length - placeholder.relative_to].pack('N')
               end
 

@@ -18,27 +18,27 @@ module TTFunk
         end
 
         def encode
-          EncodedString.create do |result|
+          EncodedString.new do |result|
             if default_lang_sys_table
-              result << ph(:common, default_lang_sys_table.id, length: 2)
+              result << Placeholder.new("common_#{default_lang_sys_table.id}", length: 2)
             else
-              result.write(0, 'n')
+              result << [0].pack('n')
             end
 
-            result.write(lang_sys_tables.count, 'n')
+            result << [lang_sys_tables.count].pack('n')
 
             lang_sys_tables.encode_to(result) do |lang_sys_table|
-              [lang_sys_table.tag, ph(:common, lang_sys_table.id, length: 2)]
+              [lang_sys_table.tag, Placeholder.new("common_#{lang_sys_table.id}", length: 2)]
             end
 
             lang_sys_tables.each do |lang_sys_table|
-              result.resolve_placeholders(:common, lang_sys_table.id, [result.length].pack('n'))
+              result.resolve_placeholder("common_#{lang_sys_table.id}", [result.length].pack('n'))
               result << lang_sys_table.encode
             end
 
             if default_lang_sys_table
-              result.resolve_placeholders(
-                :common, default_lang_sys_table.id, [result.length].pack('n')
+              result.resolve_placeholder(
+                "common_#{default_lang_sys_table.id}", [result.length].pack('n')
               )
 
               result << default_lang_sys_table.encode

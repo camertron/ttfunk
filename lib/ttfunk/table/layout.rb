@@ -6,27 +6,24 @@ module TTFunk
       attr_reader :lookup_list_offset, :feature_variation_offset
 
       def self.encode(gsub)
-        EncodedString.create do |result|
-          result.write([gsub.major_version, gsub.minor_version], 'nn')
-          result.add_placeholder(:gsub, gsub.script_list.id, position: result.length, length: 2)
-          result << "\0\0"
-          result.add_placeholder(:gsub, gsub.feature_list.id, position: result.length, length: 2)
-          result << "\0\0"
-          result.add_placeholder(:gsub, gsub.lookup_list.id, position: result.length, length: 2)
-          result << "\0\0"
+        EncodedString.new do |result|
+          result << [gsub.major_version, gsub.minor_version].pack('nn')
+          result << Placeholder.new("gsub_#{gsub.script_list.id}", length: 2)
+          result << Placeholder.new("gsub_#{gsub.feature_list.id}", length: 2)
+          result << Placeholder.new("gsub_#{gsub.lookup_list.id}", length: 2)
 
-          result.resolve_placeholders(:gsub, gsub.script_list.id, [result.length].pack('n'))
+          result.resolve_placeholder("gsub_#{gsub.script_list.id}", [result.length].pack('n'))
           result << gsub.script_list.encode
 
-          result.resolve_placeholders(:gsub, gsub.feature_list.id, [result.length].pack('n'))
+          result.resolve_placeholder("gsub_#{gsub.feature_list.id}", [result.length].pack('n'))
           result << gsub.feature_list.encode
 
-          result.resolve_placeholders(:gsub, gsub.lookup_list.id, [result.length].pack('n'))
+          result.resolve_placeholder("gsub_#{gsub.lookup_list.id}", [result.length].pack('n'))
           result << gsub.lookup_list.encode
           gsub.lookup_list.finalize(result)
 
           if gsub.feature_variation_list
-            result.resolve_placeholders(:gsub, gsub.feature_variation_list.id, [result.length].pack('N'))
+            result.resolve_placeholder("gsub_#{gsub.feature_variation_list.id}", [result.length].pack('N'))
             result << gsub.feature_variation_list.encode
           end
         end.string

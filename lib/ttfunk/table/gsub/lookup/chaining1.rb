@@ -5,7 +5,8 @@ module TTFunk
         class Chaining1 < TTFunk::SubTable
           include Common::CoverageTableMixin
 
-          attr_reader :lookup_type, :format, :coverage_offset, :chain_sub_rule_sets
+          attr_reader :lookup_type, :format, :coverage_offset
+          attr_reader :chain_sub_rule_sets
 
           def initialize(file, offset, lookup_type)
             @lookup_type = lookup_type
@@ -25,17 +26,17 @@ module TTFunk
           end
 
           def encode
-            EncodedString.create do |result|
-              result.write(format, 'n')
-              result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
-              result.write(chain_sub_rule_sets.count, 'n')
+            EncodedString.new do |result|
+              result << [format].pack('n')
+              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << [chain_sub_rule_sets.count].pack('n')
               result << chain_sub_rule_sets.encode_to(result) do |chain_sub_rule_set|
-                [ph(:gsub, chain_sub_rule_set.id, length: 2)]
+                [Placeholder.new("gsub_#{chain_sub_rule_set.id}", length: 2)]
               end
 
               chain_sub_rule_sets.each do |chain_sub_rule_set|
-                result.resolve_placeholders(
-                  :gsub, chain_sub_rule_set.id, [result.length].pack('n')
+                result.resolve_placeholder(
+                  "gsub_#{chain_sub_rule_set.id}", [result.length].pack('n')
                 )
 
                 result << chain_sub_rule_set.encode
@@ -44,8 +45,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.has_placeholders?(:gsub, coverage_table.id)
-              data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+            if data.placeholders.include?("gsub_#{coverage_table.id}")
+              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

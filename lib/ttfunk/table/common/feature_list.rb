@@ -5,14 +5,14 @@ module TTFunk
         attr_reader :tables
 
         def encode
-          EncodedString.create do |result|
-            result.write(tables.count, 'n')
+          EncodedString.new do |result|
+            result << [tables.count].pack('n')
             tables.encode_to(result) do |table|
-              [table.tag, ph(:common, table.id, length: 2)]
+              [table.tag, Placeholder.new("common_#{table.id}", length: 2)]
             end
 
             tables.each do |table|
-              result.resolve_placeholders(:common, table.id, [result.length].pack('n'))
+              result.resolve_placeholder("common_#{table.id}", [result.length].pack('n'))
               result << table.encode
             end
           end

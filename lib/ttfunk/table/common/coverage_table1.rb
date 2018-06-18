@@ -5,8 +5,8 @@ module TTFunk
         attr_reader :format, :glyph_ids
 
         def encode
-          EncodedString.create do |result|
-            result.write([format, glyph_ids.count], 'nn')
+          EncodedString.new do |result|
+            result << [format, glyph_ids.count].pack('nn')
             glyph_ids.encode_to(result)
           end
         end

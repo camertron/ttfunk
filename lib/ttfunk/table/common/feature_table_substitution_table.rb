@@ -5,7 +5,7 @@ module TTFunk
         attr_reader :file, :feature_table_index, :alternate_feature_table_offset
 
         def encode
-          EncodedString.create do |result|
+          EncodedString.new do |result|
             result << alternate_feature_table.encode
           end
         end

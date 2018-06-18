@@ -5,15 +5,15 @@ module TTFunk
         attr_reader :sub_class_rules
 
         def encode
-          EncodedString.create do |result|
-            result.write(sub_class_rules.count, 'n')
+          EncodedString.new do |result|
+            result << [sub_class_rules.count].pack('n')
             sub_class_rules.encode_to(result) do |sub_class_rule|
-              [ph(:gsub, sub_class_rule.id, length: 2)]
+              [Placeholder.new("gsub_#{sub_class_rule.id}", length: 2)]
             end
 
             sub_class_rules.each do |sub_class_rule|
-              result.resolve_placeholders(
-                :gsub, sub_class_rule.id, [result.length].pack('n')
+              result.resolve_placeholder(
+                "gsub_#{sub_class_rule.id}", [result.length].pack('n')
               )
 
               result << sub_class_rule.encode

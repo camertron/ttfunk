@@ -25,17 +25,17 @@ module TTFunk
           end
 
           def encode
-            EncodedString.create do |result|
-              result.write(format, 'n')
-              result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
-              result.write(sequences.count, 'n')
+            EncodedString.new do |result|
+              result << [format].pack('n')
+              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << [sequences.count].pack('n')
               result << sequences.encode_to(result) do |sequence|
-                [ph(:gsub, sequence.id, length: 2)]
+                [Placeholder.new("gsub_#{sequence.id}", length: 2)]
               end
 
               sequences.each do |sequence|
-                result.resolve_placeholders(
-                  :gsub, sequence.id, [result.length].pack('n')
+                result.resolve_placeholder(
+                  "gsub_#{sequence.id}", [result.length].pack('n')
                 )
 
                 result << sequence.encode
@@ -44,8 +44,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.has_placeholders?(:gsub, coverage_table.id)
-              data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+            if data.placeholders.include?("gsub_#{coverage_table.id}")
+              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

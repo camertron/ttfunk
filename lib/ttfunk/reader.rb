@@ -1,13 +1,21 @@
 module TTFunk
   module Reader
-    private
-
-    def io
-      @file.contents
+    def parse_from(position)
+      saved = io.pos
+      io.pos = position
+      result = yield position
+      io.pos = saved
+      result
     end
 
     def read(bytes, format)
       io.read(bytes).unpack(format)
+    end
+
+    private
+
+    def io
+      @file.contents
     end
 
     def read_signed(count)
@@ -20,16 +28,8 @@ module TTFunk
 
     def read_f2dot14(count)
       io.read(count * 2).unpack('n*').map do |value|
-        BinUtils.unpack_f2dot14(value)
+        BinUtils.decode_f2dot14(value)
       end
-    end
-
-    def parse_from(position)
-      saved = io.pos
-      io.pos = position
-      result = yield position
-      io.pos = saved
-      result
     end
 
     # For debugging purposes

@@ -13,11 +13,11 @@ module TTFunk
         end
 
         def encode
-          EncodedString.create do |result|
-            result.write([lookup_table_class::EXTENSION_LOOKUP_TYPE, lookup_flag.value, sub_tables.count], 'nnn')
+          EncodedString.new do |result|
+            result << [lookup_table_class::EXTENSION_LOOKUP_TYPE, lookup_flag.value, sub_tables.count].pack('nnn')
 
             sub_tables.encode_to(result) do |sub_table|
-              [ph(:common, sub_table.id, length: 2, relative_to: 0)]
+              [Placeholder.new("common_#{sub_table.id}", length: 2, relative_to: 0)]
             end
 
             result.write(mark_filtering_set, 'n') if mark_filtering_set
@@ -26,7 +26,7 @@ module TTFunk
 
         def finalize(data)
           sub_tables.each do |sub_table|
-            data.resolve_each(:common, sub_table.id) do |placeholder|
+            data.resolve_each("common_#{sub_table.id}") do |placeholder|
               [data.length - placeholder.relative_to].pack('n')
             end
 

@@ -5,8 +5,8 @@ module TTFunk
         attr_reader :ligature_glyph_id, :component_glyph_ids
 
         def encode
-          EncodedString.create do |result|
-            result.write([ligature_glyph_id, component_glyph_ids.count + 1], 'nn')
+          EncodedString.new do |result|
+            result << [ligature_glyph_id, component_glyph_ids.count + 1].pack('nn')
             component_glyph_ids.encode_to(result)
           end
         end

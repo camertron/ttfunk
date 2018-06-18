@@ -16,8 +16,8 @@ module TTFunk
         end
 
         def encode
-          EncodedString.create do |result|
-            result.write([start_glyph_id, end_glyph_id, class_id], FORMAT)
+          EncodedString.new do |result|
+            result << [start_glyph_id, end_glyph_id, class_id].pack(FORMAT)
           end
         end
       end

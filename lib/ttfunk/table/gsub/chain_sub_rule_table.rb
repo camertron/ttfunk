@@ -6,16 +6,19 @@ module TTFunk
         attr_reader :subst_lookup_tables
 
         def encode
-          EncodedString.create do |result|
-            result.write(backtrack_glyph_ids.count, 'n')
+          EncodedString.new do |result|
+            result << [backtrack_glyph_ids.count].pack('n')
             backtrack_glyph_ids.encode_to(result)
-            result.write(input_glyph_ids.count + 1, 'n')
+            result << [input_glyph_ids.count + 1].pack('n')
             input_glyph_ids.encode_to(result)
-            result.write(lookahead_glyph_ids.count, 'n')
+            result << [lookahead_glyph_ids.count].pack('n')
             lookahead_glyph_ids.encode_to(result)
-            result.write(subst_lookup_tables.count, 'n')
+            result << [subst_lookup_tables.count].pack('n')
             subst_lookup_tables.encode_to(result) do |subst_lookup_table|
-              [subst_lookup_table.glyph_sequence_index, subst_lookup_table.lookup_list_index]
+              [
+                subst_lookup_table.glyph_sequence_index,
+                subst_lookup_table.lookup_list_index
+              ]
             end
           end
         end

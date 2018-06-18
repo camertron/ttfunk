@@ -29,17 +29,17 @@ module TTFunk
           end
 
           def encode
-            EncodedString.create do |result|
-              result.write(format, 'n')
-              result << ph(:gsub, coverage_table.id, length: 2, relative_to: 0)
-              result.write(ligature_sets.count, 'n')
+            EncodedString.new do |result|
+              result << [format].pack('n')
+              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << [ligature_sets.count].pack('n')
               ligature_sets.encode_to(result) do |ligature_set|
-                [ph(:gsub, ligature_set.id, length: 2)]
+                [Placeholder.new("gsub_#{ligature_set.id}", length: 2)]
               end
 
               ligature_sets.each do |ligature_set|
-                result.resolve_placeholders(
-                  :gsub, ligature_set.id, [result.length].pack('n')
+                result.resolve_placeholder(
+                  "gsub_#{ligature_set.id}", [result.length].pack('n')
                 )
 
                 result << ligature_set.encode
@@ -48,8 +48,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.has_placeholders?(:gsub, coverage_table.id)
-              data.resolve_each(:gsub, coverage_table.id) do |placeholder|
+            if data.placeholders.include?("gsub_#{coverage_table.id}")
+              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

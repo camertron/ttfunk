@@ -5,15 +5,15 @@ module TTFunk
         attr_reader :conditions
 
         def encode
-          EncodedString.create do |result|
-            result.write(conditions.count, 'n')
+          EncodedString.new do |result|
+            result << [conditions.count].pack('n')
             conditions.encode_to(result) do |condition|
-              [ph(:gsub, condition.id, length: 2)]
+              [Placeholder.new("gsub_#{condition.id}", length: 2)]
             end
 
             conditions.each do |condition|
-              result.resolve_placeholders(
-                :gsub, condition.id, [result.length].pack('N')
+              result.resolve_placeholder(
+                "gsub_#{condition.id}", [result.length].pack('N')
               )
 
               result << condition.encode

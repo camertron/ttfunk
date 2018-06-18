@@ -5,8 +5,8 @@ module TTFunk
         attr_reader :start_glyph_id, :end_glyph_id, :start_coverage_index
 
         def encode
-          EncodedString.create do |result|
-            result.write([start_glyph_id, end_glyph_id, start_coverage_index], 'nnn')
+          EncodedString.new do |result|
+            result << [start_glyph_id, end_glyph_id, start_coverage_index].pack('nnn')
           end
         end
 

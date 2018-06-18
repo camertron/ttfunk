@@ -5,18 +5,18 @@ module TTFunk
         attr_reader :major_version, :minor_version, :tables
 
         def encode
-          EncodedString.create do |result|
-            result.write([major_version, minor_version, tables.count], 'nnn')
+          EncodedString.new do |result|
+            result << [major_version, minor_version, tables.count].pack('nnn')
             tables.encode_to(result) do |table|
               [
                 table.feature_table_index,
-                ph(:common, table.alternate_feature_table.id, length: 2)
+                Placeholder.new("common_#{table.alternate_feature_table.id}", length: 2)
               ]
             end
 
             tables.each do |table|
-              result.resolve_placeholders(
-                :common, table.alternate_feature_table.id, [result.length].pack('N')
+              result.resolve_placeholder(
+                "common_#{table.alternate_feature_table.id}", [result.length].pack('N')
               )
 
               result << table.alternate_feature_table.encode

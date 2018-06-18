@@ -47,6 +47,23 @@ module TTFunk
         ranges << [start, values.last - start]
       end
     end
+
+    # value can be a Rational, Float, Integer, etc
+    # for best results, use a Rational
+    def encode_f2dot14(value)
+      # 16384 is a magic constant defined in the OTF spec for the f2dot14 format
+      int = twos_comp(value.abs.to_i, 2) << 14
+      frac = ((value - value.to_i) * 16384.0).to_i
+      int | frac
+    end
+
+    # returns a Rational
+    def decode_f2dot14(value)
+      # 16384 is a magic constant defined in the OTF spec for the f2dot14 format
+      int = twos_comp(value >> 14, 2)
+      frac = Rational(value & 0x3FFF, 16384.0)
+      int + frac
+    end
   end
 
   BinUtils.extend(BinUtils)

@@ -10,8 +10,8 @@ module TTFunk
         end
 
         def encode
-          EncodedString.create do |result|
-            result.write([feature_params_offset, lookup_indices.count], 'nn')
+          EncodedString.new do |result|
+            result << [feature_params_offset, lookup_indices.count].pack('nn')
             lookup_indices.encode_to(result)
           end
         end

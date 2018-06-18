@@ -5,8 +5,8 @@ module TTFunk
         attr_reader :format, :class_range_tables
 
         def encode
-          EncodedString.create do |result|
-            result.write([format, class_range_tables.count], 'nn')
+          EncodedString.new do |result|
+            result << [format, class_range_tables.count].pack('nn')
 
             class_range_tables.each do |class_range_table|
               result << class_range_table.encode
