@@ -13,6 +13,9 @@ require_relative '../table/simple'
 module TTFunk
   module Subset
     class Base
+      MICROSOFT_PLATFORM_ID = 3
+      MS_SYMBOL_ENCODING_ID = 0
+
       attr_reader :original
 
       def initialize(original)
@@ -23,6 +26,11 @@ module TTFunk
         false
       end
 
+      def microsoft_symbol?
+        new_cmap_table[:platform_id] == MICROSOFT_PLATFORM_ID &&
+          new_cmap_table[:encoding_id] == MS_SYMBOL_ENCODING_ID
+      end
+
       def to_unicode_map
         {}
       end
@@ -31,7 +39,50 @@ module TTFunk
         encoder_klass.new(original, self, options).encode
       end
 
+      def old2new_glyph
+        @old2new_glyph ||= begin
+          charmap = new_cmap_table[:charmap]
+          old2new = charmap.each_with_object(0 => 0) do |(_, ids), map|
+            map[ids[:old]] = ids[:new]
+          end
+
+          next_glyph_id = new_cmap_table[:max_glyph_id]
+
+          glyphs.keys.each do |old_id|
+            unless old2new.key?(old_id)
+              old2new[old_id] = next_glyph_id
+              next_glyph_id += 1
+            end
+          end
+
+          old2new
+        end
+      end
+
+      def new2old_glyph
+        @new2old_glyph ||= old2new_glyph.invert
+      end
+
+      def glyphs
+        @glyphs ||= collect_glyphs(original_glyph_ids)
+      end
+
       private
+
+      def collect_glyphs(glyph_ids)
+        glyphs = glyph_ids.each_with_object({}) do |id, h|
+          h[id] = original.glyph_outlines.for(id)
+        end
+
+        additional_ids = glyphs.values
+                               .select { |g| g && g.compound? }
+                               .map(&:glyph_ids)
+                               .flatten
+
+        glyphs.update(collect_glyphs(additional_ids)) if additional_ids.any?
+
+        glyphs
+      end
 
       def encoder_klass
         original.cff.exists? ? OtfEncoder : TTFEncoder
