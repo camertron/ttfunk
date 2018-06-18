@@ -42,6 +42,10 @@ module TTFunk
             @left_side_bearing -
             (@x_max - @x_min)
         end
+
+        def number_of_contours
+          path.number_of_contours
+        end
       end
     end
   end
