@@ -111,7 +111,7 @@ module TTFunk
 
     def head_table
       @head_table ||= TTFunk::Table::Head.encode(
-        original.header, loca_table
+        original.header, loca_table, new2old_glyph
       )
     end
 
