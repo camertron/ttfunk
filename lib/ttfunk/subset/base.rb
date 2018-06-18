@@ -39,6 +39,33 @@ module TTFunk
         encoder_klass.new(original, self, options).encode
       end
 
+      def encoder_klass
+        original.cff.exists? ? OTFEncoder : TTFEncoder
+      end
+
+      def unicode_cmap
+        @unicode_cmap ||= @original.cmap.unicode.first
+      end
+
+      def glyphs
+        @glyphs ||= collect_glyphs(original_glyph_ids)
+      end
+
+      def collect_glyphs(glyph_ids)
+        collected = glyph_ids.each_with_object({}) do |id, h|
+          h[id] = glyph_for(id)
+        end
+
+        additional_ids = collected.values
+                                  .select { |g| g && g.compound? }
+                                  .map(&:glyph_ids)
+                                  .flatten
+
+        collected.update(collect_glyphs(additional_ids)) if additional_ids.any?
+
+        collected
+      end
+
       def old2new_glyph
         @old2new_glyph ||= begin
           charmap = new_cmap_table[:charmap]
@@ -63,33 +90,18 @@ module TTFunk
         @new2old_glyph ||= old2new_glyph.invert
       end
 
-      def glyphs
-        @glyphs ||= collect_glyphs(original_glyph_ids)
-      end
-
       private
 
-      def collect_glyphs(glyph_ids)
-        glyphs = glyph_ids.each_with_object({}) do |id, h|
-          h[id] = original.glyph_outlines.for(id)
+      def glyph_for(glyph_id)
+        if original.cff.exists?
+          original
+            .cff
+            .top_index[0]
+            .charstrings_index[glyph_id]
+            .glyph
+        else
+          original.glyph_outlines.for(glyph_id)
         end
-
-        additional_ids = glyphs.values
-                               .select { |g| g && g.compound? }
-                               .map(&:glyph_ids)
-                               .flatten
-
-        glyphs.update(collect_glyphs(additional_ids)) if additional_ids.any?
-
-        glyphs
-      end
-
-      def encoder_klass
-        original.cff.exists? ? OtfEncoder : TTFEncoder
-      end
-
-      def unicode_cmap
-        @unicode_cmap ||= @original.cmap.unicode.first
       end
     end
   end

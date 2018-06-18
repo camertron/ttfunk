@@ -46,6 +46,10 @@ module TTFunk
         def number_of_contours
           path.number_of_contours
         end
+
+        def compound?
+          false
+        end
       end
     end
   end
