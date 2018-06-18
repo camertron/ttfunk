@@ -1,8 +1,9 @@
 module TTFunk
   class TTFEncoder
-    OPTIMAL_TABLE_ORDER = %w[
-      head hhea maxp OS/2 hmtx LTSH VDMX hdmx cmap fpgm
-      prep cvt loca glyf kern name post gasp PCLT
+    OPTIMAL_TABLE_ORDER = [
+      'head', 'hhea', 'maxp', 'OS/2', 'hmtx', 'LTSH', 'VDMX',
+      'hdmx', 'cmap', 'fpgm', 'prep', 'cvt ', 'loca', 'glyf',
+      'kern', 'name', 'post', 'gasp', 'PCLT'
     ].freeze
 
     attr_reader :original, :subset, :options
@@ -134,6 +135,10 @@ module TTFunk
       @prep_table ||= TTFunk::Table::Simple.new(original, 'prep').raw
     end
 
+    def gasp_table
+      @gasp_table ||= TTFunk::Table::Simple.new(original, 'gasp').raw
+    end
+
     def kern_table
       # for PDFs, the kerning info is all included in the PDF as the text is
       # drawn. Thus, the PDF readers do not actually use the kerning info in
@@ -176,7 +181,8 @@ module TTFunk
         'fpgm' => fpgm_table,
         'cvt ' => cvt_table,
         'VORG' => vorg_table,
-        'DSIG' => dsig_table
+        'DSIG' => dsig_table,
+        'gasp' => gasp_table
       }.reject { |_tag, table| table.nil? }
     end
 
