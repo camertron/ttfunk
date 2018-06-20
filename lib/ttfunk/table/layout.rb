@@ -30,6 +30,7 @@ module TTFunk
           result << gsub.lookup_list.encode(new2old_glyph, old2new_lookups)
           gsub.lookup_list.finalize(result, old2new_lookups)
 
+          # I can't find any examples of this in the wild...
           if gsub.feature_variation_list
             result.resolve_placeholder("gsub_#{gsub.feature_variation_list.id}", [result.length].pack('N'))
             result << gsub.feature_variation_list.encode
@@ -38,15 +39,21 @@ module TTFunk
       end
 
       def script_list
-        @script_list ||= Common::ScriptList.new(file, offset + script_list_offset)
+        @script_list ||= Common::ScriptList.new(
+          file, offset + script_list_offset
+        )
       end
 
       def feature_list
-        @feature_list ||= Common::FeatureList.new(file, offset + feature_list_offset)
+        @feature_list ||= Common::FeatureList.new(
+          file, offset + feature_list_offset
+        )
       end
 
       def lookup_list
-        @lookup_list ||= Common::LookupList.new(file, offset + lookup_list_offset, lookup_table)
+        @lookup_list ||= Common::LookupList.new(
+          file, offset + lookup_list_offset, lookup_table
+        )
       end
 
       def feature_variation_list
