@@ -4,22 +4,39 @@ module TTFunk
       class FeatureList < TTFunk::SubTable
         attr_reader :tables
 
-        def encode
+        def encode(old2new_lookups, old2new_features)
           EncodedString.new do |result|
-            result << [tables.count].pack('n')
-            tables.encode_to(result) do |table|
-              [table.tag, Placeholder.new("common_#{table.id}", length: 2)]
+            result << [old2new_features.count].pack('n')
+
+            old2new_features.each do |old_index, _|
+              table = tables[old_index]
+              result << [table.tag].pack('A4')
+              result << Placeholder.new("common_#{table.id}", length: 2)
             end
 
-            tables.each do |table|
+            old2new_features.each do |old_index, _|
+              table = tables[old_index]
               result.resolve_placeholder("common_#{table.id}", [result.length].pack('n'))
-              result << table.encode
+              result << table.encode(old2new_lookups)
             end
           end
         end
 
         def length
           @length + sum(tables, &:length)
+        end
+
+        def old2new_features_for(old2new_lookups)
+          old_lookup_indices = old2new_lookups.keys
+          new_index = 0
+
+          {}.tap do |old2new_features|
+            tables.each_with_index do |table, old_index|
+              next unless (table.lookup_indices.to_a & old_lookup_indices).any?
+              old2new_features[old_index] = new_index
+              new_index += 1
+            end
+          end
         end
 
         private

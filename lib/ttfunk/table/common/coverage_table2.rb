@@ -21,6 +21,10 @@ module TTFunk
           end
         end
 
+        def glyph_ids
+          @glyph_ids ||= range_tables.flat_map(&:glyph_ids)
+        end
+
         def length
           @length + sum(range_tables, &:length)
         end

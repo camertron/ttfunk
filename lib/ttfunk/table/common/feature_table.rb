@@ -9,10 +9,13 @@ module TTFunk
           super(file, offset)
         end
 
-        def encode
+        def encode(old2new_lookups)
           EncodedString.new do |result|
-            result << [feature_params_offset, lookup_indices.count].pack('nn')
-            lookup_indices.encode_to(result)
+            subset_lookup_indices = old2new_lookups.keys & lookup_indices.to_a
+            result << [feature_params_offset, subset_lookup_indices.count].pack('nn')
+            result << subset_lookup_indices
+              .map { |lookup_index| old2new_lookups[lookup_index] }
+              .pack('n*')
           end
         end
 

@@ -9,27 +9,53 @@ module TTFunk
           super(file, offset)
         end
 
-        def encode
+        def encode(new2old_glyph, old2new_lookups)
           EncodedString.new do |result|
-            result << [tables.count].pack('n')
-            tables.encode_to(result) do |table|
-              [Placeholder.new("common_#{table.id}", length: 2)]
+            result << [old2new_lookups.count].pack('n')
+            old2new_lookups.each do |old_index, _|
+              table = tables[old_index]
+              result << Placeholder.new("common_#{table.id}", length: 2)
             end
 
-            tables.each do |table|
+            old2new_lookups.each do |old_index, _|
+              table = tables[old_index]
               result.resolve_placeholder("common_#{table.id}", [result.length].pack('n'))
               result << table.encode
             end
           end
         end
 
-        def finalize(data)
-          tables.each { |table| table.finalize(data) }
-          tables.each { |table| table.finalize_sub_tables(data) }
+        def finalize(data, old2new_lookups)
+          old2new_lookups.each do |old_index, _|
+            tables[old_index].finalize(data)
+          end
+
+          old2new_lookups.each do |old_index, _|
+            tables[old_index].finalize_sub_tables(data)
+          end
         end
 
         def length
           @length + sum(tables, &:length)
+        end
+
+        def old2new_lookups_for(glyph_ids)
+          # return tables.to_a
+          new_index = 0
+
+          {}.tap do |old2new_lookups|
+            tables.each_with_index do |table, old_index|
+              exists = table.sub_tables.any? do |sub_table|
+                        sub_table.dependent_coverage_tables.any? do |coverage_table|
+                          !(coverage_table.glyph_ids & glyph_ids).empty?
+                        end
+                      end
+
+              next unless exists
+              old2new_lookups[old_index] = new_index
+              new_index += 1
+            end
+          end
         end
 
         private

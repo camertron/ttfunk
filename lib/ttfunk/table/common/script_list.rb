@@ -4,7 +4,7 @@ module TTFunk
       class ScriptList < TTFunk::SubTable
         attr_reader :tables
 
-        def encode
+        def encode(old2new_features)
           EncodedString.new do |result|
             result << [tables.count].pack('n')
             tables.encode_to(result) do |table|
@@ -13,7 +13,7 @@ module TTFunk
 
             tables.each do |table|
               result.resolve_placeholder("common_#{table.id}", [result.length].pack('n'))
-              result << table.encode
+              result << table.encode(old2new_features)
             end
           end
         end

@@ -10,6 +10,10 @@ module TTFunk
           end
         end
 
+        def glyph_ids
+          @glyph_ids ||= (start_glyph_id..end_glyph_id).to_a
+        end
+
         private
 
         def parse!

@@ -17,31 +17,37 @@ module TTFunk
           end
         end
 
-        def encode
+        def encode(old2new_features)
           EncodedString.new do |result|
-            if default_lang_sys_table
+            include_default = include_lang_sys_table?(
+              default_lang_sys_table, old2new_features
+            )
+
+            if default_lang_sys_table && include_default
               result << Placeholder.new("common_#{default_lang_sys_table.id}", length: 2)
             else
               result << [0].pack('n')
             end
 
-            result << [lang_sys_tables.count].pack('n')
+            ls_tables = lang_sys_tables_for(old2new_features)
+            result << [ls_tables.count].pack('n')
 
-            lang_sys_tables.encode_to(result) do |lang_sys_table|
-              [lang_sys_table.tag, Placeholder.new("common_#{lang_sys_table.id}", length: 2)]
+            ls_tables.each do |ls_table|
+              result << [ls_table.tag].pack('A4')
+              result << Placeholder.new("common_#{ls_table.id}", length: 2)
             end
 
-            lang_sys_tables.each do |lang_sys_table|
-              result.resolve_placeholder("common_#{lang_sys_table.id}", [result.length].pack('n'))
-              result << lang_sys_table.encode
+            ls_tables.each do |ls_table|
+              result.resolve_placeholder("common_#{ls_table.id}", [result.length].pack('n'))
+              result << ls_table.encode(old2new_features)
             end
 
-            if default_lang_sys_table
+            if default_lang_sys_table && include_default
               result.resolve_placeholder(
                 "common_#{default_lang_sys_table.id}", [result.length].pack('n')
               )
 
-              result << default_lang_sys_table.encode
+              result << default_lang_sys_table.encode(old2new_features)
             end
           end
         end
@@ -51,6 +57,24 @@ module TTFunk
         end
 
         private
+
+        def lang_sys_tables_for(old2new_features)
+          lang_sys_tables.select do |table|
+            include_lang_sys_table?(table, old2new_features)
+          end
+        end
+
+        def include_lang_sys_table?(table, old2new_features)
+          if table.has_required_feature?
+            unless old2new_features.include?(table.required_feature_index)
+              return false
+            end
+          end
+
+          table.feature_indices.all? do |index|
+            old2new_features.include?(index)
+          end
+        end
 
         def parse!
           @default_lang_sys_offset, count = read(4, 'nn')
