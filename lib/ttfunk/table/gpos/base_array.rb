@@ -14,11 +14,11 @@ module TTFunk
         def parse!
           count = read(2, 'n').first
 
-          @bases = ArraySequence.new(io, count) do
+          @bases = Array.new(count) do
             BaseTable.new(file, io.pos, table_offset, mark_class_count)
           end
 
-          @length = 2 + bases.length
+          @length = 2 + sum(bases, &:length)
         end
       end
     end

@@ -41,7 +41,6 @@ module TTFunk
 
           private
 
-          # @TODO: Move to base class? Other things need this functionality.
           def finalize_coverage_sequence(coverage_sequence, data)
             coverage_sequence.each do |coverage_table|
               if data.placeholders.include?("gsub_#{coverage_table.id}")

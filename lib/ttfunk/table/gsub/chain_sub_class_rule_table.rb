@@ -8,7 +8,7 @@ module TTFunk
         def encode
           EncodedString.new do |result|
             result << [backtrack_glyph_ids.count].pack('n')
-            backtrack_glyph_ids.encode_to_result
+            backtrack_glyph_ids.encode_to(result)
             result << [input_glyph_ids.count].pack('n')
             input_glyph_ids.encode_to(result)
             result << [lookahead_glyph_ids.count].pack('n')
@@ -30,9 +30,9 @@ module TTFunk
           @backtrack_glyph_ids = Sequence.from(io, backtrack_count, 'n')
           input_count = read(2, 'n').first
           @input_glyph_ids = Sequence.from(io, input_count, 'n')
-          lookahead_count = read(2, 'n')
+          lookahead_count = read(2, 'n').first
           @lookahead_glyph_ids = Sequence.from(io, lookahead_count, 'n')
-          subst_count = read(2, 'n')
+          subst_count = read(2, 'n').first
           @subst_lookup_tables = Sequence.from(io, subst_count, SubstLookupTable::FORMAT) do |*args|
             SubstLookupTable.new(*args)
           end

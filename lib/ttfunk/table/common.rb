@@ -1,10 +1,10 @@
 module TTFunk
   class Table
     module Common
-      autoload :ClassDef,                      'ttfunk/table/gsub/class_def'
-      autoload :ClassDef1,                     'ttfunk/table/gsub/class_def1'
-      autoload :ClassDef2,                     'ttfunk/table/gsub/class_def2'
-      autoload :ClassRangeTable,               'ttfunk/table/gsub/class_range_table'
+      autoload :ClassDef,                      'ttfunk/table/common/class_def'
+      autoload :ClassDef1,                     'ttfunk/table/common/class_def1'
+      autoload :ClassDef2,                     'ttfunk/table/common/class_def2'
+      autoload :ClassRangeTable,               'ttfunk/table/common/class_range_table'
       autoload :CoverageTable,                 'ttfunk/table/common/coverage_table'
       autoload :CoverageTable1,                'ttfunk/table/common/coverage_table1'
       autoload :CoverageTable2,                'ttfunk/table/common/coverage_table2'

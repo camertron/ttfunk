@@ -15,7 +15,7 @@ module TTFunk
           lookahead_glyph_count = read(2, 'n').first
           @lookahead_sequence = Sequence.from(io, lookahead_glyph_count, 'n')
           pos_count = read(2, 'n').first
-          @pos_lookups = ArraySequence.new(io, pos_count) do
+          @pos_lookups = Array.new(pos_count) do
             PosLookupTable.new(file, io.pos)
           end
 

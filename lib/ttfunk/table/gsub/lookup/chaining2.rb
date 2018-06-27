@@ -17,19 +17,19 @@ module TTFunk
 
           def backtrack_class_def
             @backtrack_class_def ||= Common::ClassDef.create(
-              self, backtrack_class_def_offset
+              self, table_offset + backtrack_class_def_offset
             )
           end
 
           def input_class_def
             @input_class_def ||= Common::ClassDef.create(
-              self, input_class_def_offset
+              self, table_offset + input_class_def_offset
             )
           end
 
           def lookahead_class_def
             @lookahead_class_def ||= Common::ClassDef.create(
-              self, lookahead_class_def_offset
+              self, table_offset + lookahead_class_def_offset
             )
           end
 
@@ -50,22 +50,37 @@ module TTFunk
             EncodedString.new do |result|
               result << [format].pack('n')
               result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
-              result << Placeholder.new("gsub_#{backtrack_class_def.id}", length: 2)
-              result << Placeholder.new("gsub_#{input_class_def.id}", length: 2)
-              result << Placeholder.new("gsub_#{lookahead_class_def.id}", length: 2)
-              result << chain_sub_class_sets.encode do |chain_sub_class_set|
+              result << Placeholder.new("gsub_#{backtrack_class_def.id}", length: 2, relative_to: 0)
+              result << Placeholder.new("gsub_#{input_class_def.id}", length: 2, relative_to: 0)
+              result << Placeholder.new("gsub_#{lookahead_class_def.id}", length: 2, relative_to: 0)
+              result << chain_sub_class_sets.encode_to(result) do |chain_sub_class_set|
                 if chain_sub_class_set
-                  [Placeholder.new("gsub_#{chain_sub_class_set.id}", length: 2)]
+                  [Placeholder.new("gsub_#{chain_sub_class_set.id}", length: 2, relative_to: 0)]
                 else
                   [0]
                 end
               end
 
-              result.resolve_placeholder("gsub_#{backtrack_class_def.id}", [result.length].pack('n'))
+              # Although not mentioned anywhere in the documentation, class
+              # defs can be shared between backtrack, input, and lookahead.
+              # This means there could be more than one placeholder per
+              # class def table ID, necessitating the use of resolve_each.
+              result.resolve_each("gsub_#{backtrack_class_def.id}") do
+                [result.length].pack('n')
+              end
+
               result << backtrack_class_def.encode
-              result.resolve_placeholder("gsub_#{input_class_def.id}", [result.length].pack('n'))
+
+              result.resolve_each("gsub_#{input_class_def.id}") do
+                [result.length].pack('n')
+              end
+
               result << input_class_def.encode
-              result.resolve_placeholder("gsub_#{lookahead_class_def.id}", [result.length].pack('n'))
+
+              result.resolve_each("gsub_#{lookahead_class_def.id}") do
+                [result.length].pack('n')
+              end
+
               result << lookahead_class_def.encode
 
               chain_sub_class_sets.each do |chain_sub_class_set|
@@ -102,7 +117,11 @@ module TTFunk
               count = read(12, 'n6')
 
             @chain_sub_class_sets = Sequence.from(io, count, 'n') do |chain_sub_class_set_offset|
-              if chain_sub_class_set_offset > 0  # can be nil
+              # "If no contexts begin with a particular class (that is, if a
+              # ChainSubClassSet contains no ChainSubClassRule tables), then
+              # the offset to that particular ChainSubClassSet in the
+              # ChainSubClassSet array will be set to NULL." (i.e. 0)
+              if chain_sub_class_set_offset > 0
                 Gsub::ChainSubClassSet.new(file, table_offset + chain_sub_class_set_offset)
               end
             end

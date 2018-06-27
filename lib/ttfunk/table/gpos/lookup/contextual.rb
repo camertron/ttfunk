@@ -4,7 +4,7 @@ module TTFunk
       module Lookup
         class Contextual
           FORMAT_MAP = {
-            1 => Lookup::Contextual1, 2 => Contextual2, 3 => Contextual3
+            1 => Contextual1, 2 => Contextual2, 3 => Contextual3
           }
 
           def self.create(file, parent_table, offset, lookup_type)

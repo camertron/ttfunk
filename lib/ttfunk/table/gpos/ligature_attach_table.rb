@@ -14,7 +14,7 @@ module TTFunk
         def parse!
           count = read(2, 'n').first
 
-          @components = ArraySequence.new(io, count) do
+          @components = Array.new(count) do
             ComponentTable.new(file, io.pos, table_offset, mark_class_count)
           end
 

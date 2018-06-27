@@ -12,7 +12,6 @@ require_relative 'ttfunk/sci_form'
 require_relative 'ttfunk/bit_field'
 require_relative 'ttfunk/bin_utils'
 require_relative 'ttfunk/sub_table'
-require_relative 'ttfunk/array_sequence'
 require_relative 'ttfunk/sequence'
 require_relative 'ttfunk/pack_format'
 

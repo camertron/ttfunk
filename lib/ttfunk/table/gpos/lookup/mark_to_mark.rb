@@ -23,6 +23,45 @@ module TTFunk
             )
           end
 
+          def dependent_coverage_tables
+            [mark1_coverage_table, mark2_coverage_table]
+          end
+
+          def encode
+            EncodedString.new do |result|
+              result << [format].pack('n')
+              result << Placeholder.new("gpos_#{mark1_coverage_table.id}", length: 2, relative_to: 0)
+              result << Placeholder.new("gpos_#{mark2_coverage_table.id}", length: 2, relative_to: 0)
+              result << [mark1_array.count].pack('n')
+              result << Placeholder.new("gpos_#{mark1_array.id}", length: 2, relative_to: 0)
+              result << Placeholder.new("gpos_#{mark2_array.id}", length: 2, relative_to: 0)
+
+              result.resolve_placeholder("gpos_#{mark1_array.id}", [result.length].pack('n'))
+              result << mark1_array.encode
+
+              result.resolve_placeholder("gpos_#{mark2_array.id}", [result.length].pack('n'))
+              result << mark2_array.encode
+            end
+          end
+
+          def finalize(data)
+            if data.placeholders.include?("gpos_#{mark1_coverage_table.id}")
+              data.resolve_each("gsub_#{mark1_coverage_table.id}") do |placeholder|
+                [data.length - placeholder.relative_to].pack('n')
+              end
+
+              data << mark1_coverage_table.encode
+            end
+
+            if data.placeholders.include?("gpos_#{mark2_coverage_table.id}")
+              data.resolve_each("gpos_#{mark2_coverage_table.id}") do |placeholder|
+                [data.length - placeholder.relative_to].pack('n')
+              end
+
+              data << mark2_coverage_table.encode
+            end
+          end
+
           private
 
           def parse!

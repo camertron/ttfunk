@@ -12,11 +12,11 @@ module TTFunk
           def parse!
             @format, @coverage_offset, @value_format, count = read(8, 'nnnn')
 
-            @value_tables = ArraySequence.new(io, count) do
+            @value_tables = Array.new(count) do
               ValueTable.new(file, io.pos, value_format, table_offset)
             end
 
-            @length = 8 + value_tables.length
+            @length = 8 + sum(value_tables, &:length)
           end
         end
       end
