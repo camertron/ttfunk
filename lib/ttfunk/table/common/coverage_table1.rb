@@ -15,6 +15,10 @@ module TTFunk
           @glyph_ids ||= glyph_seq.to_a
         end
 
+        def placeholder
+          @placeholder ||= Placeholder.new(id, length: 2, relative_to: 0)
+        end
+
         private
 
         def parse!

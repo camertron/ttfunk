@@ -24,6 +24,10 @@ module TTFunk
       @id ||= "#{self.class.underscored_name}_#{table_offset}"
     end
 
+    def placeholder
+      @placeholder ||= Placeholder.new(id, length: 2)
+    end
+
     private
 
     def sum(enum)

@@ -8,12 +8,12 @@ module TTFunk
           EncodedString.new do |result|
             result << [sub_class_rules.count].pack('n')
             sub_class_rules.encode_to(result) do |sub_class_rule|
-              [Placeholder.new("gsub_#{sub_class_rule.id}", length: 2)]
+              [sub_class_rule.placeholder]
             end
 
             sub_class_rules.each do |sub_class_rule|
               result.resolve_placeholder(
-                "gsub_#{sub_class_rule.id}", [result.length].pack('n')
+                sub_class_rule.id, [result.length].pack('n')
               )
 
               result << sub_class_rule.encode

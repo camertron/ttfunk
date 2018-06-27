@@ -2,16 +2,11 @@ module TTFunk
   class Table
     class Gsub
       module Lookup
-        class Chaining1 < TTFunk::SubTable
+        class Chaining1 < Base
           include Common::CoverageTableMixin
 
-          attr_reader :lookup_type, :format, :coverage_offset
+          attr_reader :format, :coverage_offset
           attr_reader :chain_sub_rule_sets
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
 
           def max_context
             @max_context ||= chain_sub_rule_sets.flat_map do |chain_sub_rule_set|
@@ -21,22 +16,18 @@ module TTFunk
             end.max
           end
 
-          def dependent_coverage_tables
-            [coverage_table]
-          end
-
           def encode
             EncodedString.new do |result|
               result << [format].pack('n')
-              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << coverage_table.placeholder
               result << [chain_sub_rule_sets.count].pack('n')
               result << chain_sub_rule_sets.encode_to(result) do |chain_sub_rule_set|
-                [Placeholder.new("gsub_#{chain_sub_rule_set.id}", length: 2)]
+                [chain_sub_rule_set.placeholder]
               end
 
               chain_sub_rule_sets.each do |chain_sub_rule_set|
                 result.resolve_placeholder(
-                  "gsub_#{chain_sub_rule_set.id}", [result.length].pack('n')
+                  chain_sub_rule_set.id, [result.length].pack('n')
                 )
 
                 result << chain_sub_rule_set.encode
@@ -45,8 +36,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.placeholders.include?("gsub_#{coverage_table.id}")
-              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
+            if data.placeholders.include?(coverage_table.id)
+              data.resolve_each(coverage_table.id) do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

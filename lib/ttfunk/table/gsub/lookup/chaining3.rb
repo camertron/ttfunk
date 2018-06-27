@@ -2,15 +2,9 @@ module TTFunk
   class Table
     class Gsub
       module Lookup
-        class Chaining3 < TTFunk::SubTable
-          attr_reader :lookup_type
+        class Chaining3 < Base
           attr_reader :format, :backtrack_coverage_tables, :input_coverage_tables
           attr_reader :lookahead_coverage_tables, :subst_lookup_tables
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
 
           def max_context
             input_coverage_tables.count + lookahead_coverage_tables.count
@@ -27,37 +21,19 @@ module TTFunk
               result << [format, backtrack_coverage_tables.count].pack('nn')
 
               backtrack_coverage_tables.encode_to(result) do |backtrack_coverage_table|
-                [
-                  Placeholder.new(
-                    "gsub_#{backtrack_coverage_table.id}",
-                    length: 2,
-                    relative_to: 0
-                  )
-                ]
+                [backtrack_coverage_table.placeholder]
               end
 
               result << [input_coverage_tables.count].pack('n')
 
               input_coverage_tables.encode_to(result) do |input_coverage_table|
-                [
-                  Placeholder.new(
-                    "gsub_#{input_coverage_table.id}",
-                    length: 2,
-                    relative_to: 0
-                  )
-                ]
+                [input_coverage_table.placeholder]
               end
 
               result << [lookahead_coverage_tables.count].pack('n')
 
               lookahead_coverage_tables.encode_to(result) do |lookahead_coverage_table|
-                [
-                  Placeholder.new(
-                    "gsub_#{lookahead_coverage_table.id}",
-                    length: 2,
-                    relative_to: 0
-                  )
-                ]
+                [lookahead_coverage_table.placeholder]
               end
 
               result << [subst_lookup_tables.count].pack('n')
@@ -89,8 +65,8 @@ module TTFunk
           # @TODO: Move to base class? Other things need this functionality.
           def finalize_coverage_sequence(coverage_sequence, data)
             coverage_sequence.each do |coverage_table|
-              if data.placeholders.include?("gsub_#{coverage_table.id}")
-                data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
+              if data.placeholders.include?(coverage_table.id)
+                data.resolve_each(coverage_table.id) do |placeholder|
                   [data.length - placeholder.relative_to].pack('n')
                 end
 

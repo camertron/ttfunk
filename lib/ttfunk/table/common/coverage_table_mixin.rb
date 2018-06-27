@@ -9,6 +9,10 @@ module TTFunk
             file, self, table_offset + coverage_offset
           )
         end
+
+        def dependent_coverage_tables
+          [coverage_table]
+        end
       end
     end
   end

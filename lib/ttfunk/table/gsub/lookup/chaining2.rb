@@ -2,18 +2,12 @@ module TTFunk
   class Table
     class Gsub
       module Lookup
-        class Chaining2 < TTFunk::SubTable
+        class Chaining2 < Base
           include Common::CoverageTableMixin
 
-          attr_reader :lookup_type
           attr_reader :format, :coverage_offset, :backtrack_class_def_offset
           attr_reader :input_class_def_offset, :lookahead_class_def_offset
           attr_reader :chain_sub_class_sets
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
 
           def backtrack_class_def
             @backtrack_class_def ||= Common::ClassDef.create(
@@ -42,42 +36,35 @@ module TTFunk
             end.max
           end
 
-          def dependent_coverage_tables
-            [coverage_table]
-          end
-
           def encode
             EncodedString.new do |result|
               result << [format].pack('n')
-              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
-              result << Placeholder.new("gsub_#{backtrack_class_def.id}", length: 2, relative_to: 0)
-              result << Placeholder.new("gsub_#{input_class_def.id}", length: 2, relative_to: 0)
-              result << Placeholder.new("gsub_#{lookahead_class_def.id}", length: 2, relative_to: 0)
+              result << coverage_table.placeholder
+              result << backtrack_class_def.placeholder
+              result << input_class_def.placeholder
+              result << lookahead_class_def.placeholder
               result << chain_sub_class_sets.encode_to(result) do |chain_sub_class_set|
-                if chain_sub_class_set
-                  [Placeholder.new("gsub_#{chain_sub_class_set.id}", length: 2, relative_to: 0)]
-                else
-                  [0]
-                end
+                next [0] unless chain_sub_class_set
+                [chain_sub_class_set.placeholder]
               end
 
               # Although not mentioned anywhere in the documentation, class
               # defs can be shared between backtrack, input, and lookahead.
               # This means there could be more than one placeholder per
               # class def table ID, necessitating the use of resolve_each.
-              result.resolve_each("gsub_#{backtrack_class_def.id}") do
+              result.resolve_each(backtrack_class_def.id) do
                 [result.length].pack('n')
               end
 
               result << backtrack_class_def.encode
 
-              result.resolve_each("gsub_#{input_class_def.id}") do
+              result.resolve_each(input_class_def.id) do
                 [result.length].pack('n')
               end
 
               result << input_class_def.encode
 
-              result.resolve_each("gsub_#{lookahead_class_def.id}") do
+              result.resolve_each(lookahead_class_def.id) do
                 [result.length].pack('n')
               end
 
@@ -87,7 +74,7 @@ module TTFunk
                 next unless chain_sub_class_set
 
                 result.resolve_placeholder(
-                  "gsub_#{chain_sub_class_set.id}", [result.length].pack('n')
+                  chain_sub_class_set.id, [result.length].pack('n')
                 )
 
                 result << chain_sub_class_set.encode
@@ -96,8 +83,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.placeholders.include?("gsub_#{coverage_table.id}")
-              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
+            if data.placeholders.include?(coverage_table.id)
+              data.resolve_each(coverage_table.id) do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 
@@ -106,7 +93,9 @@ module TTFunk
           end
 
           def length
-            @length + sum(chain_sub_class_sets) { |cscs| cscs&.length || 0 }
+            @length + sum(chain_sub_class_sets) do |cscs|
+              cscs ? cscs.length : 0
+            end
           end
 
           private

@@ -8,12 +8,12 @@ module TTFunk
           EncodedString.new do |result|
             result << [tables.count].pack('n')
             tables.encode_to(result) do |table|
-              [Placeholder.new("gsub_#{table.id}", length: 2)]
+              [table.placeholder]
             end
 
             tables.each do |table|
               result.resolve_placeholder(
-                "gsub_#{table.id}", [result.length].pack('n')
+                table.id, [result.length].pack('n')
               )
 
               result << table.encode

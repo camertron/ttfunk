@@ -2,8 +2,8 @@ module TTFunk
   class Table
     class Gsub
       module Lookup
-        class Contextual3 < TTFunk::SubTable
-          attr_reader :lookup_type, :coverage_tables, :subst_lookup_tables
+        class Contextual3 < Base
+          attr_reader :coverage_tables, :subst_lookup_tables
 
           def initialize(file, offset, lookup_type)
             @lookup_type = lookup_type
@@ -23,7 +23,7 @@ module TTFunk
               result << [format, coverage_tables.count, subst_lookup_tables.count].pack('nnn')
 
               result << coverage_tables.encode do |coverage_table|
-                [Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)]
+                [coverage_table.placeholder]
               end
 
               result << subst_lookup_tables.encode do |subst_lookup_table|
@@ -43,8 +43,8 @@ module TTFunk
 
           def finalize_coverage_sequence(coverage_sequence, data)
             coverage_sequence.each do |coverage_table|
-              if data.placeholders.include?("gsub_#{coverage_table.id}")
-                data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
+              if data.placeholders.include?(coverage_table.id)
+                data.resolve_each(coverage_table.id) do |placeholder|
                   [data.length - placeholder.relative_to].pack('n')
                 end
 

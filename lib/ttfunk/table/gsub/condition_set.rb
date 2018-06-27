@@ -8,12 +8,12 @@ module TTFunk
           EncodedString.new do |result|
             result << [conditions.count].pack('n')
             conditions.encode_to(result) do |condition|
-              [Placeholder.new("gsub_#{condition.id}", length: 2)]
+              [condition.placeholder]
             end
 
             conditions.each do |condition|
               result.resolve_placeholder(
-                "gsub_#{condition.id}", [result.length].pack('N')
+                condition.id, [result.length].pack('N')
               )
 
               result << condition.encode

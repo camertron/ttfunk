@@ -2,36 +2,27 @@ module TTFunk
   class Table
     class Gsub
       module Lookup
-        class Single2 < TTFunk::SubTable
+        class Single2 < Base
           include Common::CoverageTableMixin
 
-          attr_reader :lookup_type, :format, :coverage_offset, :glyph_ids
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
+          attr_reader :format, :coverage_offset, :glyph_ids
 
           def max_context
             1
           end
 
-          def dependent_coverage_tables
-            [coverage_table]
-          end
-
           def encode
             EncodedString.new do |result|
               result << [format].pack('n')
-              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << coverage_table.placeholder
               result << [glyph_ids.count].pack('n')
               glyph_ids.encode_to(result)
             end
           end
 
           def finalize(data)
-            if data.placeholders.include?("gsub_#{coverage_table.id}")
-              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
+            if data.placeholders.include?(coverage_table.id)
+              data.resolve_each(coverage_table.id) do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

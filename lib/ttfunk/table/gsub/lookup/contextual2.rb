@@ -2,17 +2,11 @@ module TTFunk
   class Table
     class Gsub
       module Lookup
-        class Contextual2 < TTFunk::SubTable
+        class Contextual2 < Base
           include Common::CoverageTableMixin
 
-          attr_reader :lookup_type
           attr_reader :format, :coverage_offset, :class_def_offset
           attr_reader :sub_class_sets
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
 
           def class_def
             @class_def ||= Common::ClassDef.create(
@@ -28,26 +22,19 @@ module TTFunk
             end.max
           end
 
-          def dependent_coverage_tables
-            [coverage_table]
-          end
-
           def encode
             EncodedString.new do |result|
               result << [format].pack('n')
-              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
-              result << Placeholder.new("gsub_#{class_def.id}", length: 2)
+              result << coverage_table.placeholder
+              result << class_def.placeholder
               result << [sub_class_sets.count].pack('n')
               sub_class_sets.encode_to(result) do |sub_class_set|
-                if sub_class_set
-                  [Placeholder.new("gsub_#{sub_class_set.id}", length: 2)]
-                else
-                  [0]
-                end
+                next [0] unless sub_class_set
+                [sub_class_set.placeholder]
               end
 
               result.resolve_placeholder(
-                "gsub_#{class_def.id}", [result.length].pack('n')
+                class_def.id, [result.length].pack('n')
               )
 
               result << class_def.encode
@@ -56,7 +43,7 @@ module TTFunk
                 next unless sub_class_set
 
                 result.resolve_placeholder(
-                  "gsub_#{sub_class_set.id}", [result.length].pack('n')
+                  sub_class_set.id, [result.length].pack('n')
                 )
 
                 result << sub_class_set.encode
@@ -65,8 +52,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.has_placeholders?("gsub_#{coverage_table.id}")
-              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
+            if data.has_placeholders?(coverage_table.id)
+              data.resolve_each(coverage_table.id) do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 
@@ -75,7 +62,9 @@ module TTFunk
           end
 
           def length
-            @length + sum(sub_class_sets) { |scs| scs&.length || 0 }
+            @length + sum(sub_class_sets) do |scs|
+              scs ? scs.length : 0
+            end
           end
 
           private

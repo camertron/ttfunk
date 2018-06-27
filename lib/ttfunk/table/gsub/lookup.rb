@@ -3,6 +3,7 @@ module TTFunk
     class Gsub
       module Lookup
         autoload :Alternate,       'ttfunk/table/gsub/lookup/alternate'
+        autoload :Base,            'ttfunk/table/gsub/lookup/base'
         autoload :Chaining,        'ttfunk/table/gsub/lookup/chaining'
         autoload :Chaining1,       'ttfunk/table/gsub/lookup/chaining1'
         autoload :Chaining2,       'ttfunk/table/gsub/lookup/chaining2'

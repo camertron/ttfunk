@@ -2,23 +2,14 @@ module TTFunk
   class Table
     class Gsub
       module Lookup
-        class Multiple < TTFunk::SubTable
+        class Multiple < Base
           include Common::CoverageTableMixin
 
           def self.create(file, _parent_table, offset, lookup_type)
             new(file, offset, lookup_type)
           end
 
-          attr_reader :lookup_type, :format, :coverage_offset, :sequences
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
-
-          def dependent_coverage_tables
-            [coverage_table]
-          end
+          attr_reader :format, :coverage_offset, :sequences
 
           def max_context
             1
@@ -27,15 +18,15 @@ module TTFunk
           def encode
             EncodedString.new do |result|
               result << [format].pack('n')
-              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << coverage_table.placeholder
               result << [sequences.count].pack('n')
               result << sequences.encode_to(result) do |sequence|
-                [Placeholder.new("gsub_#{sequence.id}", length: 2)]
+                [sequence.placeholder]
               end
 
               sequences.each do |sequence|
                 result.resolve_placeholder(
-                  "gsub_#{sequence.id}", [result.length].pack('n')
+                  sequence.id, [result.length].pack('n')
                 )
 
                 result << sequence.encode
@@ -44,8 +35,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.placeholders.include?("gsub_#{coverage_table.id}")
-              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
+            if data.placeholders.include?(coverage_table.placeholder)
+              data.resolve_each(coverage_table.id) do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

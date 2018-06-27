@@ -20,23 +20,19 @@ module TTFunk
             1
           end
 
-          def dependent_coverage_tables
-            [coverage_table]
-          end
-
           def encode
             EncodedString.new do |result|
               result << [format].pack('n')
-              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << coverage_table.placeholder
               result << [alternate_sets.count].pack('n')
 
               alternate_sets.encode_to(result) do |alternate_set|
-                [Placeholder.new("gsub_#{alternate_set.id}", length: 2)]
+                [alternate_set.placeholder]
               end
 
               alternate_sets.each do |alternate_set|
                 result.resolve_placeholder(
-                  "gsub_#{alternate_set.id}", [result.length].pack('n')
+                  alternate_set.id, [result.length].pack('n')
                 )
 
                 result << alternate_set.encode
@@ -45,8 +41,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.placeholders.include?("gsub_#{coverage_table.id}")
-              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
+            if data.placeholders.include?(coverage_table.id)
+              data.resolve_each(coverage_table.id) do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

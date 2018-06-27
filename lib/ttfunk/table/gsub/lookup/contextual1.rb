@@ -2,15 +2,10 @@ module TTFunk
   class Table
     class Gsub
       module Lookup
-        class Contextual1 < TTFunk::SubTable
+        class Contextual1 < Base
           include Common::CoverageTableMixin
 
-          attr_reader :lookup_type, :format, :coverage_offset, :sub_rule_sets
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
+          attr_reader :format, :coverage_offset, :sub_rule_sets
 
           def max_context
             @max_context ||= sub_rule_sets.flat_map do |sub_rule_set|
@@ -20,22 +15,18 @@ module TTFunk
             end.max
           end
 
-          def dependent_coverage_tables
-            [coverage_table]
-          end
-
           def encode
             EncodedString.new do |result|
               result << [format].pack('n')
-              result << Placeholder.new("gsub_#{coverage_table.id}", length: 2, relative_to: 0)
+              result << coverage_table.placeholder
               result << [sub_rule_sets.count].pack('n')
               result << sub_rule_sets.encode_to(result) do |sub_rule_set|
-                [Placeholder.new("gsub_#{sub_rule_set.id}", length: 2)]
+                [sub_rule_set.placeholder]
               end
 
               sub_rule_sets.each do |sub_rule_set|
                 result.resolve_placeholder(
-                  "gsub_#{sub_rule_set.id}", [result.length].pack('n')
+                  sub_rule_set.id, [result.length].pack('n')
                 )
 
                 result << sub_rule_set.encode
@@ -44,8 +35,8 @@ module TTFunk
           end
 
           def finalize(data)
-            if data.placeholders.include?("gsub_#{coverage_table.id}")
-              data.resolve_each("gsub_#{coverage_table.id}") do |placeholder|
+            if data.placeholders.include?(coverage_table.id)
+              data.resolve_each(coverage_table.id) do |placeholder|
                 [data.length - placeholder.relative_to].pack('n')
               end
 

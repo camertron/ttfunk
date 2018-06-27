@@ -8,11 +8,11 @@ module TTFunk
           EncodedString.new do |result|
             result << [format, range_tables.count].pack('nn')
             range_tables.encode_to(result) do |range_table|
-              [Placeholder.new("common_#{range_table.id}", length: 2)]
+              [range_table.placeholder]
             end
 
             range_tables.each do |range_table|
-              result.resolve_each("common_#{range_table.id}") do |_placeholder|
+              result.resolve_each(range_table.id) do |_placeholder|
                 [result.length].pack('n')
               end
 
@@ -27,6 +27,10 @@ module TTFunk
 
         def length
           @length + sum(range_tables, &:length)
+        end
+
+        def placeholder
+          @placeholder ||= Placeholder.new(id, length: 2, relative_to: 0)
         end
 
         private
