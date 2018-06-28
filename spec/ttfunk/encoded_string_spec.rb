@@ -13,7 +13,7 @@ RSpec.describe TTFunk::EncodedString do
     it 'adds the given placeholder' do
       subject << 'abc'
       subject << TTFunk::Placeholder.new(:foo)
-      placeholder = subject.placeholders[:foo]
+      placeholder = subject.placeholders[:foo].first
       expect(placeholder.position).to eq(3)
     end
 
@@ -23,20 +23,13 @@ RSpec.describe TTFunk::EncodedString do
         str << TTFunk::Placeholder.new(:foo, length: 3)
       end
 
-      expect(other.placeholders[:foo].position).to eq(3)
+      expect(other.placeholders[:foo].first.position).to eq(3)
 
       subject << 'def'
       subject << other
 
       # carries over the placeholder and adjusts its position
-      expect(subject.placeholders[:foo].position).to eq(6)
-    end
-
-    it 'does not allow adding two placeholders with the same name' do
-      subject << TTFunk::Placeholder.new(:foo)
-      expect { subject << TTFunk::Placeholder.new(:foo) }.to(
-        raise_error(TTFunk::DuplicatePlaceholderError)
-      )
+      expect(subject.placeholders[:foo].first.position).to eq(6)
     end
 
     it 'adds padding bytes when adding a placeholder' do

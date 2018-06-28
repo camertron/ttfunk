@@ -2,19 +2,10 @@ module TTFunk
   class Table
     class Gsub
       module Lookup
-        class Alternate < TTFunk::SubTable
+        class Alternate < Base
           include Common::CoverageTableMixin
 
-          attr_reader :lookup_type, :format, :coverage_offset, :alternate_sets
-
-          def self.create(file, _parent_table, offset, lookup_type)
-            new(file, offset, lookup_type)
-          end
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
+          attr_reader :format, :coverage_offset, :alternate_sets
 
           def max_context
             1
@@ -37,16 +28,6 @@ module TTFunk
 
                 result << alternate_set.encode
               end
-            end
-          end
-
-          def finalize(data)
-            if data.placeholders.include?(coverage_table.id)
-              data.resolve_each(coverage_table.id) do |placeholder|
-                [data.length - placeholder.relative_to].pack('n')
-              end
-
-              data << coverage_table.encode
             end
           end
 

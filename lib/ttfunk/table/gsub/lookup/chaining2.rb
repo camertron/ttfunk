@@ -82,16 +82,6 @@ module TTFunk
             end
           end
 
-          def finalize(data)
-            if data.placeholders.include?(coverage_table.id)
-              data.resolve_each(coverage_table.id) do |placeholder|
-                [data.length - placeholder.relative_to].pack('n')
-              end
-
-              data << coverage_table.encode
-            end
-          end
-
           def length
             @length + sum(chain_sub_class_sets) do |cscs|
               cscs ? cscs.length : 0

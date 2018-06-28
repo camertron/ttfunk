@@ -47,12 +47,6 @@ module TTFunk
             end
           end
 
-          def finalize(data)
-            finalize_coverage_sequence(backtrack_coverage_tables, data)
-            finalize_coverage_sequence(input_coverage_tables, data)
-            finalize_coverage_sequence(lookahead_coverage_tables, data)
-          end
-
           def length
             @length +
               sum(backtrack_coverage_tables, &:length) +
@@ -61,19 +55,6 @@ module TTFunk
           end
 
           private
-
-          # @TODO: Move to base class? Other things need this functionality.
-          def finalize_coverage_sequence(coverage_sequence, data)
-            coverage_sequence.each do |coverage_table|
-              if data.placeholders.include?(coverage_table.id)
-                data.resolve_each(coverage_table.id) do |placeholder|
-                  [data.length - placeholder.relative_to].pack('n')
-                end
-
-                data << coverage_table.encode
-              end
-            end
-          end
 
           def parse!
             @format, backtrack_count = read(4, 'nn')

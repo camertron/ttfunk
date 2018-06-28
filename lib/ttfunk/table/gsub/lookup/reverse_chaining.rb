@@ -5,10 +5,6 @@ module TTFunk
         class ReverseChaining < Base
           include Common::CoverageTableMixin
 
-          def self.create(file, _parent_table, offset, lookup_type)
-            new(file, offset, lookup_type)
-          end
-
           attr_reader :format, :coverage_offset, :backtrack_coverage_tables
           attr_reader :lookahead_coverage_tables, :substitute_glyph_ids
 
@@ -41,33 +37,7 @@ module TTFunk
             end
           end
 
-          def finalize(data)
-            if data.placeholders.include?(coverage_table.id)
-              data.resolve_each(coverage_table.id) do |placeholder|
-                [data.length - placeholder.relative_to].pack('n')
-              end
-
-              data << coverage_table.encode
-            end
-
-            finalize_coverage_sequence(backtrack_coverage_tables, data)
-            finalize_coverage_sequence(lookahead_coverage_tables, data)
-          end
-
           private
-
-          # @TODO: Move to base class? Other things need this functionality.
-          def finalize_coverage_sequence(coverage_sequence, data)
-            coverage_sequence.each do |coverage_table|
-              if data.placeholders.include?(coverage_table.id)
-                data.resolve_each(coverage_table.id) do |placeholder|
-                  [data.length - placeholder.relative_to].pack('n')
-                end
-
-                data << coverage_table.encode
-              end
-            end
-          end
 
           def parse!
             @format, @coverage_offset, backtrack_count = read(6, 'nnn')

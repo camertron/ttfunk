@@ -10,6 +10,8 @@ module TTFunk
           )
         end
 
+        # override in derived classes if this table depends on more than one
+        # coverage table
         def dependent_coverage_tables
           [coverage_table]
         end

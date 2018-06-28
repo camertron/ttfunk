@@ -5,11 +5,7 @@ module TTFunk
         class Ligature < Base
           include Common::CoverageTableMixin
 
-          def self.create(file, _parent_table, offset, lookup_type)
-            new(file, offset, lookup_type)
-          end
-
-          attr_reader :lookup_type, :format, :coverage_offset, :ligature_sets
+          attr_reader :format, :coverage_offset, :ligature_sets
 
           def max_context
             @max_context ||= ligature_sets.flat_map do |ligature_set|
@@ -35,16 +31,6 @@ module TTFunk
 
                 result << ligature_set.encode
               end
-            end
-          end
-
-          def finalize(data)
-            if data.placeholders.include?(coverage_table.id)
-              data.resolve_each(coverage_table.id) do |placeholder|
-                [data.length - placeholder.relative_to].pack('n')
-              end
-
-              data << coverage_table.encode
             end
           end
 

@@ -5,10 +5,6 @@ module TTFunk
         class Multiple < Base
           include Common::CoverageTableMixin
 
-          def self.create(file, _parent_table, offset, lookup_type)
-            new(file, offset, lookup_type)
-          end
-
           attr_reader :format, :coverage_offset, :sequences
 
           def max_context
@@ -31,16 +27,6 @@ module TTFunk
 
                 result << sequence.encode
               end
-            end
-          end
-
-          def finalize(data)
-            if data.placeholders.include?(coverage_table.placeholder)
-              data.resolve_each(coverage_table.id) do |placeholder|
-                [data.length - placeholder.relative_to].pack('n')
-              end
-
-              data << coverage_table.encode
             end
           end
 
