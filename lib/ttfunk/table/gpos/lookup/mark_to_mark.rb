@@ -2,14 +2,10 @@ module TTFunk
   class Table
     class Gpos
       module Lookup
-        class MarkToMark < TTFunk::SubTable
+        class MarkToMark < Base
           attr_reader :mark1_coverage_offset, :mark2_coverage_offset, :mark_class_count
           attr_reader :mark1_array_offset, :mark2_array_offset
           attr_reader :mark1_array, :mark2_array
-
-          def self.create(file, _parent_table, offset, lookup_type)
-            new(file, offset, lookup_type)
-          end
 
           def mark1_coverage_table
             @mark1_coverage_table ||= Common::CoverageTable.create(
@@ -30,35 +26,17 @@ module TTFunk
           def encode
             EncodedString.new do |result|
               result << [format].pack('n')
-              result << Placeholder.new("gpos_#{mark1_coverage_table.id}", length: 2, relative_to: 0)
-              result << Placeholder.new("gpos_#{mark2_coverage_table.id}", length: 2, relative_to: 0)
+              result << mark1_coverage_table.placeholder
+              result << mark2_coverage_table.placeholder
               result << [mark1_array.count].pack('n')
-              result << Placeholder.new("gpos_#{mark1_array.id}", length: 2, relative_to: 0)
-              result << Placeholder.new("gpos_#{mark2_array.id}", length: 2, relative_to: 0)
+              result << mark1_array.placeholder
+              result << mark2_array.placeholder
 
-              result.resolve_placeholder("gpos_#{mark1_array.id}", [result.length].pack('n'))
+              result.resolve_placeholder(mark1_array.id, [result.length].pack('n'))
               result << mark1_array.encode
 
-              result.resolve_placeholder("gpos_#{mark2_array.id}", [result.length].pack('n'))
+              result.resolve_placeholder(mark2_array.id, [result.length].pack('n'))
               result << mark2_array.encode
-            end
-          end
-
-          def finalize(data)
-            if data.placeholders.include?("gpos_#{mark1_coverage_table.id}")
-              data.resolve_each("gsub_#{mark1_coverage_table.id}") do |placeholder|
-                [data.length - placeholder.relative_to].pack('n')
-              end
-
-              data << mark1_coverage_table.encode
-            end
-
-            if data.placeholders.include?("gpos_#{mark2_coverage_table.id}")
-              data.resolve_each("gpos_#{mark2_coverage_table.id}") do |placeholder|
-                [data.length - placeholder.relative_to].pack('n')
-              end
-
-              data << mark2_coverage_table.encode
             end
           end
 

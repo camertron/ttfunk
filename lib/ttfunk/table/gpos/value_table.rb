@@ -85,6 +85,21 @@ module TTFunk
           end
         end
 
+        def encode
+          EncodedString.new do |result|
+            result << [x_placement].pack('n') if x_placement?
+            result << [y_placement].pack('n') if y_placement?
+            result << [x_advance].pack('n') if x_advance?
+            result << [y_advance].pack('n') if y_advance?
+
+            # @TODO: figure out how to resolve these
+            result << x_placement_device.placeholder if x_placement_device?
+            result << y_placement_device.placeholder if y_placement_device?
+            result << x_advance_device.placeholder if x_advance_device?
+            result << y_advance_device.placeholder if y_advance_device?
+          end
+        end
+
         private
 
         def parse!

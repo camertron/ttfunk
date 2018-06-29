@@ -2,24 +2,26 @@ module TTFunk
   class Table
     class Gpos
       module Lookup
-        class Extension < TTFunk::SubTable
+        class Extension < Base
           FORMAT = 1
           LOOKUP_TYPE = 9
 
           class << self
-            def create(file, _parent_table, offset, _lookup_type)
-              new(file, offset).sub_table
+            def create(file, _parent_table, offset, lookup_type)
+              new(file, offset, lookup_type).sub_table
             end
 
             def encode(sub_table)
               EncodedString.new do |result|
                 result << [FORMAT, sub_table.lookup_type].pack('nn')
-                result << Placeholder.new("gpos_#{sub_table.id}", length: 4, relative_to: 0)
+                result << Placeholder.new(
+                  sub_table.id, length: 4, relative_to: 0
+                )
               end
             end
 
             def finalize(sub_table, data)
-              data.resolve_each("gpos_#{sub_table.id}") do |placeholder|
+              data.resolve_each(sub_table.id) do |placeholder|
                 [data.length - placeholder.relative_to].pack('N')
               end
 

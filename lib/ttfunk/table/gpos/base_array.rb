@@ -9,6 +9,13 @@ module TTFunk
           super(file, offset)
         end
 
+        def encode
+          EncodedString.new do |result|
+            result << [bases.size].pack('n')
+            bases.each { |base| result << base.encode }
+          end
+        end
+
         private
 
         def parse!

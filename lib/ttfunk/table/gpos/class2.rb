@@ -13,6 +13,13 @@ module TTFunk
           super(file, offset)
         end
 
+        def encode
+          EncodedString.new do |result|
+            result << value_record1.encode if value_record1
+            result << value_record2.encode if value_record2
+          end
+        end
+
         private
 
         def parse!

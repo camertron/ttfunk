@@ -12,6 +12,20 @@ module TTFunk
           super(file, offset)
         end
 
+        def encode
+          EncodedString.new do |result|
+            result << [pair_value_tables.count].pack('n')
+            pair_value_tables.encode_to(result) do |pair_value_table|
+              [pair_value_table.placeholder]
+            end
+
+            pair_value_tables.each do |pair_value_table|
+              result.resolve_each(pair_value_table.id) { [result.length].pack('n') }
+              result << pair_value_table.encode
+            end
+          end
+        end
+
         private
 
         def parse!

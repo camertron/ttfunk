@@ -12,6 +12,14 @@ module TTFunk
           super(file, offset)
         end
 
+        def encode
+          EncodedString.new do |result|
+            result << [second_glyph].pack('n')
+            result << value_table1.encode if value_table1
+            result << value_table2.encode if value_table2
+          end
+        end
+
         private
 
         def parse!
@@ -22,7 +30,7 @@ module TTFunk
           if value_format1 != 0
             @value_table1 = ValueTable.new(
               file,
-              table_offset + 2,
+              table_offset,
               value_format1,
               lookup_table_offset
             )
@@ -35,7 +43,7 @@ module TTFunk
           if value_format2 != 0
             @value_table2 = ValueTable.new(
               file,
-              table_offset + value_table1_len + 2,
+              table_offset + value_table1_len,
               value_format2,
               lookup_table_offset
             )

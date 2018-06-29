@@ -5,35 +5,35 @@ module TTFunk
       attr_reader :script_list_offset, :feature_list_offset
       attr_reader :lookup_list_offset, :feature_variation_offset
 
-      def self.encode(gsub, new2old_glyph)
-        old2new_lookups = gsub.lookup_list.old2new_lookups_for(
+      def self.encode(table, new2old_glyph)
+        old2new_lookups = table.lookup_list.old2new_lookups_for(
           new2old_glyph.values
         )
 
-        old2new_features = gsub.feature_list.old2new_features_for(
+        old2new_features = table.feature_list.old2new_features_for(
           old2new_lookups
         )
 
         EncodedString.new do |result|
-          result << [gsub.major_version, gsub.minor_version].pack('nn')
-          result << Placeholder.new("gsub_#{gsub.script_list.id}", length: 2)
-          result << Placeholder.new("gsub_#{gsub.feature_list.id}", length: 2)
-          result << Placeholder.new("gsub_#{gsub.lookup_list.id}", length: 2)
+          result << [table.major_version, table.minor_version].pack('nn')
+          result << table.script_list.placeholder
+          result << table.feature_list.placeholder
+          result << table.lookup_list.placeholder
 
-          result.resolve_placeholder("gsub_#{gsub.script_list.id}", [result.length].pack('n'))
-          result << gsub.script_list.encode(old2new_features)
+          result.resolve_placeholder(table.script_list.id, [result.length].pack('n'))
+          result << table.script_list.encode(old2new_features)
 
-          result.resolve_placeholder("gsub_#{gsub.feature_list.id}", [result.length].pack('n'))
-          result << gsub.feature_list.encode(old2new_lookups, old2new_features)
+          result.resolve_placeholder(table.feature_list.id, [result.length].pack('n'))
+          result << table.feature_list.encode(old2new_lookups, old2new_features)
 
-          result.resolve_placeholder("gsub_#{gsub.lookup_list.id}", [result.length].pack('n'))
-          result << gsub.lookup_list.encode(new2old_glyph, old2new_lookups)
-          gsub.lookup_list.finalize(result, old2new_lookups)
+          result.resolve_placeholder(table.lookup_list.id, [result.length].pack('n'))
+          result << table.lookup_list.encode(new2old_glyph, old2new_lookups)
+          table.lookup_list.finalize(result, old2new_lookups)
 
           # I can't find any examples of this in the wild...
-          if gsub.feature_variation_list
-            result.resolve_placeholder("gsub_#{gsub.feature_variation_list.id}", [result.length].pack('N'))
-            result << gsub.feature_variation_list.encode
+          if table.feature_variation_list
+            result.resolve_placeholder(table.feature_variation_list.id, [result.length].pack('N'))
+            result << table.feature_variation_list.encode
           end
         end.string
       end
@@ -78,7 +78,7 @@ module TTFunk
 
       def parse!
         @major_version, @minor_version, @script_list_offset,
-          @feature_list_offset, @lookup_list_offset = read(10, 'n5')
+          @feature_list_offset, @lookup_list_offset = read(10, 'n*')
 
         if minor_version == 1
           @feature_variations_offset = read(4, 'N')

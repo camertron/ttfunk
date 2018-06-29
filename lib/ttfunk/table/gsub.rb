@@ -31,6 +31,11 @@ module TTFunk
       def lookup_table
         LOOKUP_TABLE
       end
+
+      # @TODO: remove this
+      # def self.encode(gsub, new2old_glyph)
+      #   gsub.raw
+      # end
     end
   end
 end

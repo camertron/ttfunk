@@ -2,15 +2,9 @@ module TTFunk
   class Table
     class Gpos
       module Lookup
-        class Chaining3 < TTFunk::SubTable
-          attr_reader :lookup_type
+        class Chaining3 < Base
           attr_reader :format, :backtrack_coverage_tables
           attr_reader :input_coverage_tables, :lookahead_coverage_tables
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
 
           def dependent_coverage_tables
             backtrack_coverage_tables.to_a +
@@ -23,37 +17,19 @@ module TTFunk
               result << [format, backtrack_coverage_tables.count].pack('nn')
 
               backtrack_coverage_tables.encode_to(result) do |backtrack_coverage_table|
-                [
-                  Placeholder.new(
-                    "gpos_#{backtrack_coverage_table.id}",
-                    length: 2,
-                    relative_to: 0
-                  )
-                ]
+                [backtrack_coverage_table.placeholder]
               end
 
               result << [input_coverage_tables.count].pack('n')
 
               input_coverage_tables.encode_to(result) do |input_coverage_table|
-                [
-                  Placeholder.new(
-                    "gpos_#{input_coverage_table.id}",
-                    length: 2,
-                    relative_to: 0
-                  )
-                ]
+                [input_coverage_table.placeholder]
               end
 
               result << [lookahead_coverage_tables.count].pack('n')
 
               lookahead_coverage_tables.encode_to(result) do |lookahead_coverage_table|
-                [
-                  Placeholder.new(
-                    "gpos_#{lookahead_coverage_table.id}",
-                    length: 2,
-                    relative_to: 0
-                  )
-                ]
+                [lookahead_coverage_table.placeholder]
               end
 
               result << [subst_lookup_tables.count].pack('n')
@@ -65,12 +41,6 @@ module TTFunk
                 ]
               end
             end
-          end
-
-          def finalize(data)
-            finalize_coverage_sequence(backtrack_coverage_tables, data)
-            finalize_coverage_sequence(input_coverage_tables, data)
-            finalize_coverage_sequence(lookahead_coverage_tables, data)
           end
 
           def length

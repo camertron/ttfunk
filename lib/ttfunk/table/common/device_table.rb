@@ -4,10 +4,16 @@ module TTFunk
       class DeviceTable < TTFunk::SubTable
         attr_reader :start_size, :end_size, :delta_format, :delta_values
 
+        def encode
+          EncodedString.new do |result|
+            result << [start_size, end_size, delta_format].pack('n*')
+          end
+        end
+
         private
 
         def parse!
-          @start_size, @end_size, @delta_format, delta_value = read(8, 'n4')
+          @start_size, @end_size, @delta_format, delta_value = read(8, 'n*')
 
           bit_len = case delta_format
             when 1 then 2

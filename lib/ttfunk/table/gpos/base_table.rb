@@ -11,6 +11,19 @@ module TTFunk
           super(file, offset)
         end
 
+        def encode
+          EncodedString.new do |result|
+            anchor_tables.encode_to(result) do |anchor_table|
+              [anchor_table.placeholder]
+            end
+
+            anchor_tables.each do |anchor_table|
+              result.resolve_placeholder(anchor_table.id, [result.length].pack('n'))
+              result << anchor_table.encode
+            end
+          end
+        end
+
         private
 
         def parse!

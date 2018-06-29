@@ -4,6 +4,16 @@ module TTFunk
       class PosRule < TTFunk::SubTable
         attr_reader :input_sequence, :pos_lookup_tables
 
+        def encode
+          EncodedString.new do |result|
+            result << [input_sequence.count, pos_lookup_tables.size].pack('n*')
+            input_sequence.encode_to(result)
+            pos_lookup_tables.each do |pos_lookup_table|
+              result << pos_lookup_table.encode
+            end
+          end
+        end
+
         private
 
         def parse!

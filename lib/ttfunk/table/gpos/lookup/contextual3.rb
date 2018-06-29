@@ -2,14 +2,8 @@ module TTFunk
   class Table
     class Gpos
       module Lookup
-        class Contextual3 < TTFunk::SubTable
-          attr_reader :lookup_type
+        class Contextual3 < Base
           attr_reader :format, :coverage_offsets, :pos_lookups
-
-          def initialize(file, offset, lookup_type)
-            @lookup_type = lookup_type
-            super(file, offset)
-          end
 
           def dependent_coverage_tables
             coverage_tables
@@ -20,7 +14,7 @@ module TTFunk
               result << [format, coverage_tables.count, pos_lookups.count].pack('nnn')
 
               result << coverage_tables.encode do |coverage_table|
-                [Placeholder.new("gpos_#{coverage_table.id}", length: 2, relative_to: 0)]
+                [coverage_table.placeholder]
               end
 
               result << pos_lookups.encode do |pos_lookup|
@@ -32,23 +26,7 @@ module TTFunk
             end
           end
 
-          def finalize(data)
-            finalize_coverage_sequence(coverage_tables, data)
-          end
-
           private
-
-          def finalize_coverage_sequence(coverage_sequence, data)
-            coverage_sequence.each do |coverage_table|
-              if data.placeholders.include?("gpos_#{coverage_table.id}")
-                data.resolve_each("gpos_#{coverage_table.id}") do |placeholder|
-                  [data.length - placeholder.relative_to].pack('n')
-                end
-
-                data << coverage_table.encode
-              end
-            end
-          end
 
           def parse!
             @format, glyph_count, pos_count = read(6, 'nnn')

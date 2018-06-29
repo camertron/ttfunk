@@ -9,6 +9,20 @@ module TTFunk
           super(file, offset)
         end
 
+        def encode
+          EncodedString.new do |result|
+            result << [ligature_attachments.count].pack('n')
+            ligature_attachments.encode_to(result) do |ligature_attachment|
+              [ligature_attachment.placeholder]
+            end
+
+            ligature_attachments.each do |ligature_attachment|
+              result.resolve_placeholder(ligature_attachment.id, [result.length].pack('n'))
+              result << ligature_attachment.encode
+            end
+          end
+        end
+
         private
 
         def parse!

@@ -4,6 +4,20 @@ module TTFunk
       class ChainPosRuleSet < TTFunk::SubTable
         attr_reader :chain_pos_rules
 
+        def encode
+          EncodedString.new do |result|
+            result << [chain_pos_rules.count].pack('n')
+            chain_pos_rules.encode_to(result) do |chain_pos_rule|
+              [chain_pos_rule.placeholder]
+            end
+
+            chain_pos_rules.each do |chain_pos_rule|
+              result.resolve_placeholder(chain_pos_rule.id, [result.length].pack('n'))
+              result << chain_pos_rule.encode
+            end
+          end
+        end
+
         private
 
         def parse!

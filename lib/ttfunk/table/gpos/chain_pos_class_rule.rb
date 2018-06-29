@@ -5,6 +5,22 @@ module TTFunk
         attr_reader :backtrack_sequence, :input_sequence
         attr_reader :lookahead_sequence, :pos_lookups
 
+        def encode
+          EncodedString.new do |result|
+            result << [backtrack_sequence.count].pack('n')
+            backtrack_sequence.encode_to(result)
+
+            result << [input_sequence.count].pack('n')
+            input_sequence.encode_to(result)
+
+            result << [lookahead_sequence.count].pack('n')
+            lookahead_sequence.encode_to(result)
+
+            result << [pos_lookups.size].pack('n')
+            pos_lookups.each { |pos_lookup| result << pos_lookup.encode }
+          end
+        end
+
         private
 
         def parse!

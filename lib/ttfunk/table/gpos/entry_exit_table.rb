@@ -8,6 +8,10 @@ module TTFunk
         # parent.
         attr_reader :entry_anchor_offset, :exit_anchor_offset
 
+        def encode
+          EncodedString.new  # @TODO: figure this table out
+        end
+
         private
 
         def parse!
