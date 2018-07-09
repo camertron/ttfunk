@@ -17,8 +17,9 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format].pack('n')
-              result << coverage_table.placeholder
+              result << coverage_table.placeholder_relative_to(id)
               result << [ligature_sets.count].pack('n')
               ligature_sets.encode_to(result) do |ligature_set|
                 [ligature_set.placeholder]

@@ -54,7 +54,7 @@ module TTFunk
             @class1_tables = Array.new(class1_count) do
               Array.new(class2_count) do
                 Class2.new(
-                  file, io.pos, value_format1, value_format2, table_offset
+                  file, io.pos, value_format1, value_format2, self
                 )
               end
             end

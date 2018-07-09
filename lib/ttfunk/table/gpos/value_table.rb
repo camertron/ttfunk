@@ -5,11 +5,11 @@ module TTFunk
         attr_reader :x_placement, :y_placement, :x_advance, :y_advance
         attr_reader :x_pla_device_offset, :y_pla_device_offset
         attr_reader :x_adv_device_offset, :y_adv_device_offset
-        attr_reader :value_format, :lookup_table_offset
+        attr_reader :value_format, :lookup_table
 
-        def initialize(file, offset, value_format, lookup_table_offset)
+        def initialize(file, offset, value_format, lookup_table)
           @value_format = BitField.new(value_format)
-          @lookup_table_offset = lookup_table_offset
+          @lookup_table = lookup_table
           super(file, offset)
         end
 
@@ -49,9 +49,9 @@ module TTFunk
           return unless x_placement_device?
 
           @x_placement_device ||= if file.variable?
-            Common::VariationIndex.new(file, lookup_table_offset + x_pla_device_offset)
+            Common::VariationIndex.new(file, lookup_table.table_offset + x_pla_device_offset)
           else
-            Common::DeviceTable.new(file, lookup_table_offset + x_pla_device_offset)
+            Common::DeviceTable.new(file, lookup_table.table_offset + x_pla_device_offset)
           end
         end
 
@@ -59,9 +59,9 @@ module TTFunk
           return unless y_placement_device?
 
           @y_placement_device ||= if file.variable?
-            Common::VariationIndex.new(file, lookup_table_offset + y_pla_device_offset)
+            Common::VariationIndex.new(file, lookup_table.table_offset + y_pla_device_offset)
           else
-            Common::DeviceTable.new(file, lookup_table_offset + y_pla_device_offset)
+            Common::DeviceTable.new(file, lookup_table.table_offset + y_pla_device_offset)
           end
         end
 
@@ -69,9 +69,9 @@ module TTFunk
           return unless x_advance_device?
 
           @x_advance_device ||= if file.variable?
-            Common::VariationIndex.new(file, lookup_table_offset + x_adv_device_offset)
+            Common::VariationIndex.new(file, lookup_table.table_offset + x_adv_device_offset)
           else
-            Common::DeviceTable.new(file, lookup_table_offset + x_adv_device_offset)
+            Common::DeviceTable.new(file, lookup_table.table_offset + x_adv_device_offset)
           end
         end
 
@@ -79,9 +79,9 @@ module TTFunk
           return unless y_advance_device?
 
           @y_advance_device ||= if file.variable?
-            Common::VariationIndex.new(file, lookup_table_offset + y_adv_device_offset)
+            Common::VariationIndex.new(file, lookup_table.table_offset + y_adv_device_offset)
           else
-            Common::DeviceTable.new(file, lookup_table_offset + y_adv_device_offset)
+            Common::DeviceTable.new(file, lookup_table.table_offset + y_adv_device_offset)
           end
         end
 

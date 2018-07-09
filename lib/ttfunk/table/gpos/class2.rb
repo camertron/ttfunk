@@ -4,12 +4,12 @@ module TTFunk
       class Class2 < TTFunk::SubTable
         attr_reader :value_record1, :value_record2
         attr_reader :value_format1, :value_format2
-        attr_reader :lookup_table_offset
+        attr_reader :lookup_table
 
-        def initialize(file, offset, value_format1, value_format2, lookup_table_offset)
+        def initialize(file, offset, value_format1, value_format2, lookup_table)
           @value_format1 = value_format1
           @value_format2 = value_format2
-          @lookup_table_offset = lookup_table_offset
+          @lookup_table = lookup_table
           super(file, offset)
         end
 
@@ -30,7 +30,7 @@ module TTFunk
               file,
               table_offset,
               value_format1,
-              lookup_table_offset
+              lookup_table
             )
 
             value_record1_len = value_record1.length
@@ -43,7 +43,7 @@ module TTFunk
               file,
               table_offset + value_record1_len,
               value_format2,
-              lookup_table_offset
+              lookup_table
             )
 
             value_record2_len = value_record2.length

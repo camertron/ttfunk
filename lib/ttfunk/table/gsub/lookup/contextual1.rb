@@ -17,8 +17,9 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format].pack('n')
-              result << coverage_table.placeholder
+              result << coverage_table.placeholder_relative_to(id)
               result << [sub_rule_sets.count].pack('n')
               result << sub_rule_sets.encode_to(result) do |sub_rule_set|
                 [sub_rule_set.placeholder]

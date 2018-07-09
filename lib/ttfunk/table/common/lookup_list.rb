@@ -14,12 +14,13 @@ module TTFunk
             result << [old2new_lookups.count].pack('n')
             old2new_lookups.each do |old_index, _|
               table = tables[old_index]
-              result << Placeholder.new("common_#{table.id}", length: 2)
+              result << Placeholder.new(table.id, length: 2)
             end
 
             old2new_lookups.each do |old_index, _|
               table = tables[old_index]
-              result.resolve_placeholder("common_#{table.id}", [result.length].pack('n'))
+              result.resolve_placeholder(table.id, [result.length].pack('n'))
+              result.tag_with(table.id)
               result << table.encode
             end
           end

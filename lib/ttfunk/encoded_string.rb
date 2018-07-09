@@ -1,11 +1,9 @@
 require 'stringio'
 
 module TTFunk
-  class UnresolvedPlaceholderError < StandardError
-  end
-
-  class MultiplePlaceholdersError < StandardError
-  end
+  class UnresolvedPlaceholderError < StandardError; end
+  class MultiplePlaceholdersError < StandardError; end
+  class MissingTagError < StandardError; end
 
   class EncodedString
     def initialize
@@ -20,15 +18,20 @@ module TTFunk
         add_placeholder(obj, obj.position || io.pos, obj.relative_to)
         io << "\0" * obj.length
       when self.class
-        # adjust placeholders to be relative to the entire encoded string
+        # adjust tags and placeholders to be relative to the entire
+        # encoded string
         obj.placeholders.each_pair do |_, placeholders|
           placeholders.each do |ph|
             add_placeholder(
               ph.dup,
-              ph.relative? ? ph.position : ph.position + io.length,
-              ph.relative? ? ph.relative_to + io.length : ph.relative_to
+              ph.position + io.length,
+              ph.relative_to
             )
           end
+        end
+
+        obj.tags.each_pair do |_, tag|
+          tag_with(tag.name, tag.position + io.length)
         end
 
         self << obj.unresolved_string
@@ -74,6 +77,23 @@ module TTFunk
       @placeholders ||= Hash.new { |h, k| h[k] = [] }
     end
 
+    def tags
+      @tags ||= {}
+    end
+
+    def tag_with(name, pos = io.pos)
+      tags[name] = Tag.new(name, pos)
+    end
+
+    def tag_for(placeholder)
+      if tag = tags[placeholder.relative_to]
+        tag
+      else
+        raise MissingTagError,
+          "couldn't find tag for '#{placeholder.relative_to}'"
+      end
+    end
+
     def resolve_placeholder(name, value)
       if placeholders[name].size > 1
         raise MultiplePlaceholdersError, 'More than one placeholder was found '\
@@ -100,19 +120,13 @@ module TTFunk
 
     def resolve(placeholder, value)
       last_pos = io.pos
-
-      if placeholder.relative?
-        io.seek(placeholder.relative_to + placeholder.position)
-      else
-        io.seek(placeholder.position)
-      end
-
+      io.seek(placeholder.position)
       io.write(value[0..placeholder.length])
     ensure
       io.seek(last_pos)
     end
 
-    def add_placeholder(new_placeholder, pos = io.pos, relative_to = nil)
+    def add_placeholder(new_placeholder, pos, relative_to = nil)
       new_placeholder.position = pos
       new_placeholder.relative_to = relative_to
       placeholders[new_placeholder.name] << new_placeholder

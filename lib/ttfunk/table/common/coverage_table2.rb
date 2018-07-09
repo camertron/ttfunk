@@ -29,8 +29,8 @@ module TTFunk
           @length + sum(range_tables, &:length)
         end
 
-        def placeholder
-          @placeholder ||= Placeholder.new(id, length: 2, relative_to: 0)
+        def placeholder_relative_to(tag_id)
+          Placeholder.new(id, length: 2, relative_to: tag_id)
         end
 
         private

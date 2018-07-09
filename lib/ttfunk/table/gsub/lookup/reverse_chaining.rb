@@ -20,17 +20,18 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format].pack('n')
               result << coverage_table.placeholder
 
               result << [backtrack_coverage_tables.count].pack('n')
-              backtrack_coverage_tables.encode_to(result) do |table|
-                [table.placeholder]
+              backtrack_coverage_tables.encode_to(result) do |cov_table|
+                [cov_table.placeholder_relative_to(id)]
               end
 
               result << [lookahead_coverage_tables.count].pack('n')
-              lookahead_coverage_tables.encode_to(result) do |table|
-                [table.placeholder]
+              lookahead_coverage_tables.encode_to(result) do |cov_table|
+                [cov_table.placeholder_relative_to(id)]
               end
 
               substitute_glyph_ids.encode_to(result)

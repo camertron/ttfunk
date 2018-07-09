@@ -44,6 +44,7 @@ module TTFunk
         LOOKUP_TABLE
       end
 
+      # @TODO: remove this
       def self.encode(gpos, new2old_glyph)
         gpos.raw
       end

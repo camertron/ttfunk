@@ -20,10 +20,11 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format, coverage_tables.count, subst_lookup_tables.count].pack('nnn')
 
               result << coverage_tables.encode do |coverage_table|
-                [coverage_table.placeholder]
+                [coverage_table.placeholder_relative_to(id)]
               end
 
               result << subst_lookup_tables.encode do |subst_lookup_table|
