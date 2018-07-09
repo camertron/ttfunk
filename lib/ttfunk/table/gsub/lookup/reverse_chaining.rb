@@ -22,7 +22,7 @@ module TTFunk
             EncodedString.new do |result|
               result.tag_with(id)
               result << [format].pack('n')
-              result << coverage_table.placeholder
+              result << coverage_table.placeholder_relative_to(id)
 
               result << [backtrack_coverage_tables.count].pack('n')
               backtrack_coverage_tables.encode_to(result) do |cov_table|
