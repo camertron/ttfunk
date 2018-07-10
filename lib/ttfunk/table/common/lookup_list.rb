@@ -28,18 +28,7 @@ module TTFunk
 
         def finalize(data, old2new_lookups)
           old2new_lookups.each do |old_index, _|
-            old_total = $total
-            old_len = data.length
-            # binding.pry
             tables[old_index].finalize(data)
-            diff = data.length - old_len
-            $total += diff
-
-            if format = tables[old_index].sub_tables.first.respond_to?(:format) ? tables[old_index].sub_tables.first.format : nil
-              puts "#{tables[old_index].lookup_type}, #{format} => #{old_total}, #{$total}"
-            else
-              puts "#{tables[old_index].lookup_type} => #{old_total}, #{$total}"
-            end
           end
 
           old2new_lookups.each do |old_index, _|
@@ -52,7 +41,6 @@ module TTFunk
         end
 
         def old2new_lookups_for(glyph_ids)
-          # return tables.to_a
           new_index = 0
 
           {}.tap do |old2new_lookups|

@@ -11,11 +11,13 @@ module TTFunk
               new(file, offset, lookup_type).sub_table
             end
 
-            def encode(sub_table, parent_table)
+            def encode(sub_table)
               EncodedString.new do |result|
+                ext_id = ext_id_for(sub_table)
+                result.tag_with(ext_id)
                 result << [FORMAT, sub_table.lookup_type].pack('nn')
                 result << Placeholder.new(
-                  sub_table.id, length: 4, relative_to: parent_table.id
+                  sub_table.id, length: 4, relative_to: ext_id
                 )
               end
             end
@@ -27,6 +29,10 @@ module TTFunk
 
               data << sub_table.encode
               sub_table.finalize(data)
+            end
+
+            def ext_id_for(sub_table)
+              "extension_#{sub_table.table_offset}"
             end
           end
 
