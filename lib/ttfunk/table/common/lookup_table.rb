@@ -33,7 +33,7 @@ module TTFunk
 
             # just wrap everything in a freaking extension table so we don't have to
             # worry about super complicated overflow issues
-            data << lookup_table_class::EXTENSION_CLASS.encode(sub_table)
+            data << lookup_table_class::EXTENSION_CLASS.encode(sub_table, self)
           end
         end
 

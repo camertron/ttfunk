@@ -11,16 +11,18 @@ module TTFunk
               new(file, offset, lookup_type).sub_table
             end
 
-            def encode(sub_table)
+            def encode(sub_table, parent_table)
               EncodedString.new do |result|
                 result << [FORMAT, sub_table.lookup_type].pack('nn')
-                result << Placeholder.new(sub_table.id, length: 4, relative_to: 0)
+                result << Placeholder.new(
+                  sub_table.id, length: 4, relative_to: parent_table.id
+                )
               end
             end
 
             def finalize(sub_table, data)
               data.resolve_each(sub_table.id) do |placeholder|
-                [data.length - placeholder.relative_to].pack('N')
+                [data.length - data.tag_for(placeholder).position].pack('N')
               end
 
               data << sub_table.encode
