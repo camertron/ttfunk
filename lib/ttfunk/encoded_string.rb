@@ -104,6 +104,10 @@ module TTFunk
         resolve(placeholder, value)
         placeholders[name].delete_at(0)
       end
+
+      if placeholders[name].empty?
+        placeholders.delete(name)
+      end
     end
 
     def resolve_each(name)

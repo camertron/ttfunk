@@ -14,8 +14,6 @@ module TTFunk
           old2new_lookups
         )
 
-        gsub_start = 10678212
-
         EncodedString.new do |result|
           result << [table.major_version, table.minor_version].pack('nn')
           result << table.script_list.placeholder
@@ -30,7 +28,6 @@ module TTFunk
 
           result.resolve_placeholder(table.lookup_list.id, [result.length].pack('n'))
           result << table.lookup_list.encode(new2old_glyph, old2new_lookups)
-          $total = gsub_start + result.length
           table.lookup_list.finalize(result, old2new_lookups)
 
           # I can't find any examples of this in the wild...

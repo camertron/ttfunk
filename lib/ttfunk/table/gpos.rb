@@ -45,9 +45,9 @@ module TTFunk
       end
 
       # @TODO: remove this
-      def self.encode(gpos, new2old_glyph)
-        gpos.raw
-      end
+      # def self.encode(gpos, new2old_glyph)
+      #   gpos.raw
+      # end
     end
   end
 end

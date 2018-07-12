@@ -25,9 +25,10 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format].pack('n')
-              result << mark1_coverage_table.placeholder
-              result << mark2_coverage_table.placeholder
+              result << mark1_coverage_table.placeholder_relative_to(id)
+              result << mark2_coverage_table.placeholder_relative_to(id)
               result << [mark1_array.count].pack('n')
               result << mark1_array.placeholder
               result << mark2_array.placeholder

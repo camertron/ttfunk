@@ -29,8 +29,9 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format].pack('n')
-              result << coverage_table.placeholder
+              result << coverage_table.placeholder_relative_to(id)
               result << backtrack_class_def.placeholder
               result << input_class_def.placeholder
               result << lookahead_class_def.placeholder

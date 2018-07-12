@@ -1,3 +1,4 @@
+
 module TTFunk
   class Table
     class Gpos
@@ -25,9 +26,10 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format].pack('n')
-              result << mark_coverage_table.placeholder
-              result << base_coverage_table.placeholder
+              result << mark_coverage_table.placeholder_relative_to(id)
+              result << base_coverage_table.placeholder_relative_to(id)
               result << [mark_class_count].pack('n')
               result << mark_array.placeholder
               result << base_array.placeholder

@@ -23,7 +23,7 @@ module TTFunk
             coverage_tables.each do |cov_table|
               if data.placeholders.include?(cov_table.id)
                 data.resolve_each(cov_table.id) do |placeholder|
-                  [data.length - placeholder.relative_to].pack('n')
+                  [data.length - data.tag_for(placeholder).position].pack('n')
                 end
 
                 data << cov_table.encode

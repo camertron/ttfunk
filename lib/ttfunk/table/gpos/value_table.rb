@@ -92,11 +92,47 @@ module TTFunk
             result << [x_advance].pack('n') if x_advance?
             result << [y_advance].pack('n') if y_advance?
 
-            # @TODO: figure out how to resolve these
-            result << x_placement_device.placeholder if x_placement_device?
-            result << y_placement_device.placeholder if y_placement_device?
-            result << x_advance_device.placeholder if x_advance_device?
-            result << y_advance_device.placeholder if y_advance_device?
+            if x_placement_device?
+              result << x_placement_device.placeholder_relative_to(lookup_table.id)
+            end
+
+            if y_placement_device?
+              result << y_placement_device.placeholder_relative_to(lookup_table.id)
+            end
+
+            if x_advance_device?
+              result << x_advance_device.placeholder_relative_to(lookup_table.id)
+            end
+
+            if y_advance_device?
+              result << y_advance_device.placeholder_relative_to(lookup_table.id)
+            end
+          end
+        end
+
+        def finalize(data)
+          if x_placement_device?
+            data.resolve_each(x_placement_device.id) do |placeholder|
+              [data.length - data.tag_for(placeholder).position].pack('n')
+            end
+          end
+
+          if y_placement_device?
+            data.resolve_each(y_placement_device.id) do |placeholder|
+              [data.length - data.tag_for(placeholder).position].pack('n')
+            end
+          end
+
+          if x_advance_device?
+            data.resolve_each(x_advance_device.id) do |placeholder|
+              [data.length - data.tag_for(placeholder).position].pack('n')
+            end
+          end
+
+          if y_advance_device?
+            data.resolve_each(y_advance_device.id) do |placeholder|
+              [data.length - data.tag_for(placeholder).position].pack('n')
+            end
           end
         end
 

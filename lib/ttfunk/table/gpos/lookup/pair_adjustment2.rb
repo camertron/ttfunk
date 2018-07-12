@@ -21,10 +21,18 @@ module TTFunk
             )
           end
 
+          # @TODO: added for debugging, but do we need it?
+          def value_tables
+            class1_tables.flat_map do |cl2s|
+              cl2s.flat_map { |cl2| [cl2.value_record1, value_record2].compact }
+            end
+          end
+
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format].pack('n')
-              result << coverage_table.placeholder
+              result << coverage_table.placeholder_relative_to(id)
               result << [value_format1, value_format2].pack('n*')
               result << class_def1.placeholder
               result << class_def2.placeholder

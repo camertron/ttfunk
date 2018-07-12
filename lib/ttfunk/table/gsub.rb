@@ -33,9 +33,9 @@ module TTFunk
       end
 
       # @TODO: remove this
-      # def self.encode(gsub, new2old_glyph)
-      #   gsub.raw
-      # end
+      def self.encode(gsub, new2old_glyph)
+        gsub.raw
+      end
     end
   end
 end

@@ -28,13 +28,14 @@ module TTFunk
 
     def count_ones
       val = value
+      count = 0
 
-      0.tap do |count|
-        until val == 0
-          count += val % 2
-          val /= 2
-        end
+      until val == 0
+        count += val % 2
+        val /= 2
       end
+
+      count
     end
   end
 end

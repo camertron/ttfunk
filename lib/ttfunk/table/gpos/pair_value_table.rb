@@ -3,12 +3,12 @@ module TTFunk
     class Gpos
       class PairValueTable < TTFunk::SubTable
         attr_reader :second_glyph, :value_table1, :value_table2
-        attr_reader :value_format1, :value_format2, :lookup_table_offset
+        attr_reader :value_format1, :value_format2, :lookup_table
 
-        def initialize(file, offset, value_format1, value_format2, lookup_table_offset)
+        def initialize(file, offset, value_format1, value_format2, lookup_table)
           @value_format1 = value_format1
           @value_format2 = value_format2
-          @lookup_table_offset = lookup_table_offset
+          @lookup_table = lookup_table
           super(file, offset)
         end
 
@@ -18,6 +18,11 @@ module TTFunk
             result << value_table1.encode if value_table1
             result << value_table2.encode if value_table2
           end
+        end
+
+        def finalize(data)
+          value_table1.finalize(data) if value_format1 != 0
+          value_table2.finalize(data) if value_format2 != 0
         end
 
         private
@@ -32,7 +37,7 @@ module TTFunk
               file,
               table_offset,
               value_format1,
-              lookup_table_offset
+              lookup_table
             )
 
             value_table1_len = value_table1.length
@@ -45,7 +50,7 @@ module TTFunk
               file,
               table_offset + value_table1_len,
               value_format2,
-              lookup_table_offset
+              lookup_table
             )
 
             value_table2_len = value_table2.length

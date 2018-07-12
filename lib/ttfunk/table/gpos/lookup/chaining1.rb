@@ -9,9 +9,10 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format].pack('n')
-              result << coverage_table.placeholder
-              result << [count].pack('n')
+              result << coverage_table.placeholder_relative_to(id)
+              result << [chain_pos_rule_sets.count].pack('n')
               result << chain_pos_rule_sets.encode_to(result) do |chain_pos_rule_set|
                 [chain_pos_rule_set.placeholder]
               end

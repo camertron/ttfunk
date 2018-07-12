@@ -13,20 +13,26 @@ module TTFunk
 
             def encode(sub_table)
               EncodedString.new do |result|
+                ext_id = ext_id_for(sub_table)
+                result.tag_with(ext_id)
                 result << [FORMAT, sub_table.lookup_type].pack('nn')
                 result << Placeholder.new(
-                  sub_table.id, length: 4, relative_to: 0
+                  sub_table.id, length: 4, relative_to: ext_id
                 )
               end
             end
 
             def finalize(sub_table, data)
               data.resolve_each(sub_table.id) do |placeholder|
-                [data.length - placeholder.relative_to].pack('N')
+                [data.length - data.tag_for(placeholder).position].pack('N')
               end
 
               data << sub_table.encode
               sub_table.finalize(data)
+            end
+
+            def ext_id_for(sub_table)
+              "extension_#{sub_table.table_offset}"
             end
           end
 

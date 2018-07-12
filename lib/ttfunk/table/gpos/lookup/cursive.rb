@@ -9,8 +9,9 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format].pack('n')
-              result << coverage_table.placeholder
+              result << coverage_table.placeholder_relative_to(id)
               result << [entry_exits.count].pack('n')
               entry_exits.encode_to(result) do |entry_exit|
                 [entry_exit.placeholder]
@@ -23,13 +24,18 @@ module TTFunk
             end
           end
 
+          def finalize(data)
+            entry_exits.each { |ex| ex.finalize(data) }
+            super
+          end
+
           private
 
           def parse!
             @format, @coverage_offset, count = read(6, 'nnn')
 
             @entry_exits = Sequence.from(io, count, 'n') do |entry_exit_offset|
-              EntryExitTable.new(file, table_offset + entry_exit_offset)
+              EntryExitTable.new(file, table_offset + entry_exit_offset, self)
             end
 
             @length = 6 + entry_exits.length

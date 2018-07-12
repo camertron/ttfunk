@@ -20,6 +20,11 @@ module TTFunk
           end
         end
 
+        def finalize(data)
+          value_record1.finalize(data)
+          value_record2.finalize(data)
+        end
+
         private
 
         def parse!

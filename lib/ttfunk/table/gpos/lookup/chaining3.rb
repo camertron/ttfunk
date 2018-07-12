@@ -14,22 +14,23 @@ module TTFunk
 
           def encode
             EncodedString.new do |result|
+              result.tag_with(id)
               result << [format, backtrack_coverage_tables.count].pack('nn')
 
               backtrack_coverage_tables.encode_to(result) do |backtrack_coverage_table|
-                [backtrack_coverage_table.placeholder]
+                [backtrack_coverage_table.placeholder_relative_to(id)]
               end
 
               result << [input_coverage_tables.count].pack('n')
 
               input_coverage_tables.encode_to(result) do |input_coverage_table|
-                [input_coverage_table.placeholder]
+                [input_coverage_table.placeholder_relative_to(id)]
               end
 
               result << [lookahead_coverage_tables.count].pack('n')
 
               lookahead_coverage_tables.encode_to(result) do |lookahead_coverage_table|
-                [lookahead_coverage_table.placeholder]
+                [lookahead_coverage_table.placeholder_relative_to(id)]
               end
 
               result << [subst_lookup_tables.count].pack('n')
