@@ -9,6 +9,10 @@ module TTFunk
           attr_reader :value_format2, :class_def1_offset
           attr_reader :class_def2_offset, :class1_tables
 
+          def max_context
+            2
+          end
+
           def class_def1
             @class_def1 ||= Common::ClassDef.create(
               self, table_offset + class_def1_offset

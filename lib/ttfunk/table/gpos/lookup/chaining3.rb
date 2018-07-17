@@ -6,6 +6,10 @@ module TTFunk
           attr_reader :format, :backtrack_coverage_tables
           attr_reader :input_coverage_tables, :lookahead_coverage_tables
 
+          def max_context
+            input_coverage_tables.count + lookahead_coverage_tables.count
+          end
+
           def dependent_coverage_tables
             backtrack_coverage_tables.to_a +
               input_coverage_tables.to_a +

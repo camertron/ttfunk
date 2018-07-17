@@ -7,6 +7,15 @@ module TTFunk
 
           attr_reader :format, :coverage_offset, :pos_rule_sets
 
+          def max_context
+            pos_rule_sets.flat_map do |pos_rule_set|
+              pos_rule_set.pos_rules.map do |pos_rule|
+                # i.e. glyph count
+                pos_rule.input_sequence.count
+              end
+            end.max
+          end
+
           def encode
             EncodedString.new do |result|
               result.tag_with(id)

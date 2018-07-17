@@ -10,7 +10,7 @@ module TTFunk
           def max_context
             @max_context ||= ligature_sets.flat_map do |ligature_set|
               ligature_set.tables.map do |ligature_table|
-                ligature_table.component_glyph_ids.count
+                ligature_table.component_glyph_ids.count + 1
               end
             end.max
           end

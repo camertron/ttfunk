@@ -7,6 +7,12 @@ module TTFunk
           attr_reader :mark_class_count, :mark_array_offset, :ligature_array_offset
           attr_reader :mark_array, :ligature_array
 
+          def max_context
+            ligature_array.ligature_attachments.map do |lig_at|
+              lig_at.components.count
+            end.max
+          end
+
           def mark_coverage_table
             @mark_coverage_table ||= Common::CoverageTable.create(
               file, self, table_offset + mark_coverage_offset

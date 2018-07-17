@@ -216,7 +216,7 @@ module TTFunk
               if os2.version > 1
                 result << [
                   os2.x_height, os2.cap_height, os2.default_char,
-                  os2.break_char, os2.max_context
+                  os2.break_char, calc_max_context_for(os2, subset)
                 ].pack('n*')
               end
             end
@@ -224,6 +224,13 @@ module TTFunk
         end
 
         private
+
+        def calc_max_context_for(os2, subset)
+          [
+            os2.file.glyph_substitution.max_context_for(subset.new2old_glyph),
+            os2.file.glyph_positioning.max_context_for(subset.new2old_glyph)
+          ].max
+        end
 
         def code_pages_for(subset)
           field = BitField.new(0)
@@ -365,11 +372,6 @@ module TTFunk
           if @version > 1
             @x_height, @cap_height = read_signed(2)
             @default_char, @break_char, @max_context = read(6, 'nnn')
-
-            # Set this to zero until GSUB/GPOS support has been implemented.
-            # This value is calculated via those tables, and should be set to
-            # zero if the data is not available.
-            @max_context = 0
           end
         end
       end

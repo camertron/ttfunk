@@ -7,6 +7,15 @@ module TTFunk
 
           attr_reader :format, :coverage_offset, :chain_pos_rule_sets
 
+          def max_context
+            chain_pos_rule_sets.flat_map do |chain_pos_rule_set|
+              chain_pos_rule_set.chain_pos_rules.map do |chain_pos_rule|
+                chain_pos_rule.input_sequence.count +
+                  chain_pos_rule.lookahead_glyph_ids.count
+              end
+            end.max
+          end
+
           def encode
             EncodedString.new do |result|
               result.tag_with(id)

@@ -74,6 +74,16 @@ module TTFunk
         end.max
       end
 
+      def max_context_for(new2old_glyph)
+        old2new_lookups = lookup_list.old2new_lookups_for(
+          new2old_glyph.values
+        )
+
+        old2new_lookups.flat_map do |old_index, _|
+          lookup_list.tables[old_index].sub_tables.map(&:max_context)
+        end.max
+      end
+
       private
 
       def parse!

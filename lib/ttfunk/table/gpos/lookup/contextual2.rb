@@ -8,6 +8,14 @@ module TTFunk
           attr_reader :format, :coverage_offset, :class_def_offset
           attr_reader :pos_class_sets
 
+          def max_context
+            pos_class_sets.flat_map do |pos_class_set|
+              pos_class_set.pos_class_rules.map do |pos_class_rule|
+                pos_class_rule.classes.count + 1
+              end
+            end.max
+          end
+
           def class_def
             @class_def ||= Common::ClassDef.create(
               self, table_offset + class_def_offset

@@ -8,6 +8,10 @@ module TTFunk
           attr_reader :mark_class_count, :mark_array_offset, :base_array_offset
           attr_reader :mark_array, :base_array
 
+          def max_context
+            1
+          end
+
           def mark_coverage_table
             @mark_coverage_table ||= Common::CoverageTable.create(
               file, self, table_offset + mark_coverage_offset

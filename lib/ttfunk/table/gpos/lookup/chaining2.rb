@@ -9,6 +9,15 @@ module TTFunk
           attr_reader :input_class_def_offset, :lookahead_class_def_offset
           attr_reader :chain_pos_class_sets
 
+          def max_context
+            chain_pos_class_sets.flat_map do |chain_pos_class_set|
+              chain_pos_class_set.chain_pos_class_rules.map do |chain_pos_class_rule|
+                chain_pos_class_rule.input_sequence.count +
+                  chain_pos_class_rule.lookahead_sequence.count
+              end
+            end.max
+          end
+
           def backtrack_class_def
             @backtrack_class_def ||= Common::ClassDef.create(
               self, table_offset + backtrack_class_def_offset

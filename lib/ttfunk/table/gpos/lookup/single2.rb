@@ -7,6 +7,10 @@ module TTFunk
 
           attr_reader :format, :coverage_offset, :value_format, :value_tables
 
+          def max_context
+            1
+          end
+
           def encode
             EncodedString.new do |result|
               result.tag_with(id)

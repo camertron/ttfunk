@@ -5,6 +5,11 @@ module TTFunk
         class Contextual3 < Base
           attr_reader :format, :coverage_offsets, :pos_lookups
 
+          def max_context
+            # i.e. glyph count
+            coverage_offsets.count
+          end
+
           def dependent_coverage_tables
             coverage_tables
           end
