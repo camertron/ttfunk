@@ -100,35 +100,31 @@ module TTFunk
 
         def parse!
           until @index >= @data.size
-            code = read_byte
+            code = @data[@index]
+            @index += 1
 
-            if code == 11
-              # return from callgsubr - do nothing since we inline subrs
-            elsif code >= 32 && code <= 246
+            # return from callgsubr - do nothing since we inline subrs
+            next if code == 11
+
+            if code >= 32 && code <= 246
               @stack << code - 139
+            elsif (m = CODE_MAP[code])
+              send(m)
             elsif code >= 247 && code <= 250
               b0 = code
-              b1 = read_byte
+              b1 = @data[@index]
+              @index += 1
               @stack << (b0 - 247) * 256 + b1 + 108
             elsif code >= 251 && code <= 254
               b0 = code
-              b1 = read_byte
+              b1 = @data[@index]
+              @index += 1
               @stack << -(b0 - 251) * 256 - b1 - 108
-            elsif (m = CODE_MAP[code])
-              # start_time = Time.now
-              send(m)
-              # $counts[CODE_MAP[code]] += (Time.now - start_time)
             else
               b1, b2, b3, b4 = read_bytes(4)
               @stack << ((b1 << 24) | (b2 << 16) | (b3 << 8) | b4) / 65_536
             end
           end
-        end
-
-        def read_byte
-          byte = @data[@index]
-          @index += 1
-          byte
         end
 
         def read_bytes(length)
@@ -226,12 +222,13 @@ module TTFunk
 
         def callsubr
           code_index = @stack.pop + @subrs_bias
-          subr_codes = @subrs[code_index].bytes
-          @data.insert(@index, *subr_codes) if subr_codes
+          subr_code = @subrs[code_index].bytes
+          @data[@index, 0] = subr_code
         end
 
         def flex_select
-          flex_code = read_byte
+          flex_code = @data[@index]
+          @index += 1
           send(FLEX_CODE_MAP[flex_code])
         end
 
@@ -436,7 +433,7 @@ module TTFunk
         def callgsubr
           code_index = @stack.pop + @gsubrs_bias
           subr_code = @gsubrs[code_index].bytes
-          @data.insert(@index, *subr_code) if subr_code
+          @data[@index, 0] = subr_code
         end
 
         def vhcurveto

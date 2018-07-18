@@ -4,10 +4,11 @@ module TTFunk
       class Path
         CLOSE_PATH_CMD = [:close].freeze
 
-        attr_reader :commands
+        attr_reader :commands, :number_of_contours
 
         def initialize
           @commands = []
+          @number_of_contours = 0
         end
 
         # rubocop:disable Naming/UncommunicativeMethodParamName
@@ -25,11 +26,7 @@ module TTFunk
 
         def close_path
           @commands << CLOSE_PATH_CMD
-        end
-
-        def number_of_contours
-          # contours must be closed
-          commands.count { |cmd| cmd[0] == :close }
+          @number_of_contours += 1
         end
 
         def to_svg
