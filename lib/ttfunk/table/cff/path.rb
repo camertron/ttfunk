@@ -2,6 +2,8 @@ module TTFunk
   class Table
     class Cff < TTFunk::Table
       class Path
+        CLOSE_PATH_CMD = [:close].freeze
+
         attr_reader :commands
 
         def initialize
@@ -10,37 +12,29 @@ module TTFunk
 
         # rubocop:disable Naming/UncommunicativeMethodParamName
         def move_to(x, y)
-          @commands << { type: :move, x: x, y: y }
+          @commands << [:move, x, y]
         end
 
         def line_to(x, y)
-          @commands << { type: :line, x: x, y: y }
+          @commands << [:line, x, y]
         end
 
         def curve_to(x1, y1, x2, y2, x, y)
-          @commands << {
-            type: :curve,
-            x1: x1,
-            y1: y1,
-            x2: x2,
-            y2: y2,
-            x: x,
-            y: y
-          }
+          @commands << [:curve, x1, y1, x2, y2, x, y]
         end
 
         def close_path
-          @commands << { type: :close }
+          @commands << CLOSE_PATH_CMD
         end
 
         def number_of_contours
           # contours must be closed
-          commands.count { |cmd| cmd[:type] == :close }
+          commands.count { |cmd| cmd[0] == :close }
         end
 
         def to_svg
           path_data = commands.map do |command|
-            case command[:type]
+            case command[0]
             when :move
               "M#{format_values(command, :x, :y)}"
             when :line

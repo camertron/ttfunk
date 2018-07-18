@@ -14,22 +14,9 @@ module TTFunk
           y_coords = []
 
           path.commands.each do |command|
-            type = command[:type]
-
-            if type != :close
-              x_coords << command[:x]
-              y_coords << command[:y]
-            end
-
-            if %i[quad curve].include?(type)
-              x_coords << command[:x1]
-              y_coords << command[:y1]
-            end
-
-            if type == :curve
-              x_coords << command[:x2]
-              y_coords << command[:y2]
-            end
+            next if command[0] == :close
+            x_coords << command[1]
+            y_coords << command[2]
           end
 
           @x_min = x_coords.min || 0

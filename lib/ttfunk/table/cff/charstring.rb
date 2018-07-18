@@ -115,9 +115,10 @@ module TTFunk
               b1 = read_byte
               @stack.push(-(b0 - 251) * 256 - b1 - 108)
             elsif (m = CODE_MAP[code])
+              # start_time = Time.now
               send(m)
+              # $counts[CODE_MAP[code]] += (Time.now - start_time)
             else
-              b0 = code
               b1, b2, b3, b4 = read_bytes(4)
               @stack.push(((b1 << 24) | (b2 << 16) | (b3 << 8) | b4) / 65_536)
             end
@@ -147,7 +148,7 @@ module TTFunk
         def stem
           # The number of stem operators on the stack is always even.
           # If the value is uneven, that means a width is specified.
-          has_width_arg = @stack.size.odd?
+          has_width_arg = @stack.size % 2 == 1
 
           if has_width_arg && !@have_width
             @width = @stack.shift + @nominal_width_x
@@ -254,7 +255,7 @@ module TTFunk
         end
 
         def hflex
-          c1x = @x + @stack.shift # dx1
+          c1x = @x + @stack.shift     # dx1
           c1y = @y                    # dy1
           c2x = c1x + @stack.shift    # dx2
           c2y = c1y + @stack.shift    # dy2
@@ -396,7 +397,7 @@ module TTFunk
         end
 
         def vvcurveto
-          if @stack.size.odd?
+          if @stack.size % 2 == 1
             @x += @stack.shift
           end
 
@@ -412,7 +413,7 @@ module TTFunk
         end
 
         def hhcurveto
-          if @stack.size.odd?
+          if @stack.size % 2 == 1
             @y += @stack.shift
           end
 
