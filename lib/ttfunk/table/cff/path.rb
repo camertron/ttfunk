@@ -34,16 +34,14 @@ module TTFunk
 
         def to_svg
           path_data = commands.map do |command|
-            case command[0]
-            when :move
-              "M#{format_values(command, :x, :y)}"
-            when :line
-              "L#{format_values(command, :x, :y)}"
-            when :curve
-              "C#{format_values(command, :x1, :y1, :x2, :y2, :x, :y)}"
-            when :close
-              'Z'
+            instr = case command[0]
+            when :move then 'M'
+            when :line then 'L'
+            when :curve then 'C'
+            when :close then 'Z'
             end
+
+            "#{instr}#{format_values(command)}"
           end.join(' ')
 
           "<path d=\"#{path_data}\"/>"
@@ -56,15 +54,15 @@ module TTFunk
           commands.each do |cmd|
             case cmd[:type]
             when :move
-              new_path.move_to(x + (cmd[:x] * scale), y + (-cmd[:y] * scale))
+              new_path.move_to(x + (cmd[1] * scale), y + (-cmd[2] * scale))
             when :line
-              new_path.line_to(x + (cmd[:x] * scale), y + (-cmd[:y] * scale))
+              new_path.line_to(x + (cmd[1] * scale), y + (-cmd[2] * scale))
             when :curve
               new_path.curve_to(
-                x + (cmd[:x1] * scale),
-                y + (-cmd[:y1] * scale),
-                x + (cmd[:x2] * scale), y + (-cmd[:y2] * scale),
-                x + (cmd[:x] * scale), y + (-cmd[:y] * scale)
+                x + (cmd[1] * scale),
+                y + (-cmd[2] * scale),
+                x + (cmd[3] * scale), y + (-cmd[4] * scale),
+                x + (cmd[5] * scale), y + (-cmd[6] * scale)
               )
             when :close
               new_path.close_path
@@ -77,8 +75,8 @@ module TTFunk
 
         private
 
-        def format_values(command, *keys)
-          keys.map { |k| format('%.2f', command[k]) }.join(' ')
+        def format_values(command)
+          command[1..-1].map { |k| format('%.2f', k) }.join(' ')
         end
       end
     end

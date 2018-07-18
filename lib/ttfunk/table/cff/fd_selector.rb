@@ -25,7 +25,7 @@ module TTFunk
             end
 
             range, entry = entries.bsearch do |rng, _|
-              if rng.include?(glyph_id)
+              if rng.cover?(glyph_id)
                 0
               elsif glyph_id < rng.first
                 -1

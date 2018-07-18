@@ -105,22 +105,22 @@ module TTFunk
             if code == 11
               # return from callgsubr - do nothing since we inline subrs
             elsif code >= 32 && code <= 246
-              @stack.push(code - 139)
+              @stack << code - 139
             elsif code >= 247 && code <= 250
               b0 = code
               b1 = read_byte
-              @stack.push((b0 - 247) * 256 + b1 + 108)
+              @stack << (b0 - 247) * 256 + b1 + 108
             elsif code >= 251 && code <= 254
               b0 = code
               b1 = read_byte
-              @stack.push(-(b0 - 251) * 256 - b1 - 108)
+              @stack << -(b0 - 251) * 256 - b1 - 108
             elsif (m = CODE_MAP[code])
               # start_time = Time.now
               send(m)
               # $counts[CODE_MAP[code]] += (Time.now - start_time)
             else
               b1, b2, b3, b4 = read_bytes(4)
-              @stack.push(((b1 << 24) | (b2 << 16) | (b3 << 8) | b4) / 65_536)
+              @stack << ((b1 << 24) | (b2 << 16) | (b3 << 8) | b4) / 65_536
             end
           end
         end
@@ -430,7 +430,7 @@ module TTFunk
 
         def shortint
           b1, b2 = read_bytes(2)
-          @stack.push(((b1 << 24) | (b2 << 16)) >> 16)
+          @stack << (((b1 << 24) | (b2 << 16)) >> 16)
         end
 
         def callgsubr
