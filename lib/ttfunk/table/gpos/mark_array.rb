@@ -12,11 +12,13 @@ module TTFunk
             # which is why these gymnastics are necessary
             marks.each do |mark|
               result << mark.encode.unresolved_string
-              result << Placeholder.new(mark.id, length: 2).tap { |ph| ph.position = result.length - 2 }
+              result << Placeholder.new(mark.id, length: 2).tap do |ph|
+                ph.position = result.length - 2
+              end
             end
 
             marks.each do |mark|
-              result.resolve_placeholder(mark.id, [result.length].pack('n'))
+              result.resolve_each(mark.id) { [result.length].pack('n') }
             end
           end
         end

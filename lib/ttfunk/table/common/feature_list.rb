@@ -11,12 +11,12 @@ module TTFunk
             old2new_features.each do |old_index, _|
               table = tables[old_index]
               result << [table.tag].pack('A4')
-              result << Placeholder.new("common_#{table.id}", length: 2)
+              result << table.placeholder
             end
 
             old2new_features.each do |old_index, _|
               table = tables[old_index]
-              result.resolve_placeholder("common_#{table.id}", [result.length].pack('n'))
+              result.resolve_placeholder(table.id, [result.length].pack('n'))
               result << table.encode(old2new_lookups)
             end
           end

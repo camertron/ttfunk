@@ -10,13 +10,13 @@ module TTFunk
             tables.encode_to(result) do |table|
               [
                 table.feature_table_index,
-                Placeholder.new("common_#{table.alternate_feature_table.id}", length: 2)
+                table.alternate_feature_table.placeholder
               ]
             end
 
             tables.each do |table|
               result.resolve_placeholder(
-                "common_#{table.alternate_feature_table.id}", [result.length].pack('N')
+                table.alternate_feature_table.id, [result.length].pack('N')
               )
 
               result << table.alternate_feature_table.encode

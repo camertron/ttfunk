@@ -3,8 +3,8 @@ module TTFunk
     class Gpos
       module Lookup
         class MarkToMark < Base
-          attr_reader :mark1_coverage_offset, :mark2_coverage_offset, :mark_class_count
-          attr_reader :mark1_array_offset, :mark2_array_offset
+          attr_reader :format, :mark1_coverage_offset, :mark2_coverage_offset
+          attr_reader :mark_class_count, :mark1_array_offset, :mark2_array_offset
           attr_reader :mark1_array, :mark2_array
 
           def max_context
@@ -33,7 +33,7 @@ module TTFunk
               result << [format].pack('n')
               result << mark1_coverage_table.placeholder_relative_to(id)
               result << mark2_coverage_table.placeholder_relative_to(id)
-              result << [mark1_array.count].pack('n')
+              result << [mark1_array.marks.count].pack('n')
               result << mark1_array.placeholder
               result << mark2_array.placeholder
 

@@ -2,7 +2,7 @@ module TTFunk
   class Table
     class Gpos
       class Mark2Table < TTFunk::SubTable
-        attr_reader :mark_class_count, :anchor_tables
+        attr_reader :mark_class_count, :mark2_array_offset, :anchor_tables
 
         def initialize(file, offset, mark_class_count, mark2_array_offset)
           @mark_class_count = mark_class_count
@@ -27,7 +27,7 @@ module TTFunk
 
         def parse!
           @anchor_tables = Sequence.from(io, mark_class_count, 'n') do |anchor_offset|
-            AnchorTable.new(file, mark2_array_offset + anchor_offset)
+            AnchorTable.create(file, self, mark2_array_offset + anchor_offset)
           end
 
           @length = anchor_tables.length

@@ -9,20 +9,20 @@ module TTFunk
             result << [major_version, minor_version, tables.count].pack('nnn')
             tables.encode_to(result) do |table|
               [
-                Placeholder.new("common_#{table.condition_set.id}", length: 4),
-                Placeholder.new("common_#{table.feature_table_substitutions.id}", length: 4)
+                Placeholder.new(table.condition_set.id, length: 4),
+                Placeholder.new(table.feature_table_substitutions.id, length: 4)
               ]
             end
 
             tables.each do |table|
               result.resolve_placeholder(
-                "common_+#{table.condition_set.id}", [result.length].pack('N')
+                table.condition_set.id, [result.length].pack('N')
               )
 
               result << table.condition_set.encode
 
               result.resolve_placeholder(
-                "common_#{table.feature_table_substitutions.id}", [result.length].pack('N')
+                table.feature_table_substitutions.id, [result.length].pack('N')
               )
 
               result << table.feature_table_substitutions.encode

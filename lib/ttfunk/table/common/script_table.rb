@@ -24,7 +24,7 @@ module TTFunk
             )
 
             if default_lang_sys_table && include_default
-              result << Placeholder.new("common_#{default_lang_sys_table.id}", length: 2)
+              result << default_lang_sys_table.placeholder
             else
               result << [0].pack('n')
             end
@@ -34,17 +34,20 @@ module TTFunk
 
             ls_tables.each do |ls_table|
               result << [ls_table.tag].pack('A4')
-              result << Placeholder.new("common_#{ls_table.id}", length: 2)
+              result << ls_table.placeholder
             end
 
             ls_tables.each do |ls_table|
-              result.resolve_placeholder("common_#{ls_table.id}", [result.length].pack('n'))
+              result.resolve_each(ls_table.id) do |_placeholder|
+                [result.length].pack('n')
+              end
+
               result << ls_table.encode(old2new_features)
             end
 
             if default_lang_sys_table && include_default
               result.resolve_placeholder(
-                "common_#{default_lang_sys_table.id}", [result.length].pack('n')
+                default_lang_sys_table.id, [result.length].pack('n')
               )
 
               result << default_lang_sys_table.encode(old2new_features)
