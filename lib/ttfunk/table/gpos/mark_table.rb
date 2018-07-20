@@ -26,7 +26,7 @@ module TTFunk
         private
 
         def parse!
-          @mark_class, @mark_anchor_offset = read(4, 'nn')
+          @mark_class, @mark_anchor_offset = read(4, 'n*')
           @length = 4
         end
       end

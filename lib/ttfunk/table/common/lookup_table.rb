@@ -50,7 +50,7 @@ module TTFunk
         private
 
         def parse!
-          @lookup_type, lookup_flag_value, count = read(6, 'nnn')
+          @lookup_type, lookup_flag_value, count = read(6, 'n*')
           @lookup_flag = BitField.new(lookup_flag_value)
 
           @sub_tables = Sequence.from(io, count, 'n') do |sub_table_offset|

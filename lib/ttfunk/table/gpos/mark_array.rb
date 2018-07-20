@@ -6,7 +6,7 @@ module TTFunk
 
         def encode
           EncodedString.new do |result|
-            result << [marks.size].pack('n')
+            result << [marks.count].pack('n')
 
             # the mark's anchor table is relative to the mark array (i.e. us),
             # which is why these gymnastics are necessary
@@ -28,7 +28,7 @@ module TTFunk
         def parse!
           count = read(2, 'n').first
 
-          @marks = Array.new(count) do
+          @marks = ArraySequence.new(io, count) do
             MarkTable.new(file, io.pos, table_offset)
           end
 

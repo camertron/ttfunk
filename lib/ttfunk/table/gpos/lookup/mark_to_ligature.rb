@@ -35,7 +35,7 @@ module TTFunk
               result << [format].pack('n')
               result << mark_coverage_table.placeholder_relative_to(id)
               result << ligature_coverage_table.placeholder_relative_to(id)
-              result << [mark_array.count].pack('n')
+              result << [mark_array.marks.count].pack('n')
               result << mark_array.placeholder
               result << ligature_array.placeholder
 

@@ -28,7 +28,7 @@ module TTFunk
 
         def parse!
           @anchor_tables = Sequence.from(io, mark_class_count, 'n') do |anchor_offset|
-            AnchorTable.create(file, self, table_offset + anchor_offset)
+            AnchorTable.create(file, self, base_array_offset + anchor_offset)
           end
 
           @length = anchor_tables.length
