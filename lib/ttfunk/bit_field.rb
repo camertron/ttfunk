@@ -25,5 +25,17 @@ module TTFunk
     def dup
       self.class.new(value)
     end
+
+    def count_ones
+      val = value
+      count = 0
+
+      until val == 0
+        count += val % 2
+        val /= 2
+      end
+
+      count
+    end
   end
 end

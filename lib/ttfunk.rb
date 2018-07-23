@@ -147,6 +147,10 @@ module TTFunk
         end
     end
 
+    def glyph_positioning
+      @glyph_positioning ||= TTFunk::Table::Gpos.new(self)
+    end
+
     def glyph_substitution
       @glyph_substitution ||= TTFunk::Table::Gsub.new(self)
     end
@@ -163,6 +167,7 @@ require_relative 'ttfunk/table/cff'
 require_relative 'ttfunk/table/cmap'
 require_relative 'ttfunk/table/dsig'
 require_relative 'ttfunk/table/glyf'
+require_relative 'ttfunk/table/gpos'
 require_relative 'ttfunk/table/gsub'
 require_relative 'ttfunk/table/head'
 require_relative 'ttfunk/table/hhea'

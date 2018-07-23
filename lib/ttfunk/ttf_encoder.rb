@@ -152,6 +152,12 @@ module TTFunk
       end
     end
 
+    def gpos_table
+      @gpos_table ||= TTFunk::Table::Gpos.encode(
+        original.glyph_positioning, new2old_glyph
+      )
+    end
+
     def gsub_table
       @gsub_table ||= TTFunk::Table::Gsub.encode(
         original.glyph_substitution, new2old_glyph
@@ -189,6 +195,7 @@ module TTFunk
         'VORG' => vorg_table,
         'DSIG' => dsig_table,
         'gasp' => gasp_table,
+        'GPOS' => gpos_table,
         'GSUB' => gsub_table
       }.reject { |_tag, table| table.nil? }
     end
