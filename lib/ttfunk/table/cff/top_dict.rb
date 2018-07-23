@@ -89,7 +89,7 @@ module TTFunk
           if private_dict
             encoded_private_dict = private_dict.encode(mapping)
             encoded_offset = encode_integer32(new_cff_data.length)
-            encoded_length = encode_integer32(encoded_private_dict.bytesize)
+            encoded_length = encode_integer32(encoded_private_dict.length)
 
             new_cff_data.resolve_placeholder(
               :"private_length_#{@table_offset}", encoded_length
