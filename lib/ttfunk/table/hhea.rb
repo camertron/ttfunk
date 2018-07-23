@@ -17,16 +17,71 @@ module TTFunk
       attr_reader :metric_data_format
       attr_reader :number_of_metrics
 
-      def self.encode(hhea, hmtx)
-        ''.tap do |table|
-          table << [hhea.version].pack('N')
-          table << [
-            hhea.ascent, hhea.descent, hhea.line_gap, hhea.advance_width_max,
-            hhea.min_left_side_bearing, hhea.min_right_side_bearing,
-            hhea.x_max_extent, hhea.carot_slope_rise, hhea.carot_slope_run,
-            hhea.caret_offset, 0, 0, 0, 0, hhea.metric_data_format,
-            hmtx[:number_of_metrics]
-          ].pack('n*')
+      class << self
+        def encode(hhea, hmtx, mapping)
+          min_max = min_max_values_for(hhea, mapping)
+
+          ''.tap do |table|
+            table << [hhea.version].pack('N')
+            table << [
+              hhea.ascent, hhea.descent, hhea.line_gap,
+              min_max[:advance_width_max], min_max[:min_lsb],
+              min_max[:min_rsb], min_max[:x_max_extent], hhea.carot_slope_rise,
+              hhea.carot_slope_run, hhea.caret_offset,
+              0, 0, 0, 0, hhea.metric_data_format, hmtx[:number_of_metrics]
+            ].pack('n*')
+          end
+        end
+
+        private
+
+        def min_max_values_for(hhea, mapping)
+          aw_max = 0
+          min_lsb = Float::INFINITY
+          min_rsb = Float::INFINITY
+          x_max_ex = -Float::INFINITY
+
+          mapping.each do |_, old_glyph_id|
+            hm = hhea.file.horizontal_metrics.for(old_glyph_id)
+            next unless hm
+            aw_max = hm.advance_width if aw_max < hm.advance_width
+
+            glyph = if hhea.file.cff.exists?
+                      hhea.file
+                          .cff
+                          .top_index[0]
+                          .charstrings_index[old_glyph_id]
+                          .glyph
+                    else
+                      hhea.file.glyph_outlines.for(old_glyph_id)
+                    end
+
+            next if glyph.nil?
+            next if glyph.number_of_contours == 0
+
+            min_lsb = hm.left_side_bearing if min_lsb > hm.left_side_bearing
+
+            rsb = hm.advance_width -
+              hm.left_side_bearing -
+              (glyph.x_max - glyph.x_min)
+
+            min_rsb = rsb if min_rsb > rsb
+
+            extent = hm.left_side_bearing + (glyph.x_max - glyph.x_min)
+            x_max_ex = extent if extent > x_max_ex
+          end
+
+          {
+            advance_width_max: aw_max,
+            min_lsb: infinity_to_zero(min_lsb),
+            min_rsb: infinity_to_zero(min_rsb),
+            x_max_extent: infinity_to_zero(x_max_ex)
+          }
+        end
+
+        def infinity_to_zero(num)
+          return num unless num.respond_to?(:infinite?)
+          num.infinite? ? 0 : num
         end
       end
 
