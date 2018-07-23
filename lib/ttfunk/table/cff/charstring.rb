@@ -141,6 +141,7 @@ module TTFunk
           stem
         end
 
+        # rubocop:disable Style/EvenOdd
         def stem
           # The number of stem operators on the stack is always even.
           # If the value is uneven, that means a width is specified.
@@ -154,6 +155,7 @@ module TTFunk
           @stack.clear
           @have_width = true
         end
+        # rubocop:enable Style/EvenOdd
 
         def vmoveto
           if @stack.size > 1 && !@have_width
@@ -393,6 +395,7 @@ module TTFunk
           @path.curve_to(c1x, c1y, c2x, c2y, @x, @y)
         end
 
+        # rubocop:disable Style/EvenOdd
         def vvcurveto
           if @stack.size % 2 == 1
             @x += @stack.shift
@@ -424,6 +427,7 @@ module TTFunk
             @path.curve_to(c1x, c1y, c2x, c2y, @x, @y)
           end
         end
+        # rubocop:enable Style/EvenOdd
 
         def shortint
           b1, b2 = read_bytes(2)

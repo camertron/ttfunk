@@ -20,7 +20,7 @@ module TTFunk
             entries[glyph_id]
 
           when :range_format
-            if entry = range_cache[glyph_id]
+            if (entry = range_cache[glyph_id])
               return entry
             end
 

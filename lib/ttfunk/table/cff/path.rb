@@ -32,11 +32,11 @@ module TTFunk
         def to_svg
           path_data = commands.map do |command|
             instr = case command[0]
-            when :move then 'M'
-            when :line then 'L'
-            when :curve then 'C'
-            when :close then 'Z'
-            end
+                    when :move then 'M'
+                    when :line then 'L'
+                    when :curve then 'C'
+                    when :close then 'Z'
+                    end
 
             "#{instr}#{format_values(command)}"
           end.join(' ')
