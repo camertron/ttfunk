@@ -152,6 +152,12 @@ module TTFunk
       end
     end
 
+    def gsub_table
+      @gsub_table ||= TTFunk::Table::Gsub.encode(
+        original.glyph_substitution, new2old_glyph
+      )
+    end
+
     def vorg_table
       @vorg_table ||= TTFunk::Table::Vorg.encode(
         original.vertical_origins
@@ -182,7 +188,8 @@ module TTFunk
         'cvt ' => cvt_table,
         'VORG' => vorg_table,
         'DSIG' => dsig_table,
-        'gasp' => gasp_table
+        'gasp' => gasp_table,
+        'GSUB' => gsub_table
       }.reject { |_tag, table| table.nil? }
     end
 

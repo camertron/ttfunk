@@ -29,12 +29,14 @@ RSpec.describe TTFunk::Table::Cff::TopDict do
 
       # replace all the old offsets with the new ones so the dicts
       # (hopefully) match
-      placeholders.each do |name, placeholder|
-        start = placeholder.position + 1
-        finish = placeholder.position + placeholder.length
-        offset = encoded.string[start...finish].unpack('N').first
-        operator = described_class::POINTER_OPERATORS[name]
-        top_dict_hash[operator][-1] = offset
+      placeholders.each do |name, placeholders|
+        placeholders.each do |placeholder|
+          start = placeholder.position + 1
+          finish = placeholder.position + placeholder.length
+          offset = encoded.string[start...finish].unpack('N').first
+          operator = described_class::POINTER_OPERATORS[name]
+          top_dict_hash[operator][-1] = offset
+        end
       end
 
       expect(new_top_dict_hash).to eq(top_dict_hash)

@@ -12,6 +12,10 @@ require_relative 'ttfunk/sci_form'
 require_relative 'ttfunk/bit_field'
 require_relative 'ttfunk/bin_utils'
 require_relative 'ttfunk/sub_table'
+require_relative 'ttfunk/sequence'
+require_relative 'ttfunk/array_sequence'
+require_relative 'ttfunk/tag'
+require_relative 'ttfunk/pack_format'
 
 module TTFunk
   class File
@@ -142,6 +146,16 @@ module TTFunk
           TTFunk::Table::Dsig.new(self)
         end
     end
+
+    def glyph_substitution
+      @glyph_substitution ||= TTFunk::Table::Gsub.new(self)
+    end
+
+    def variable?
+      # presence of an 'fvar' table indicates this is a variable font
+      # https://www.microsoft.com/typography/otspec/otvaroverview.htm
+      directory.tables.include?('fvar')
+    end
   end
 end
 
@@ -149,6 +163,7 @@ require_relative 'ttfunk/table/cff'
 require_relative 'ttfunk/table/cmap'
 require_relative 'ttfunk/table/dsig'
 require_relative 'ttfunk/table/glyf'
+require_relative 'ttfunk/table/gsub'
 require_relative 'ttfunk/table/head'
 require_relative 'ttfunk/table/hhea'
 require_relative 'ttfunk/table/hmtx'
