@@ -26,18 +26,18 @@ module TTFunk
         TAG
       end
 
-      def encode(mapping)
+      def encode(new2_old, old2_new)
         EncodedString.new do |result|
           sub_tables = [
             header.encode,
             name_index.encode,
-            top_index.encode { |top_dict| top_dict.encode(mapping) },
+            top_index.encode { |top_dict| top_dict.encode(new2_old, old2_new) },
             string_index.encode,
             global_subr_index.encode
           ]
 
           sub_tables.each { |tb| result << tb }
-          top_index[0].finalize(result, mapping)
+          top_index[0].finalize(result, new2_old, old2_new)
         end
       end
 
