@@ -82,7 +82,11 @@ module TTFunk
       end
 
       def parse_format!
-        warn Kernel.format('postscript table format 0x%08X is not supported', @format)
+        warn(
+          Kernel.format(
+            'postscript table format 0x%08X is not supported', @format
+          )
+        )
       end
     end
   end

@@ -147,8 +147,8 @@ module TTFunk
         @version = @strings[VERSION_NAME_ID]
 
         unless @strings[POSTSCRIPT_NAME_NAME_ID].empty?
-          @postscript_name = @strings[POSTSCRIPT_NAME_NAME_ID].first
-                             .strip_extended
+          @postscript_name = @strings[POSTSCRIPT_NAME_NAME_ID]
+                             .first.strip_extended
         end
 
         @trademark = @strings[TRADEMARK_NAME_ID]
