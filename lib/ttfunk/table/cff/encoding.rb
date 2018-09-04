@@ -78,7 +78,10 @@ module TTFunk
           return '' unless offset
           return encode_supplemental(new2_old, old2_new) if supplemental?
 
-          codes = new2_old.keys.sort.map { |new_gid| code_for(new2_old[new_gid]) }
+          codes = new2_old.keys.sort.map do |new_gid|
+            code_for(new2_old[new_gid])
+          end
+
           ranges = TTFunk::BinUtils.rangify(codes)
 
           # calculate whether storing the charset as a series of ranges is
@@ -113,7 +116,7 @@ module TTFunk
 
         private
 
-        def encode_supplemental(new2_old, old2_new)
+        def encode_supplemental(_new2_old, old2_new)
           new_entries = @entries.each_with_object({}) do |(code, old_gid), ret|
             if (new_gid = old2_new[old_gid])
               ret[code] = new_gid
