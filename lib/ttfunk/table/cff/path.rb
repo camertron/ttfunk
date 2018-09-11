@@ -29,11 +29,6 @@ module TTFunk
           @number_of_contours += 1
         end
 
-        def number_of_contours
-          # contours must be closed
-          commands.count { |cmd| cmd[:type] == :close }
-        end
-
         def to_svg
           path_data = commands.map do |command|
             instr = case command[0]
