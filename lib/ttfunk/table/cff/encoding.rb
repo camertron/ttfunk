@@ -1,3 +1,5 @@
+require 'yaml'
+
 module TTFunk
   class Table
     class Cff < TTFunk::Table
@@ -70,13 +72,16 @@ module TTFunk
           end
         end
 
-        # mapping is new -> old glyph ids
-        def encode(mapping)
+        def encode(new2_old, old2_new)
           # no offset means no encoding was specified (i.e. we're supposed to
           # use a predefined encoding) so there's nothing to encode
           return '' unless offset
+          return encode_supplemental(new2_old, old2_new) if supplemental?
 
-          codes = mapping.keys.sort.map { |new_gid| code_for(mapping[new_gid]) }
+          codes = new2_old.keys.sort.map do |new_gid|
+            code_for(new2_old[new_gid])
+          end
+
           ranges = TTFunk::BinUtils.rangify(codes)
 
           # calculate whether storing the charset as a series of ranges is
@@ -104,7 +109,29 @@ module TTFunk
           end.join
         end
 
+        def supplemental?
+          # high-order bit set to 1 indicates supplemental encoding
+          @format >> 7 == 1
+        end
+
         private
+
+        def encode_supplemental(_new2_old, old2_new)
+          new_entries = @entries.each_with_object({}) do |(code, old_gid), ret|
+            if (new_gid = old2_new[old_gid])
+              ret[code] = new_gid
+            end
+          end
+
+          result = [format_int(:supplemental), new_entries.size].pack('CC')
+          fmt = element_format(:supplemental)
+
+          new_entries.each do |code, new_gid|
+            result << [code, new_gid].pack(fmt)
+          end
+
+          result
+        end
 
         def code_for(glyph_id)
           return 0 if glyph_id == 0
@@ -130,6 +157,9 @@ module TTFunk
             end
 
             0
+
+          when :supplemental
+            @entries[glyph_id]
           end
         end
 
@@ -151,6 +181,15 @@ module TTFunk
               @entries << (code..(code + num_left))
               @count += num_left + 1
             end
+
+          when :supplemental
+            @entries = {}
+            @count = entry_count
+
+            entry_count.times do
+              code, glyph = read(element_width, element_format)
+              @entries[code] = glyph
+            end
           end
         end
 
@@ -159,6 +198,7 @@ module TTFunk
           case fmt
           when :array_format then 'C'
           when :range_format then 'CC'
+          when :supplemental then 'Cn'
           end
         end
 
@@ -167,13 +207,15 @@ module TTFunk
           case fmt
           when :array_format then 1
           when :range_format then 2
+          when :supplemental then 3
           else
             raise "'#{fmt}' is an unsupported encoding format"
           end
         end
 
-        # @TODO: handle supplemental encoding (necessary?)
         def format_sym(fmt = @format)
+          return :supplemental if supplemental?
+
           case fmt
           when 0 then :array_format
           when 1 then :range_format
@@ -186,6 +228,7 @@ module TTFunk
           case sym
           when :array_format then 0
           when :range_format then 1
+          when :supplemental then 129
           else
             raise "unsupported charset format '#{sym}'"
           end

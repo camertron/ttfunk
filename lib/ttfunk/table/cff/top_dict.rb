@@ -26,7 +26,7 @@ module TTFunk
 
         OPERATOR_CODES = OPERATORS.invert
 
-        def encode(_mapping)
+        def encode(_new2_old, _old2_new)
           EncodedString.new do |result|
             each_with_index do |(operator, operands), _idx|
               if operator == OPERATORS[:private]
@@ -45,16 +45,16 @@ module TTFunk
           end
         end
 
-        def finalize(new_cff_data, mapping)
+        def finalize(new_cff_data, new2_old, old2_new)
           if charset
             finalize_subtable(
-              new_cff_data, :charset, charset.encode(mapping)
+              new_cff_data, :charset, charset.encode(new2_old)
             )
           end
 
           if encoding
             finalize_subtable(
-              new_cff_data, :encoding, encoding.encode(mapping)
+              new_cff_data, :encoding, encoding.encode(new2_old, old2_new)
             )
           end
 
@@ -62,7 +62,7 @@ module TTFunk
             finalize_subtable(
               new_cff_data,
               :charstrings_index,
-              charstrings_index.encode(mapping, &:encode)
+              charstrings_index.encode(new2_old, &:encode)
             )
           end
 
@@ -71,23 +71,23 @@ module TTFunk
               new_cff_data,
               :font_index,
               font_index.encode do |font_dict|
-                font_dict.encode(mapping)
+                font_dict.encode(new2_old)
               end
             )
 
-            font_index.finalize(new_cff_data, mapping)
+            font_index.finalize(new_cff_data, new2_old)
           end
 
           if font_dict_selector
             finalize_subtable(
               new_cff_data,
               :font_dict_selector,
-              font_dict_selector.encode(mapping)
+              font_dict_selector.encode(new2_old)
             )
           end
 
           if private_dict
-            encoded_private_dict = private_dict.encode(mapping)
+            encoded_private_dict = private_dict.encode(new2_old)
             encoded_offset = encode_integer32(new_cff_data.length)
             encoded_length = encode_integer32(encoded_private_dict.length)
 
