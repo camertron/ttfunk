@@ -110,7 +110,49 @@ describe TTFunk::File, '#directory_info' do
   context 'with DejaVuSans' do
     let!(:file) { TTFunk::File.open(test_font('DejaVuSans')) }
 
-    it 'should extract the correct value'
+    it 'extracts the head entry correctly' do
+      head = file.directory_info('head')
+      expect(head).to eq(
+        tag: 'head',
+        checksum: 4183760953,
+        offset: 581036,
+        length: 54
+      )
+    end
+
+    it 'extracts the hmtx entry correctly' do
+      hmtx = file.directory_info('hmtx')
+      expect(hmtx).to eq(
+        tag: 'hmtx',
+        checksum: 4158872760,
+        offset: 581128,
+        length: 23712
+      )
+    end
+
+    it 'extracts the glyf entry correctly' do
+      glyf = file.directory_info('glyf')
+      expect(glyf).to eq(
+        tag: 'glyf',
+        checksum: 2009777384,
+        offset: 51644,
+        length: 529392
+      )
+    end
+  end
+
+  context 'with NotoSans' do
+    let!(:file) { TTFunk::File.open(test_font('NotoSansCJKsc-Thin', :otf)) }
+
+    it 'extracts the CFF entry correctly' do
+      cff = file.directory_info('CFF ')
+      expect(cff).to eq(
+        tag: 'CFF ',
+        checksum: 3809516217,
+        offset: 260480,
+        length: 14170569
+      )
+    end
   end
 end
 
