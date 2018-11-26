@@ -12,6 +12,9 @@ require_relative 'ttfunk/sci_form'
 require_relative 'ttfunk/bit_field'
 require_relative 'ttfunk/bin_utils'
 require_relative 'ttfunk/sub_table'
+require_relative 'ttfunk/min'
+require_relative 'ttfunk/max'
+require_relative 'ttfunk/sum'
 
 module TTFunk
   class File
@@ -141,6 +144,14 @@ module TTFunk
         if directory.tables.include?(TTFunk::Table::Dsig::TAG)
           TTFunk::Table::Dsig.new(self)
         end
+    end
+
+    def find_glyph(glyph_id)
+      if cff.exists?
+        cff.top_index[0].charstrings_index[glyph_id].glyph
+      else
+        glyph_outlines.for(glyph_id)
+      end
     end
   end
 end

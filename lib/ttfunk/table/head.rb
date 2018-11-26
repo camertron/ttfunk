@@ -42,41 +42,25 @@ module TTFunk
         private
 
         def min_max_values_for(head, mapping)
-          x_min = Float::INFINITY
-          x_max = -Float::INFINITY
-          y_min = Float::INFINITY
-          y_max = -Float::INFINITY
+          x_min = Min.new
+          x_max = Max.new
+          y_min = Min.new
+          y_max = Max.new
 
           mapping.each do |_, old_glyph_id|
-            glyph = if head.file.cff.exists?
-                      head.file
-                          .cff
-                          .top_index[0]
-                          .charstrings_index[old_glyph_id]
-                          .glyph
-                    else
-                      head.file.glyph_outlines.for(old_glyph_id)
-                    end
-
+            glyph = head.file.find_glyph(old_glyph_id)
             next unless glyph
 
-            x_min = glyph.x_min if x_min > glyph.x_min
-            x_max = glyph.x_max if x_max < glyph.x_max
-            y_min = glyph.y_min if y_min > glyph.y_min
-            y_max = glyph.y_max if y_max < glyph.y_max
+            x_min << glyph.x_min
+            x_max << glyph.x_max
+            y_min << glyph.y_min
+            y_max << glyph.y_max
           end
 
           [
-            infinity_to_zero(x_min),
-            infinity_to_zero(y_min),
-            infinity_to_zero(x_max),
-            infinity_to_zero(y_max)
+            x_min.value_or(0), y_min.value_or(0),
+            x_max.value_or(0), y_max.value_or(0)
           ]
-        end
-
-        def infinity_to_zero(num)
-          return num unless num.respond_to?(:infinite?)
-          num.infinite? ? 0 : num
         end
       end
 
