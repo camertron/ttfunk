@@ -1,5 +1,3 @@
-require 'yaml'
-
 module TTFunk
   class Table
     class Cff < TTFunk::Table
