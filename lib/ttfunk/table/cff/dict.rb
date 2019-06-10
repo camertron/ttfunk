@@ -214,9 +214,9 @@ module TTFunk
         def validate_sci!(significand, exponent)
           unless valid_significand?(significand) && valid_exponent?(exponent)
             raise InvalidOperandError,
-                  'invalid scientific notation operand with significand '\
-                  "'#{significand}' and exponent '#{exponent}' ending at "\
-                  "position #{io.pos} in dict at position #{table_offset}"
+              'invalid scientific notation operand with significand '\
+              "'#{significand}' and exponent '#{exponent}' ending at "\
+              "position #{io.pos} in dict at position #{table_offset}"
           end
         end
 

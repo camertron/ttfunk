@@ -5,7 +5,7 @@ require 'ttfunk/table/os2'
 require 'ttfunk/subset'
 
 RSpec.describe TTFunk::Table::OS2 do
-  subject(:os2_table) { font.os2 }
+  subject(:os2) { font.os2 }
 
   let(:bits_to_blocks) do
     described_class::UNICODE_BLOCKS.each_with_object({}) do |(range, bit), ret|
@@ -92,7 +92,7 @@ RSpec.describe TTFunk::Table::OS2 do
 
   it 'parses all fields correctly' do
     expected_fields.each do |field, expected_value|
-      actual_value = os2_table.public_send(field)
+      actual_value = os2.public_send(field)
       actual_value = actual_value.value if actual_value.respond_to?(:value)
       expect(actual_value).to(
         eq(expected_value),
@@ -102,7 +102,7 @@ RSpec.describe TTFunk::Table::OS2 do
   end
 
   describe '.encode' do
-    let(:encoded) { os2_table.class.encode(os2_table, subset) }
+    let(:encoded) { subject.class.encode(subject, subset) }
 
     let(:code_page_range) do
       TTFunk::BitField.new(

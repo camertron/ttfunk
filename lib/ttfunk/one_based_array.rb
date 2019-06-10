@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class OneBasedArray
     include Enumerable
@@ -19,7 +21,7 @@ module TTFunk
       entries.size
     end
 
-    def to_a
+    def to_ary
       entries
     end
 

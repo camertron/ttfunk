@@ -19,9 +19,9 @@ RSpec.describe TTFunk::TTFEncoder do
   let(:encoder) { described_class.new(original, subset, encoder_options) }
 
   describe '#encode' do
-    subject(:encoded) { encoder.encode }
+    subject(:encoded_ttf) { encoder.encode }
 
-    let(:new_font) { TTFunk::File.open(StringIO.new(subject)) }
+    let(:new_font) { TTFunk::File.open(StringIO.new(encoded_ttf)) }
 
     it 'includes all supported tables' do
       expect(new_font.directory.tables).to include('cmap')
@@ -60,11 +60,11 @@ RSpec.describe TTFunk::TTFEncoder do
 
     it 'is checksummed correctly' do
       head_offset = new_font.directory.tables['head'][:offset]
-      checksum = encoded[head_offset + 8, 4].unpack1('N')
+      checksum = encoded_ttf[head_offset + 8, 4].unpack1('N')
 
       # verified via the Font-Validator tool at:
       # https://github.com/HinTak/Font-Validator
-      expect(checksum).to eq(0x6868CBD)
+      expect(checksum).to eq(0x6DF71393)
     end
   end
 end

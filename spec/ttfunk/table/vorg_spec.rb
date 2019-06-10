@@ -25,14 +25,14 @@ RSpec.describe TTFunk::Table::Vorg do
     it 'finds the vertical origin when explicitly available' do
       glyph_id = cmap['〱'.unpack1('U*')]
       expect(vorg_table.origins).to include(glyph_id)
-      expect(vorg_table.for(glyph_id)).not_to(
+      expect(vorg_table.for(glyph_id)).to_not(
         eq(vorg_table.default_vert_origin_y)
       )
     end
 
     it 'falls back to the default vertical origin' do
       glyph_id = cmap['ろ'.unpack1('U*')]
-      expect(vorg_table.origins).not_to include(glyph_id)
+      expect(vorg_table.origins).to_not include(glyph_id)
       expect(vorg_table.for(glyph_id)).to(
         eq(vorg_table.default_vert_origin_y)
       )

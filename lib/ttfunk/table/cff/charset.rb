@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Cff < TTFunk::Table
@@ -48,12 +50,14 @@ module TTFunk
 
         def each
           return to_enum(__method__) unless block_given?
+
           # +1 adjusts for the implicit .notdef glyph
           (count + 1).times { |i| yield self[i] }
         end
 
         def [](glyph_id)
           return FIRST_GLYPH_STRING if glyph_id == 0
+
           find_string(sid_for(glyph_id))
         end
 
@@ -143,6 +147,7 @@ module TTFunk
 
         def parse!
           return unless offset
+
           @format = read(1, 'C').first
 
           case format_sym

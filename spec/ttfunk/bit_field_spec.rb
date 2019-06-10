@@ -52,7 +52,7 @@ RSpec.describe TTFunk::BitField do
     end
 
     it 'does not update the value if no bits were flipped' do
-      expect { bit_field.on(1) }.not_to(change(bit_field, :value))
+      expect { bit_field.on(1) }.to_not(change(bit_field, :value))
     end
   end
 
@@ -74,7 +74,7 @@ RSpec.describe TTFunk::BitField do
     end
 
     it 'does not update the value if no bits were flipped' do
-      expect { bit_field.off(3) }.not_to(change(bit_field, :value))
+      expect { bit_field.off(3) }.to_not(change(bit_field, :value))
     end
   end
 end

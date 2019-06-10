@@ -83,7 +83,7 @@ module TTFunk
     def add_placeholder(new_placeholder, pos = io.pos)
       if placeholders.include?(new_placeholder.name)
         raise DuplicatePlaceholderError,
-              "placeholder #{new_placeholder.name} already exists"
+          "placeholder #{new_placeholder.name} already exists"
       end
 
       new_placeholder.position = pos

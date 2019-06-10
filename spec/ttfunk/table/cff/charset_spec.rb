@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'ttfunk/table/cff'
 
@@ -14,7 +16,7 @@ RSpec.describe TTFunk::Table::Cff::Charset do
 
       it 'includes all the entries from the expert charset' do
         expect(charset.to_a).to eq(
-          ['.notdef'] + described_class.strings_for_charset_id(charset_id).to_a
+          ['.notdef'] + described_class.strings_for_charset_id(charset_id)
         )
       end
     end
