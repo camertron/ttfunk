@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../table'
 
 module TTFunk
@@ -23,7 +25,7 @@ module TTFunk
 
       class << self
         def encode(maxp, new2old_glyph)
-          ''.tap do |table|
+          ''.b.tap do |table|
             num_glyphs = new2old_glyph.length
             table << [maxp.version, num_glyphs].pack('Nn')
 

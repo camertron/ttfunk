@@ -1,8 +1,13 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Cff < TTFunk::Table
       class FdSelector < TTFunk::SubTable
         include Enumerable
+
+        ARRAY_FORMAT = 0
+        RANGE_FORMAT = 3
 
         RANGE_ENTRY_SIZE = 3
         ARRAY_ENTRY_SIZE = 1
@@ -41,6 +46,7 @@ module TTFunk
 
         def each
           return to_enum(__method__) unless block_given?
+
           count.times { |i| yield self[i] }
         end
 
@@ -52,12 +58,12 @@ module TTFunk
           total_range_size = ranges.size * RANGE_ENTRY_SIZE
           total_array_size = old_gids.size * ARRAY_ENTRY_SIZE
 
-          [].tap do |result|
+          ''.b.tap do |result|
             if total_array_size <= total_range_size
-              result << [format_int(:array_format)].pack('C')
+              result << [ARRAY_FORMAT].pack('C')
               result << old_gids.map { |old_gid| self[old_gid] }.pack('C*')
             else
-              result << [format_int(:range_format), ranges.size].pack('Cn')
+              result << [RANGE_FORMAT, ranges.size].pack('Cn')
               ranges.each { |range| result << range.pack('nC') }
 
               # "A sentinel GID follows the last range element and serves to
@@ -66,7 +72,7 @@ module TTFunk
               # is 1 greater than the last GID in the font)."
               result << [old_gids.size].pack('n')
             end
-          end.join
+          end
         end
 
         private
@@ -103,7 +109,10 @@ module TTFunk
             @entries = data.bytes
 
           when :range_format
+            # +2 for sentinel GID, +2 for num_ranges
             num_ranges = read(2, 'n').first
+            @length += (num_ranges * RANGE_ENTRY_SIZE) + 4
+
             ranges = Array.new(num_ranges) { read(RANGE_ENTRY_SIZE, 'nC') }
 
             @entries = ranges.each_cons(2).map do |first, second|
@@ -119,27 +128,16 @@ module TTFunk
             last_start_gid, last_fd_index = ranges.last
             @entries << [(last_start_gid...(n_glyphs + 1)), last_fd_index]
 
-            # +2 for sentinel GID, +2 for num_ranges
-            @length += (num_ranges * RANGE_ENTRY_SIZE) + 4
             @count = entries.inject(0) { |sum, entry| sum + entry.first.size }
           end
         end
 
         def format_sym
           case @format
-          when 0 then :array_format
-          when 3 then :range_format
+          when ARRAY_FORMAT then :array_format
+          when RANGE_FORMAT then :range_format
           else
             raise "unsupported fd select format '#{@format}'"
-          end
-        end
-
-        def format_int(format_sym)
-          case format_sym
-          when :array_format then 0
-          when :range_format then 3
-          else
-            raise "unsupported fd select format '#{format_sym}'"
           end
         end
       end

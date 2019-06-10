@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../table'
 
 module TTFunk
@@ -17,6 +19,7 @@ module TTFunk
 
       def self.encode(post, mapping)
         return nil unless post.exists?
+
         post.recode(mapping)
       end
 

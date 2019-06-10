@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'stringio'
 require 'pathname'
 
@@ -15,6 +17,7 @@ require_relative 'ttfunk/sub_table'
 require_relative 'ttfunk/min'
 require_relative 'ttfunk/max'
 require_relative 'ttfunk/sum'
+require_relative 'ttfunk/one_based_array'
 
 module TTFunk
   class File
@@ -48,6 +51,7 @@ module TTFunk
       # String or Pathname
       io_or_path = Pathname.new(io_or_path)
       raise ArgumentError, "#{io_or_path} not found" unless io_or_path.file?
+
       io = io_or_path.open('rb')
       io
     end
