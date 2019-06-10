@@ -109,7 +109,10 @@ module TTFunk
             @entries = data.bytes
 
           when :range_format
+            # +2 for sentinel GID, +2 for num_ranges
             num_ranges = read(2, 'n').first
+            @length += (num_ranges * RANGE_ENTRY_SIZE) + 4
+
             ranges = Array.new(num_ranges) { read(RANGE_ENTRY_SIZE, 'nC') }
 
             @entries = ranges.each_cons(2).map do |first, second|
@@ -125,8 +128,6 @@ module TTFunk
             last_start_gid, last_fd_index = ranges.last
             @entries << [(last_start_gid...(n_glyphs + 1)), last_fd_index]
 
-            # +2 for sentinel GID, +2 for num_ranges
-            @length += (num_ranges * RANGE_ENTRY_SIZE) + 4
             @count = entries.inject(0) { |sum, entry| sum + entry.first.size }
           end
         end
