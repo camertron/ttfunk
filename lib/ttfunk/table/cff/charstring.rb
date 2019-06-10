@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Cff < TTFunk::Table
       class Charstring
         CODE_MAP = {
-          1  => :hstem,
-          3  => :vstem,
-          4  => :vmoveto,
-          5  => :rlineto,
-          6  => :hlineto,
-          7  => :vlineto,
-          8  => :rrcurveto,
+          1 => :hstem,
+          3 => :vstem,
+          4 => :vmoveto,
+          5 => :rlineto,
+          6 => :hlineto,
+          7 => :vlineto,
+          8 => :rrcurveto,
           10 => :callsubr,
           12 => :flex_select,
           14 => :endchar,
@@ -44,8 +46,8 @@ module TTFunk
           @font_dict = font_dict
           @raw = raw
 
-          @default_width_x = (@font_dict || @top_dict)
-                             .private_dict.default_width_x
+          default_width_x = (@font_dict || @top_dict)
+                            .private_dict.default_width_x
 
           @nominal_width_x = (@font_dict || @top_dict)
                              .private_dict.nominal_width_x
@@ -61,7 +63,7 @@ module TTFunk
           @n_stems = 0
           @have_width = false
           @open = false
-          @width = @default_width_x
+          @width = default_width_x
           @x = 0
           @y = 0
         end

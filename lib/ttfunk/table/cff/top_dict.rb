@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Cff < TTFunk::Table
@@ -26,7 +28,7 @@ module TTFunk
 
         OPERATOR_CODES = OPERATORS.invert
 
-        def encode(_new2_old, _old2_new)
+        def encode
           EncodedString.new do |result|
             each_with_index do |(operator, operands), _idx|
               if operator == OPERATORS[:private]

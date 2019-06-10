@@ -1,4 +1,4 @@
-require 'yaml'
+# frozen_string_literal: true
 
 module TTFunk
   class Table
@@ -6,31 +6,19 @@ module TTFunk
       class Encoding < TTFunk::SubTable
         include Enumerable
 
-        DEFAULT_ENCODING_ID = 0
         STANDARD_ENCODING_ID = 0
         EXPERT_ENCODING_ID = 1
 
-        ENCODING_FILES = {
-          STANDARD_ENCODING_ID => 'standard.yml',
-          EXPERT_ENCODING_ID => 'expert.yml'
-        }.freeze
+        DEFAULT_ENCODING_ID = STANDARD_ENCODING_ID
 
         class << self
           def codes_for_encoding_id(encoding_id)
-            code_cache[encoding_id] ||= YAML.load_file(
-              ::File.expand_path(
-                ::File.join(
-                  '.', 'encodings', ENCODING_FILES.fetch(encoding_id)
-                ),
-                __dir__
-              )
-            ).freeze
-          end
-
-          private
-
-          def code_cache
-            @code_cache ||= {}
+            case encoding_id
+            when STANDARD_ENCODING_ID
+              Encodings::STANDARD
+            when EXPERT_ENCODING_ID
+              Encodings::EXPERT
+            end
           end
         end
 
@@ -49,6 +37,7 @@ module TTFunk
 
         def each
           return to_enum(__method__) unless block_given?
+
           # +1 adjusts for the implicit .notdef glyph
           (count + 1).times { |i| yield self[i] }
         end
@@ -56,7 +45,8 @@ module TTFunk
         def [](glyph_id)
           return 0 if glyph_id == 0
           return code_for(glyph_id) if offset
-          self.class.codes_for_encoding_id(offset_or_id)[glyph_id - 1]
+
+          self.class.codes_for_encoding_id(offset_or_id)[glyph_id]
         end
 
         def offset
@@ -92,21 +82,14 @@ module TTFunk
 
           total_array_size = codes.size * element_width(:array_format)
 
-          [].tap do |result|
-            if total_array_size <= total_range_size
-              fmt = element_format(:array_format)
-              result << [format_int(:array_format), codes.size].pack('CC')
-              result << codes.pack("#{fmt}*")
-            else
-              fmt = element_format(:range_format)
-              result << [format_int(:range_format), ranges.size].pack('CC')
-
-              ranges.each do |range|
-                code, num_left = range
-                result << [code, num_left].pack(fmt)
-              end
-            end
-          end.join
+          if total_array_size <= total_range_size
+            ([format_int(:array_format), codes.size] + codes).pack('C*')
+          else
+            element_fmt = element_format(:range_format)
+            result = [format_int(:range_format), ranges.size].pack('CC')
+            ranges.each { |range| result << range.pack(element_format) }
+            result
+          end
         end
 
         def supplemental?
@@ -142,8 +125,7 @@ module TTFunk
 
           case format_sym
           when :array_format
-            # zero is always .notdef, so adjust with - 1
-            @entries[glyph_id - 1]
+            @entries[glyph_id]
 
           when :range_format
             remaining = glyph_id
@@ -170,7 +152,7 @@ module TTFunk
           case format_sym
           when :array_format
             @count = entry_count
-            @entries = read(length, 'C*')
+            @entries = OneBasedArray.new(read(length, 'C*'))
 
           when :range_format
             @entries = []
@@ -193,7 +175,6 @@ module TTFunk
           end
         end
 
-        # @TODO: handle supplemental encoding (necessary?)
         def element_format(fmt = format_sym)
           case fmt
           when :array_format then 'C'
@@ -213,10 +194,10 @@ module TTFunk
           end
         end
 
-        def format_sym(fmt = @format)
+        def format_sym
           return :supplemental if supplemental?
 
-          case fmt
+          case @format
           when 0 then :array_format
           when 1 then :range_format
           else

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'stringio'
 require 'pathname'
 
@@ -13,9 +15,12 @@ require_relative 'ttfunk/bit_field'
 require_relative 'ttfunk/bin_utils'
 require_relative 'ttfunk/sub_table'
 require_relative 'ttfunk/sequence'
-require_relative 'ttfunk/array_sequence'
 require_relative 'ttfunk/tag'
 require_relative 'ttfunk/pack_format'
+require_relative 'ttfunk/min'
+require_relative 'ttfunk/max'
+require_relative 'ttfunk/sum'
+require_relative 'ttfunk/one_based_array'
 
 module TTFunk
   class File
@@ -49,6 +54,7 @@ module TTFunk
       # String or Pathname
       io_or_path = Pathname.new(io_or_path)
       raise ArgumentError, "#{io_or_path} not found" unless io_or_path.file?
+
       io = io_or_path.open('rb')
       io
     end
@@ -155,6 +161,14 @@ module TTFunk
       # presence of an 'fvar' table indicates this is a variable font
       # https://www.microsoft.com/typography/otspec/otvaroverview.htm
       directory.tables.include?('fvar')
+    end
+
+    def find_glyph(glyph_id)
+      if cff.exists?
+        cff.top_index[0].charstrings_index[glyph_id].glyph
+      else
+        glyph_outlines.for(glyph_id)
+      end
     end
   end
 end

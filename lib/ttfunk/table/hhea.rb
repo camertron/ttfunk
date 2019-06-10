@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../table'
 
 module TTFunk
@@ -18,16 +20,16 @@ module TTFunk
       attr_reader :number_of_metrics
 
       class << self
-        def encode(hhea, hmtx, mapping)
-          min_max = min_max_values_for(hhea, mapping)
+        def encode(hhea, hmtx, original, mapping)
+          ''.b.tap do |table|
+            metrics = metrics_for(original, mapping)
 
-          ''.tap do |table|
             table << [hhea.version].pack('N')
             table << [
               hhea.ascent, hhea.descent, hhea.line_gap,
-              min_max[:advance_width_max], min_max[:min_lsb],
-              min_max[:min_rsb], min_max[:x_max_extent], hhea.carot_slope_rise,
-              hhea.carot_slope_run, hhea.caret_offset,
+              metrics[:max_aw].value_or(0), metrics[:min_lsb].value_or(0),
+              metrics[:min_rsb].value_or(0), metrics[:max_extent].value_or(0),
+              hhea.carot_slope_rise, hhea.carot_slope_run, hhea.caret_offset,
               0, 0, 0, 0, hhea.metric_data_format, hmtx[:number_of_metrics]
             ].pack('n*')
           end
@@ -35,53 +37,33 @@ module TTFunk
 
         private
 
-        def min_max_values_for(hhea, mapping)
-          aw_max = 0
-          min_lsb = Float::INFINITY
-          min_rsb = Float::INFINITY
-          x_max_ex = -Float::INFINITY
+        def metrics_for(original, mapping)
+          metrics = {
+            min_lsb: Min.new,
+            min_rsb: Min.new,
+            max_aw: Max.new,
+            max_extent: Max.new
+          }
 
           mapping.each do |_, old_glyph_id|
-            hm = hhea.file.horizontal_metrics.for(old_glyph_id)
-            next unless hm
-            aw_max = hm.advance_width if aw_max < hm.advance_width
+            horiz_metrics = original.horizontal_metrics.for(old_glyph_id)
+            next unless horiz_metrics
 
-            glyph = if hhea.file.cff.exists?
-                      hhea.file
-                          .cff
-                          .top_index[0]
-                          .charstrings_index[old_glyph_id]
-                          .glyph
-                    else
-                      hhea.file.glyph_outlines.for(old_glyph_id)
-                    end
+            metrics[:min_lsb] << horiz_metrics.left_side_bearing
+            metrics[:max_aw] << horiz_metrics.advance_width
 
-            next if glyph.nil?
-            next if glyph.number_of_contours == 0
+            glyph = original.find_glyph(old_glyph_id)
+            next unless glyph
 
-            min_lsb = hm.left_side_bearing if min_lsb > hm.left_side_bearing
+            x_delta = glyph.x_max - glyph.x_min
 
-            rsb = hm.advance_width -
-              hm.left_side_bearing -
-              (glyph.x_max - glyph.x_min)
+            metrics[:min_rsb] << horiz_metrics.advance_width -
+              horiz_metrics.left_side_bearing - x_delta
 
-            min_rsb = rsb if min_rsb > rsb
-
-            extent = hm.left_side_bearing + (glyph.x_max - glyph.x_min)
-            x_max_ex = extent if extent > x_max_ex
+            metrics[:max_extent] << horiz_metrics.left_side_bearing + x_delta
           end
 
-          {
-            advance_width_max: aw_max,
-            min_lsb: infinity_to_zero(min_lsb),
-            min_rsb: infinity_to_zero(min_rsb),
-            x_max_extent: infinity_to_zero(x_max_ex)
-          }
-        end
-
-        def infinity_to_zero(num)
-          return num unless num.respond_to?(:infinite?)
-          num.infinite? ? 0 : num
+          metrics
         end
       end
 

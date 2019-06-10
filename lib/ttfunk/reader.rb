@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   module Reader
     def parse_from(position)

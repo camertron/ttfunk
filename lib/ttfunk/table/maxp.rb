@@ -1,38 +1,9 @@
+# frozen_string_literal: true
+
 require_relative '../table'
 
 module TTFunk
   class Table
-    class Value
-      attr_reader :value
-
-      def initialize(value = 0)
-        @value = value
-      end
-
-      private
-
-      def unwrap(obj)
-        if obj.respond_to?(:value)
-          obj.value
-        else
-          obj
-        end
-      end
-    end
-
-    class Max < Value
-      def <<(another_value)
-        unwrapped = unwrap(another_value)
-        @value = unwrapped if unwrapped > @value
-      end
-    end
-
-    class Sum < Value
-      def <<(another_value)
-        @value += unwrap(another_value)
-      end
-    end
-
     class Maxp < Table
       DEFAULT_MAX_COMPONENT_DEPTH = 1
 
@@ -54,7 +25,7 @@ module TTFunk
 
       class << self
         def encode(maxp, new2old_glyph)
-          ''.tap do |table|
+          ''.b.tap do |table|
             num_glyphs = new2old_glyph.length
             table << [maxp.version, num_glyphs].pack('Nn')
 
@@ -64,10 +35,10 @@ module TTFunk
               )
 
               table << [
-                stats[:max_points].value,
-                stats[:max_contours].value,
-                stats[:max_component_points].value,
-                stats[:max_component_contours].value,
+                stats[:max_points].value_or(0),
+                stats[:max_contours].value_or(0),
+                stats[:max_component_points].value_or(0),
+                stats[:max_component_contours].value_or(0),
                 # these all come from the fpgm and cvt tables, which
                 # we don't support at the moment
                 maxp.max_zones,
@@ -76,9 +47,9 @@ module TTFunk
                 maxp.max_function_defs,
                 maxp.max_instruction_defs,
                 maxp.max_stack_elements,
-                stats[:max_size_of_instructions].value,
-                stats[:max_component_elements].value,
-                stats[:max_component_depth].value
+                stats[:max_size_of_instructions].value_or(0),
+                stats[:max_component_elements].value_or(0),
+                stats[:max_component_depth].value_or(0)
               ].pack('n*')
             end
           end

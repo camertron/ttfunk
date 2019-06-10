@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'stringio'
 
 module TTFunk
@@ -62,7 +64,7 @@ module TTFunk
           "#{remaining} unresolved placeholder(s)"
       end
 
-      io.string
+      io.string.force_encoding(Encoding::ASCII_8BIT)
     end
 
     def bytes
@@ -70,7 +72,7 @@ module TTFunk
     end
 
     def unresolved_string
-      io.string
+      io.string.force_encoding(Encoding::ASCII_8BIT)
     end
 
     def placeholders

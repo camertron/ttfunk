@@ -1,23 +1,28 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Cff < TTFunk::Table
       autoload :Charset,          'ttfunk/table/cff/charset'
+      autoload :Charsets,         'ttfunk/table/cff/charsets'
       autoload :Charstring,       'ttfunk/table/cff/charstring'
       autoload :CharstringsIndex, 'ttfunk/table/cff/charstrings_index'
       autoload :Dict,             'ttfunk/table/cff/dict'
       autoload :Encoding,         'ttfunk/table/cff/encoding'
+      autoload :Encodings,        'ttfunk/table/cff/encodings'
       autoload :FdSelector,       'ttfunk/table/cff/fd_selector'
       autoload :FontDict,         'ttfunk/table/cff/font_dict'
       autoload :FontIndex,        'ttfunk/table/cff/font_index'
       autoload :Header,           'ttfunk/table/cff/header'
       autoload :Index,            'ttfunk/table/cff/index'
+      autoload :OneBasedIndex,    'ttfunk/table/cff/one_based_index'
       autoload :Path,             'ttfunk/table/cff/path'
       autoload :PrivateDict,      'ttfunk/table/cff/private_dict'
       autoload :SubrIndex,        'ttfunk/table/cff/subr_index'
       autoload :TopDict,          'ttfunk/table/cff/top_dict'
       autoload :TopIndex,         'ttfunk/table/cff/top_index'
 
-      TAG = 'CFF '.freeze # the extra space is important
+      TAG = 'CFF ' # the extra space is important
 
       attr_reader :header, :name_index, :top_index, :string_index
       attr_reader :global_subr_index
@@ -31,7 +36,7 @@ module TTFunk
           sub_tables = [
             header.encode,
             name_index.encode,
-            top_index.encode { |top_dict| top_dict.encode(new2_old, old2_new) },
+            top_index.encode { |top_dict| top_dict.encode },
             string_index.encode,
             global_subr_index.encode
           ]
@@ -51,7 +56,7 @@ module TTFunk
           file, @name_index.table_offset + @name_index.length
         )
 
-        @string_index = Index.new(
+        @string_index = OneBasedIndex.new(
           file, @top_index.table_offset + @top_index.length
         )
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class TTFEncoder
     OPTIMAL_TABLE_ORDER = [
@@ -41,6 +43,7 @@ module TTFunk
 
       optimal_table_order.each do |optimal_tag|
         next unless tables.include?(optimal_tag)
+
         newfont.resolve_placeholder(optimal_tag, [newfont.length].pack('N'))
         newfont << tables[optimal_tag]
         newfont.align!(4)
@@ -87,7 +90,7 @@ module TTFunk
 
     def hhea_table
       @hhea_table = TTFunk::Table::Hhea.encode(
-        original.horizontal_header, hmtx_table, new2old_glyph
+        original.horizontal_header, hmtx_table, original, new2old_glyph
       )
     end
 

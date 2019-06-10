@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'ttfunk/table/cff'
 
@@ -18,7 +20,7 @@ RSpec.describe TTFunk::Table::Cff::TopDict do
     it 'produces an encoded dict that can be re-parsed successfully' do
       new2_old = font.cmap.unicode.first.code_map
       old2_new = new2_old.invert
-      encoded = top_dict.encode(new2_old, old2_new)
+      encoded = top_dict.encode
       top_dict_length = encoded.length
       top_dict_hash = top_dict.to_h
       placeholders = encoded.placeholders.dup
@@ -45,8 +47,9 @@ RSpec.describe TTFunk::Table::Cff::TopDict do
   end
 
   context 'with a non CID-keyed font' do
-    let(:font_path) { test_font('Exo-Regular', :otf) }
     subject { top_dict.is_cid_font? }
+
+    let(:font_path) { test_font('Exo-Regular', :otf) }
 
     describe '#is_cid_font?' do
       it { is_expected.to be(false) }
