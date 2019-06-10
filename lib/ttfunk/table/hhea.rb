@@ -21,7 +21,7 @@ module TTFunk
 
       class << self
         def encode(hhea, hmtx, original, mapping)
-          ''.tap do |table|
+          ''.b.tap do |table|
             metrics = metrics_for(original, mapping)
 
             table << [hhea.version].pack('N')
