@@ -41,7 +41,7 @@ module TTFunk
 
         parse_from(offset + index) do
           raw = io.read(size)
-          number_of_contours = to_signed(raw.unpack('n').first)
+          number_of_contours = to_signed(raw.unpack1('n'))
 
           @cache[glyph_id] =
             if number_of_contours == -1

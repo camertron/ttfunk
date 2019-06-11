@@ -54,33 +54,7 @@ describe TTFunk do
       expect(table_tags.first).to be < table_tags.last
     end
 
-    it 'calculates correct search_range, entry_selector and range_shift values' do
-      font = TTFunk::File.open test_font('DejaVuSans')
-
-      subset = TTFunk::Subset.for(font, :unicode)
-      subset.use(97)
-      subset_io = StringIO.new(subset.encode)
-
-      scaler_type, table_count = subset_io.read(6).unpack('Nn')
-      search_range, entry_selector, range_shift = subset_io.read(6).unpack('nnn')
-
-      # Subset fonts include 14 tables by default.
-      expected_table_count = 14
-      # Smallest power of two less than number of tables, times 16.
-      expected_search_range = 8 * 16
-      # Log2 of max power of two smaller than number of tables.
-      expected_entry_selector = 3
-      # Range shift is defined as 16*table_count - search_range.
-      expected_range_shift = 16 * expected_table_count - expected_search_range
-
-      expect(scaler_type).to eq(font.directory.scaler_type)
-      expect(table_count).to eq(expected_table_count)
-      expect(search_range).to eq(expected_search_range)
-      expect(entry_selector).to eq(expected_entry_selector)
-      expect(range_shift).to eq(expected_range_shift)
-    end
-
-    it 'calculates correct search_range, entry_selector & range_shift values' do
+    it 'calculates search_range, entry_selector & range_shift values' do
       font = TTFunk::File.open test_font('DejaVuSans')
 
       subset = TTFunk::Subset.for(font, :unicode)

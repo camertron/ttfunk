@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Min
     attr_reader :value
@@ -14,6 +16,7 @@ module TTFunk
 
     def value_or(default)
       return default if value.nil?
+
       value
     end
   end

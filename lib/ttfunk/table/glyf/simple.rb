@@ -23,7 +23,7 @@ module TTFunk
             end
 
           @end_points_of_contours = io.read(number_of_contours * 2).unpack('n*')
-          @instruction_length = io.read(2).unpack('n').first
+          @instruction_length = io.read(2).unpack1('n')
           @instructions = io.read(instruction_length).unpack('C*')
         end
 

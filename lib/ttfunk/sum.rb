@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Sum
     attr_reader :value

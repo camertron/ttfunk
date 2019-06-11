@@ -87,7 +87,7 @@ module TTFunk
           else
             element_fmt = element_format(:range_format)
             result = [format_int(:range_format), ranges.size].pack('CC')
-            ranges.each { |range| result << range.pack(element_format) }
+            ranges.each { |range| result << range.pack(element_fmt) }
             result
           end
         end

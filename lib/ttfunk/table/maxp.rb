@@ -90,6 +90,7 @@ module TTFunk
           Hash.new { |h, k| h[k] = Max.new }.tap do |compound_stats|
             glyphs.each do |glyph|
               next unless glyph.compound?
+
               stats = totals_for_compound(maxp, [glyph], 0)
               compound_stats[:max_component_points] << stats[:total_points]
               compound_stats[:max_component_contours] << stats[:total_contours]

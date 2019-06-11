@@ -288,6 +288,7 @@ module TTFunk
           end
 
           return 0 if num_glyphs == 0
+
           total_width / num_glyphs # this should be a whole number
         end
 
@@ -307,6 +308,7 @@ module TTFunk
           LOWERCASE_START.upto(LOWERCASE_END) do |lowercase_cp|
             # make sure the subset includes the character
             next unless subset.to_unicode_map[lowercase_cp]
+
             lowercase_gid = os2.file.cmap.unicode.first[lowercase_cp]
             lowercase_hm = os2.file.horizontal_metrics.for(lowercase_gid)
 
@@ -334,6 +336,7 @@ module TTFunk
           end
 
           return 0 if num_glyphs == 0
+
           total_width / num_glyphs # this should be a whole number
         end
       end
