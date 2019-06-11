@@ -118,8 +118,8 @@ describe TTFunk::File do
         head = file.directory_info('head')
         expect(head).to eq(
           tag: 'head',
-          checksum: 4183760953,
-          offset: 581036,
+          checksum: 0xF95F2039,
+          offset: 581_036,
           length: 54
         )
       end
@@ -128,9 +128,9 @@ describe TTFunk::File do
         hmtx = file.directory_info('hmtx')
         expect(hmtx).to eq(
           tag: 'hmtx',
-          checksum: 4158872760,
-          offset: 581128,
-          length: 23712
+          checksum: 0xF7E35CB8,
+          offset: 581_128,
+          length: 23_712
         )
       end
 
@@ -138,23 +138,23 @@ describe TTFunk::File do
         glyf = file.directory_info('glyf')
         expect(glyf).to eq(
           tag: 'glyf',
-          checksum: 2009777384,
-          offset: 51644,
-          length: 529392
+          checksum: 0x77CAC4E8,
+          offset: 51_644,
+          length: 529_392
         )
       end
     end
 
     context 'with NotoSans' do
-      let(:file) { TTFunk::File.open(test_font('NotoSansCJKsc-Thin', :otf)) }
+      let(:file) { described_class.open(test_font('NotoSansCJKsc-Thin', :otf)) }
 
       it 'extracts the CFF entry correctly' do
         cff = file.directory_info('CFF ')
         expect(cff).to eq(
           tag: 'CFF ',
-          checksum: 3809516217,
-          offset: 260480,
-          length: 14170569
+          checksum: 0xE3109AB9,
+          offset: 260_480,
+          length: 14_170_569
         )
       end
     end

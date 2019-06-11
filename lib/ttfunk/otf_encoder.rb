@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class OTFEncoder < TTFEncoder
     OPTIMAL_TABLE_ORDER = [

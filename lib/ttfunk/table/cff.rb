@@ -36,7 +36,7 @@ module TTFunk
           sub_tables = [
             header.encode,
             name_index.encode,
-            top_index.encode { |top_dict| top_dict.encode },
+            top_index.encode(&:encode),
             string_index.encode,
             global_subr_index.encode
           ]

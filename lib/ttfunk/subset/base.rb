@@ -45,6 +45,10 @@ module TTFunk
         original.cff.exists? ? OTFEncoder : TTFEncoder
       end
 
+      def encoder_klass
+        original.cff.exists? ? OTFEncoder : TTFEncoder
+      end
+
       def unicode_cmap
         @unicode_cmap ||= @original.cmap.unicode.first
       end

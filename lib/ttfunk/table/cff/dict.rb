@@ -177,8 +177,8 @@ module TTFunk
         end
 
         def decode_sci
-          significand = String.new
-          exponent = String.new
+          significand = ''.b
+          exponent = ''.b
 
           loop do
             current = read(1, 'C').first

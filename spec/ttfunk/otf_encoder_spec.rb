@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'ttfunk/otf_encoder'
 require 'ttfunk/subset'
@@ -18,6 +20,7 @@ RSpec.describe TTFunk::OTFEncoder do
 
   describe '#encode' do
     subject { encoder.encode }
+
     let(:new_font) { TTFunk::File.open(StringIO.new(subject)) }
 
     it 'includes the CFF, VORG, and DSIG tables' do
