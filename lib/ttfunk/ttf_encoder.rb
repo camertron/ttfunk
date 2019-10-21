@@ -72,7 +72,7 @@ module TTFunk
 
     def glyf_table
       @glyf_table ||= TTFunk::Table::Glyf.encode(
-        glyphs, new2old_glyph, old2new_glyph
+        glyphs, new_to_old_glyph, old_to_new_glyph
       )
     end
 
@@ -84,25 +84,25 @@ module TTFunk
 
     def hmtx_table
       @hmtx_table ||= TTFunk::Table::Hmtx.encode(
-        original.horizontal_metrics, new2old_glyph
+        original.horizontal_metrics, new_to_old_glyph
       )
     end
 
     def hhea_table
       @hhea_table = TTFunk::Table::Hhea.encode(
-        original.horizontal_header, hmtx_table, original, new2old_glyph
+        original.horizontal_header, hmtx_table, original, new_to_old_glyph
       )
     end
 
     def maxp_table
       @maxp_table ||= TTFunk::Table::Maxp.encode(
-        original.maximum_profile, new2old_glyph
+        original.maximum_profile, old_to_new_glyph
       )
     end
 
     def post_table
       @post_table ||= TTFunk::Table::Post.encode(
-        original.postscript, new2old_glyph
+        original.postscript, new_to_old_glyph
       )
     end
 
@@ -114,7 +114,7 @@ module TTFunk
 
     def head_table
       @head_table ||= TTFunk::Table::Head.encode(
-        original.header, loca_table, new2old_glyph
+        original.header, loca_table, new_to_old_glyph
       )
     end
 
@@ -150,7 +150,7 @@ module TTFunk
       # to opt into it.
       if options[:kerning]
         @kern_table ||= TTFunk::Table::Kern.encode(
-          original.kerning, old2new_glyph
+          original.kerning, old_to_new_glyph
         )
       end
     end
@@ -193,12 +193,12 @@ module TTFunk
       subset.glyphs
     end
 
-    def new2old_glyph
-      subset.new2old_glyph
+    def new_to_old_glyph
+      subset.new_to_old_glyph
     end
 
-    def old2new_glyph
-      subset.old2new_glyph
+    def old_to_new_glyph
+      subset.old_to_new_glyph
     end
 
     def checksum(data)

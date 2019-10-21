@@ -91,7 +91,7 @@ module TTFunk
     end
 
     def io
-      @io ||= StringIO.new.binmode
+      @io ||= StringIO.new(''.b).binmode
     end
   end
 end
