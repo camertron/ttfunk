@@ -147,6 +147,8 @@ module TTFunk
       LOWERCASE_END = 'z'.ord
       LOWERCASE_COUNT = (LOWERCASE_END - LOWERCASE_START) + 1
       CODEPOINT_SPACE = 32
+      SPACE_GLYPH_MISSING_ERROR = "Space glyph (0x#{CODEPOINT_SPACE.to_s(16)})"\
+        ' must be included in the font'
       WEIGHT_SPACE = 166
       WEIGHT_LOWERCASE = [
         64, 14, 27, 35, 100, 20, 14, 42, 63, 3, 6, 35, 20,
@@ -280,7 +282,7 @@ module TTFunk
 
           # use new -> old glyph mapping in order to include compound glyphs
           # in the calculation
-          subset.new2old_glyph.each do |_, old_gid|
+          subset.new_to_old_glyph.each do |_, old_gid|
             if (metric = os2.file.horizontal_metrics.for(old_gid))
               total_width += metric.advance_width
               num_glyphs += 1 if metric.advance_width > 0
@@ -294,7 +296,9 @@ module TTFunk
 
         def avg_weighted_char_width_for(os2, subset)
           # make sure the subset includes the space char
-          return 0 unless subset.to_unicode_map[CODEPOINT_SPACE]
+          unless subset.to_unicode_map[CODEPOINT_SPACE]
+            raise SPACE_GLYPH_MISSING_ERROR
+          end
 
           space_gid = os2.file.cmap.unicode.first[CODEPOINT_SPACE]
           space_hm = os2.file.horizontal_metrics.for(space_gid)
@@ -325,11 +329,11 @@ module TTFunk
           # from avg_ms_char_width_for in that it includes zero-width glyphs
           # in the calculation.
           total_width = 0
-          num_glyphs = subset.new2old_glyph.size
+          num_glyphs = subset.new_to_old_glyph.size
 
           # use new -> old glyph mapping in order to include compound glyphs
           # in the calculation
-          subset.new2old_glyph.each do |_, old_gid|
+          subset.new_to_old_glyph.each do |_, old_gid|
             if (metric = os2.file.horizontal_metrics.for(old_gid))
               total_width += metric.advance_width
             end

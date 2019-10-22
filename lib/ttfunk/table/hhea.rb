@@ -22,13 +22,10 @@ module TTFunk
       class << self
         def encode(hhea, hmtx, original, mapping)
           ''.b.tap do |table|
-            metrics = metrics_for(original, mapping)
-
             table << [hhea.version].pack('N')
             table << [
               hhea.ascent, hhea.descent, hhea.line_gap,
-              metrics[:max_aw].value_or(0), metrics[:min_lsb].value_or(0),
-              metrics[:min_rsb].value_or(0), metrics[:max_extent].value_or(0),
+              *min_max_values_for(original, mapping),
               hhea.carot_slope_rise, hhea.carot_slope_run, hhea.caret_offset,
               0, 0, 0, 0, hhea.metric_data_format, hmtx[:number_of_metrics]
             ].pack('n*')
@@ -37,33 +34,34 @@ module TTFunk
 
         private
 
-        def metrics_for(original, mapping)
-          metrics = {
-            min_lsb: Min.new,
-            min_rsb: Min.new,
-            max_aw: Max.new,
-            max_extent: Max.new
-          }
+        def min_max_values_for(original, mapping)
+          min_lsb = Min.new
+          min_rsb = Min.new
+          max_aw = Max.new
+          max_extent = Max.new
 
           mapping.each do |_, old_glyph_id|
             horiz_metrics = original.horizontal_metrics.for(old_glyph_id)
             next unless horiz_metrics
 
-            metrics[:min_lsb] << horiz_metrics.left_side_bearing
-            metrics[:max_aw] << horiz_metrics.advance_width
+            min_lsb << horiz_metrics.left_side_bearing
+            max_aw << horiz_metrics.advance_width
 
             glyph = original.find_glyph(old_glyph_id)
             next unless glyph
 
             x_delta = glyph.x_max - glyph.x_min
 
-            metrics[:min_rsb] << horiz_metrics.advance_width -
+            min_rsb << horiz_metrics.advance_width -
               horiz_metrics.left_side_bearing - x_delta
 
-            metrics[:max_extent] << horiz_metrics.left_side_bearing + x_delta
+            max_extent << horiz_metrics.left_side_bearing + x_delta
           end
 
-          metrics
+          [
+            max_aw.value_or(0), min_lsb.value_or(0),
+            min_rsb.value_or(0), max_extent.value_or(0)
+          ]
         end
       end
 
