@@ -22,6 +22,17 @@ describe TTFunk do
       expect(name1).to eq name2
     end
 
+    it 'can reconstruct an entire font' do
+      font = TTFunk::File.open test_font('DejaVuSans')
+      subset = TTFunk::Subset.for(font, :unicode)
+
+      font.cmap.unicode.first.code_map.each do |code_point, _gid|
+        subset.use(code_point)
+      end
+
+      expect { subset.encode }.to_not raise_error
+    end
+
     it 'always includes the space glyph' do
       font = TTFunk::File.open test_font('DejaVuSans')
       subset = TTFunk::Subset.for(font, :unicode)

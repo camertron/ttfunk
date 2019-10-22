@@ -11,5 +11,10 @@ module TTFunk
     def <<(operand)
       @value += operand
     end
+
+    def value_or(_default)
+      # value should always be non-nil
+      value
+    end
   end
 end
