@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module TTFunk
-  class Sum
+  class Sum < Aggregate
     attr_reader :value
 
     def initialize(init_value = 0)
@@ -9,7 +9,7 @@ module TTFunk
     end
 
     def <<(operand)
-      @value += operand
+      @value += coerce(operand)
     end
 
     def value_or(_default)

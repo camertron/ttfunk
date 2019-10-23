@@ -149,6 +149,19 @@ module TTFunk
       CODEPOINT_SPACE = 32
       SPACE_GLYPH_MISSING_ERROR = "Space glyph (0x#{CODEPOINT_SPACE.to_s(16)})"\
         ' must be included in the font'
+
+      # Used to calculate the xAvgCharWidth field.
+      # From https://docs.microsoft.com/en-us/typography/opentype/spec/os2:
+      #
+      # "When first defined, the specification was biased toward Basic Latin
+      # characters, and it was thought that the xAvgCharWidth value could be
+      # used to estimate the average length of lines of text. A formula for
+      # calculating xAvgCharWidth was provided using frequency-of-use
+      # weighting factors for lowercase letters a - z."
+      #
+      # The array below contains 26 weight values which correspond to the
+      # 26 letters in the Latin alphabet. Each weight is the relative
+      # frequency of that letter in the English language.
       WEIGHT_SPACE = 166
       WEIGHT_LOWERCASE = [
         64, 14, 27, 35, 100, 20, 14, 42, 63, 3, 6, 35, 20,

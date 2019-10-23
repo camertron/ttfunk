@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module TTFunk
-  class Min
+  class Min < Aggregate
     attr_reader :value
 
     def initialize(init_value = nil)
@@ -9,6 +9,8 @@ module TTFunk
     end
 
     def <<(new_value)
+      new_value = coerce(new_value)
+
       if value.nil? || new_value < value
         @value = new_value
       end
