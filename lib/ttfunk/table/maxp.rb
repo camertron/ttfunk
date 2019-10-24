@@ -6,6 +6,7 @@ module TTFunk
   class Table
     class Maxp < Table
       DEFAULT_MAX_COMPONENT_DEPTH = 1
+      MAX_V1_TABLE_LENGTH = 34
 
       attr_reader :version
       attr_reader :num_glyphs
@@ -35,10 +36,10 @@ module TTFunk
               )
 
               table << [
-                stats[:max_points].value_or(0),
-                stats[:max_contours].value_or(0),
-                stats[:max_component_points].value_or(0),
-                stats[:max_component_contours].value_or(0),
+                stats[:max_points],
+                stats[:max_contours],
+                stats[:max_component_points],
+                stats[:max_component_contours],
                 # these all come from the fpgm and cvt tables, which
                 # we don't support at the moment
                 maxp.max_zones,
@@ -47,9 +48,9 @@ module TTFunk
                 maxp.max_function_defs,
                 maxp.max_instruction_defs,
                 maxp.max_stack_elements,
-                stats[:max_size_of_instructions].value_or(0),
-                stats[:max_component_elements].value_or(0),
-                stats[:max_component_depth].value_or(0)
+                stats[:max_size_of_instructions],
+                stats[:max_component_elements],
+                stats[:max_component_depth]
               ].pack('n*')
             end
           end
@@ -66,36 +67,56 @@ module TTFunk
         end
 
         def stats_for(maxp, glyphs)
-          stats_for_simple(maxp, glyphs).merge(
-            stats_for_compound(maxp, glyphs)
-          )
+          stats_for_simple(maxp, glyphs)
+            .merge(stats_for_compound(maxp, glyphs))
+            .each_with_object({}) do |(name, agg), ret|
+              ret[name] = agg.value_or(0)
+            end
         end
 
         def stats_for_simple(_maxp, glyphs)
-          Hash.new { |h, k| h[k] = Max.new }.tap do |simple_stats|
-            glyphs.each do |glyph|
-              if glyph.compound?
-                simple_stats[:max_component_elements] << glyph.glyph_ids.size
-              else
-                simple_stats[:max_points] << glyph.end_point_of_last_contour
-                simple_stats[:max_contours] << glyph.number_of_contours
-                simple_stats[:max_size_of_instructions] <<
-                  glyph.instruction_length
-              end
+          max_component_elements = Max.new
+          max_points = Max.new
+          max_contours = Max.new
+          max_size_of_instructions = Max.new
+
+          glyphs.each do |glyph|
+            if glyph.compound?
+              max_component_elements << glyph.glyph_ids.size
+            else
+              max_points << glyph.end_point_of_last_contour
+              max_contours << glyph.number_of_contours
+              max_size_of_instructions << glyph.instruction_length
             end
           end
+
+          {
+            max_component_elements: max_component_elements,
+            max_points: max_points,
+            max_contours: max_contours,
+            max_size_of_instructions: max_size_of_instructions
+          }
         end
 
         def stats_for_compound(maxp, glyphs)
-          Hash.new { |h, k| h[k] = Max.new }.tap do |compound_stats|
-            glyphs.each do |glyph|
-              next unless glyph.compound?
-              stats = totals_for_compound(maxp, [glyph], 0)
-              compound_stats[:max_component_points] << stats[:total_points]
-              compound_stats[:max_component_contours] << stats[:total_contours]
-              compound_stats[:max_component_depth] << stats[:max_depth]
-            end
+          max_component_points = Max.new
+          max_component_depth = Max.new
+          max_component_contours = Max.new
+
+          glyphs.each do |glyph|
+            next unless glyph.compound?
+
+            stats = totals_for_compound(maxp, [glyph], 0)
+            max_component_points << stats[:total_points]
+            max_component_depth << stats[:max_depth]
+            max_component_contours << stats[:total_contours]
           end
+
+          {
+            max_component_points: max_component_points,
+            max_component_depth: max_component_depth,
+            max_component_contours: max_component_contours
+          }
         end
 
         def totals_for_compound(maxp, glyphs, depth)
@@ -137,11 +158,15 @@ module TTFunk
             @max_component_contours, @max_zones, @max_twilight_points,
             @max_storage, @max_function_defs, @max_instruction_defs,
             @max_stack_elements, @max_size_of_instructions,
-            @max_component_elements, @max_component_depth = read(28, 'Nn*')
+            @max_component_elements = read(26, 'Nn*')
 
           # a number of fonts omit these last two bytes for some reason,
           # so we have to supply a default here to prevent nils
-          @max_component_depth ||= DEFAULT_MAX_COMPONENT_DEPTH
+          @max_component_depth = if length == MAX_V1_TABLE_LENGTH
+                                   read(2, 'n').first
+                                 else
+                                   DEFAULT_MAX_COMPONENT_DEPTH
+                                 end
         end
       end
     end

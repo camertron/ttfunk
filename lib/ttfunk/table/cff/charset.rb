@@ -6,7 +6,7 @@ module TTFunk
       class Charset < TTFunk::SubTable
         include Enumerable
 
-        FIRST_GLYPH_STRING = '.notdef'.freeze
+        FIRST_GLYPH_STRING = '.notdef'
         ARRAY_FORMAT = 0
         RANGE_FORMAT_8 = 1
         RANGE_FORMAT_16 = 2

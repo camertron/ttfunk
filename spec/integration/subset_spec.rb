@@ -6,6 +6,8 @@ require 'ttfunk/subset'
 
 describe TTFunk do
   describe 'subsetting' do
+    let(:space_char) { TTFunk::Subset::Unicode::SPACE_CHAR }
+
     it 'consistently names font for same subsets' do
       font = TTFunk::File.open test_font('DejaVuSans')
 
@@ -18,6 +20,34 @@ describe TTFunk do
       name2 = TTFunk::File.new(subset2.encode).name.strings[6]
 
       expect(name1).to eq name2
+    end
+
+    it 'can reconstruct an entire font' do
+      font = TTFunk::File.open test_font('DejaVuSans')
+      subset = TTFunk::Subset.for(font, :unicode)
+
+      font.cmap.unicode.first.code_map.each do |code_point, _gid|
+        subset.use(code_point)
+      end
+
+      expect { subset.encode }.to_not raise_error
+    end
+
+    it 'always includes the space glyph' do
+      font = TTFunk::File.open test_font('DejaVuSans')
+      subset = TTFunk::Subset.for(font, :unicode)
+      new_font = TTFunk::File.new(subset.encode)
+
+      # space should be GID 1 since it's the only glyph in the font
+      # (0 is always .notdef)
+      expect(new_font.cmap.unicode.first[space_char]).to eq(1)
+    end
+
+    it "explodes if the space glyph isn't included" do
+      font = TTFunk::File.open test_font('DejaVuSans')
+      subset = TTFunk::Subset.for(font, :unicode)
+      subset.instance_variable_get(:@subset).delete(space_char)
+      expect { subset.encode }.to raise_error(/Space glyph .* must be included/)
     end
 
     it 'changes font names for different subsets' do
@@ -54,33 +84,7 @@ describe TTFunk do
       expect(table_tags.first).to be < table_tags.last
     end
 
-    it 'calculates correct search_range, entry_selector and range_shift values' do
-      font = TTFunk::File.open test_font('DejaVuSans')
-
-      subset = TTFunk::Subset.for(font, :unicode)
-      subset.use(97)
-      subset_io = StringIO.new(subset.encode)
-
-      scaler_type, table_count = subset_io.read(6).unpack('Nn')
-      search_range, entry_selector, range_shift = subset_io.read(6).unpack('nnn')
-
-      # Subset fonts include 14 tables by default.
-      expected_table_count = 14
-      # Smallest power of two less than number of tables, times 16.
-      expected_search_range = 8 * 16
-      # Log2 of max power of two smaller than number of tables.
-      expected_entry_selector = 3
-      # Range shift is defined as 16*table_count - search_range.
-      expected_range_shift = 16 * expected_table_count - expected_search_range
-
-      expect(scaler_type).to eq(font.directory.scaler_type)
-      expect(table_count).to eq(expected_table_count)
-      expect(search_range).to eq(expected_search_range)
-      expect(entry_selector).to eq(expected_entry_selector)
-      expect(range_shift).to eq(expected_range_shift)
-    end
-
-    it 'calculates correct search_range, entry_selector & range_shift values' do
+    it 'calculates search_range, entry_selector & range_shift values' do
       font = TTFunk::File.open test_font('DejaVuSans')
 
       subset = TTFunk::Subset.for(font, :unicode)

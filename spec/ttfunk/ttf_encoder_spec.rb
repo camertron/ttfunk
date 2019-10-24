@@ -64,7 +64,7 @@ RSpec.describe TTFunk::TTFEncoder do
 
       # verified via the Font-Validator tool at:
       # https://github.com/HinTak/Font-Validator
-      expect(checksum).to eq(0x9E957F)
+      expect(checksum).to eq(0xF1AA96AB)
     end
   end
 end

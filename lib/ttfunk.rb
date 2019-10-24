@@ -3,6 +3,7 @@
 require 'stringio'
 require 'pathname'
 
+require_relative 'ttfunk/aggregate'
 require_relative 'ttfunk/directory'
 require_relative 'ttfunk/resource_file'
 require_relative 'ttfunk/collection'
