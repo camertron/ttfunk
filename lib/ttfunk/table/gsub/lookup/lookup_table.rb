@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -12,7 +14,7 @@ module TTFunk
             6 => Chaining,
             7 => Extension,
             8 => ReverseChaining
-          }
+          }.freeze
 
           EXTENSION_LOOKUP_TYPE = Extension::LOOKUP_TYPE
           EXTENSION_CLASS = SUB_TABLE_MAP[EXTENSION_LOOKUP_TYPE]

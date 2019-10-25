@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -30,8 +32,8 @@ module TTFunk
         def parse!
           condition_count = read(2, 'n').first
 
-          @conditions = Sequence.from(io, count, 'N') do |condition_table_offset|
-            ConditionTable.new(self, table_offset + condition_table_offset)
+          @conditions = Sequence.from(io, condition_count, 'N') do |ct_offset|
+            ConditionTable.new(self, table_offset + ct_offset)
           end
 
           @length = 2 + conditions.length

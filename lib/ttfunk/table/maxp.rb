@@ -25,14 +25,14 @@ module TTFunk
       attr_reader :max_component_depth
 
       class << self
-        def encode(maxp, new2old_glyph)
+        def encode(maxp, new_to_old_glyph)
           ''.b.tap do |table|
-            num_glyphs = new2old_glyph.length
+            num_glyphs = new_to_old_glyph.length
             table << [maxp.version, num_glyphs].pack('Nn')
 
             if maxp.version == 0x10000
               stats = stats_for(
-                maxp, glyphs_from_ids(maxp, new2old_glyph.values)
+                maxp, glyphs_from_ids(maxp, new_to_old_glyph.values)
               )
 
               table << [

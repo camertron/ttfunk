@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -44,8 +46,8 @@ module TTFunk
           def parse!
             @format, @coverage_offset, count = read(6, 'nnn')
 
-            @ligature_sets = Sequence.from(io, count, 'n') do |ligature_set_offset|
-              Gsub::LigatureSet.new(file, table_offset + ligature_set_offset)
+            @ligature_sets = Sequence.from(io, count, 'n') do |ls_offset|
+              Gsub::LigatureSet.new(file, table_offset + ls_offset)
             end
 
             @length = 6 + ligature_sets.length

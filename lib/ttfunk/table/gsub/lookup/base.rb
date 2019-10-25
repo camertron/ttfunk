@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -21,13 +23,13 @@ module TTFunk
 
           def finalize_coverage_tables(coverage_tables, data)
             coverage_tables.each do |cov_table|
-              if data.placeholders.include?(cov_table.id)
-                data.resolve_each(cov_table.id) do |placeholder|
-                  [data.length - data.tag_for(placeholder).position].pack('n')
-                end
+              next unless data.placeholders.include?(cov_table.id)
 
-                data << cov_table.encode
+              data.resolve_each(cov_table.id) do |placeholder|
+                [data.length - data.tag_for(placeholder).position].pack('n')
               end
+
+              data << cov_table.encode
             end
           end
 
@@ -35,7 +37,7 @@ module TTFunk
           # your own
           def dependent_coverage_tables
             raise NotImplementedError, "#{__method__} must be defined in "\
-              "derived classes"
+              'derived classes'
           end
         end
       end

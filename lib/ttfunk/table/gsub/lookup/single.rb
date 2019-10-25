@@ -1,13 +1,13 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
       module Lookup
         class Single
-          FORMAT_MAP = {
-            1 => Single1, 2 => Single2
-          }
+          FORMAT_MAP = { 1 => Single1, 2 => Single2 }.freeze
 
-          def self.create(file, parent_table, offset, lookup_type)
+          def self.create(_file, parent_table, offset, lookup_type)
             format = parent_table.parse_from(offset) do
               parent_table.read(2, 'n').first
             end

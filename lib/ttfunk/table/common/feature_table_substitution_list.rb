@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     module Common
@@ -33,9 +35,10 @@ module TTFunk
         def parse!
           @major_version, @minor_version, count = read(6, 'nnn')
 
-          @tables = Sequence.from(io, count, 'nN') do |feature_table_index, alt_feature_table_offset|
+          # feature table index, alt feature table offset
+          @tables = Sequence.from(io, count, 'nN') do |ft_index, aft_offset|
             FeatureTableSubstitutionTable.new(
-              file, feature_table_index, table_offset + alt_feature_table_offset
+              file, ft_index, table_offset + aft_offset
             )
           end
 

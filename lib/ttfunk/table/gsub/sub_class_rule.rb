@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -8,7 +10,9 @@ module TTFunk
 
         def encode
           EncodedString.new do |result|
-            result << [input_sequence.count + 1, subst_lookup_tables.count].pack('nn')
+            result << [input_sequence.count + 1, subst_lookup_tables.count]
+                      .pack('nn')
+
             input_sequence.encode_to(result)
             subst_lookup_tables.encode_to(result) do |subst_lookup_table|
               [
@@ -24,7 +28,8 @@ module TTFunk
         def parse!
           glyph_count, subst_count = read(4, 'nn')
           @input_sequence = Sequence.from(io, glyph_count - 1, 'n')
-          @subst_lookup_tables = Sequence.from(io, subst_count, SubstLookupTable::FORMAT) do |*args|
+          fmt = SubstLookupTable::FORMAT
+          @subst_lookup_tables = Sequence.from(io, subst_count, fmt) do |*args|
             SubstLookupTable.new(*args)
           end
 

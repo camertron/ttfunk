@@ -1,10 +1,10 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     module Common
       class ClassDef
-        FORMAT_MAP = {
-          1 => ClassDef1, 2 => ClassDef2
-        }
+        FORMAT_MAP = { 1 => ClassDef1, 2 => ClassDef2 }.freeze
 
         def self.create(parent_table, offset)
           format = parent_table.parse_from(offset) do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -6,7 +8,9 @@ module TTFunk
 
         def encode
           EncodedString.new do |result|
-            result << [ligature_glyph_id, component_glyph_ids.count + 1].pack('nn')
+            result << [ligature_glyph_id, component_glyph_ids.count + 1]
+                      .pack('nn')
+
             component_glyph_ids.encode_to(result)
           end
         end

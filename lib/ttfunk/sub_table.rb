@@ -11,9 +11,9 @@ module TTFunk
 
     def self.underscored_name
       @underscored_name ||= name
-        .split('::').last
-        .gsub(/([a-z])([A-Z])/, '\\1_\\2')
-        .downcase
+                            .split('::').last
+                            .gsub(/([a-z])([A-Z])/, '\\1_\\2')
+                            .downcase
     end
 
     attr_reader :file, :table_offset, :length

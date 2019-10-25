@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -33,7 +35,8 @@ module TTFunk
           lookahead_count = read(2, 'n').first
           @lookahead_glyph_ids = Sequence.from(io, lookahead_count, 'n')
           subst_count = read(2, 'n').first
-          @subst_lookup_tables = Sequence.from(io, subst_count, SubstLookupTable::FORMAT) do |*args|
+          fmt = SubstLookupTable::FORMAT
+          @subst_lookup_tables = Sequence.from(io, subst_count, fmt) do |*args|
             SubstLookupTable.new(*args)
           end
 

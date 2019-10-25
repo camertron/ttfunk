@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -44,8 +46,8 @@ module TTFunk
           def parse!
             @format, @coverage_offset, count = read(6, 'nnn')
 
-            @sub_rule_sets = Sequence.from(io, count, 'n') do |sub_rule_set_offset|
-              Gsub::SubRuleSet.new(file, table_offset + sub_rule_set_offset)
+            @sub_rule_sets = Sequence.from(io, count, 'n') do |srs_offset|
+              Gsub::SubRuleSet.new(file, table_offset + srs_offset)
             end
 
             @length = 6 + sub_rule_sets.length

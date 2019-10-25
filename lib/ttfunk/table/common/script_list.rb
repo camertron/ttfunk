@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     module Common
       class ScriptList < TTFunk::SubTable
         attr_reader :tables
 
-        def encode(old2new_features)
+        def encode(old_to_new_features)
           EncodedString.new do |result|
             result << [tables.count].pack('n')
             tables.encode_to(result) do |table|
@@ -13,7 +15,7 @@ module TTFunk
 
             tables.each do |table|
               result.resolve_placeholder(table.id, [result.length].pack('n'))
-              result << table.encode(old2new_features)
+              result << table.encode(old_to_new_features)
             end
           end
         end
@@ -27,8 +29,9 @@ module TTFunk
         def parse!
           count = read(2, 'n').first
 
-          @tables = Sequence.from(io, count, 'A4n') do |tag, script_table_offset|
-            ScriptTable.new(file, tag, table_offset + script_table_offset)
+          # st_offset = script table offset
+          @tables = Sequence.from(io, count, 'A4n') do |tag, st_offset|
+            ScriptTable.new(file, tag, table_offset + st_offset)
           end
 
           @length = 2 + tables.length

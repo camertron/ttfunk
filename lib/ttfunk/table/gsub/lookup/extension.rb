@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -39,9 +41,18 @@ module TTFunk
           attr_reader :format, :extension_lookup_type, :extension_offset
 
           def sub_table
-            @sub_table ||= Gsub::Lookup::LookupTable::SUB_TABLE_MAP[extension_lookup_type].create(
-              file, self, table_offset + extension_offset, extension_lookup_type
-            )
+            @sub_table ||= begin
+              sub_table = Gsub::Lookup::LookupTable::SUB_TABLE_MAP[
+                extension_lookup_type
+              ]
+
+              sub_table.create(
+                file,
+                self,
+                table_offset + extension_offset,
+                extension_lookup_type
+              )
+            end
           end
 
           private

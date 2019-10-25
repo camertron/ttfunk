@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -31,6 +33,7 @@ module TTFunk
               result << [sub_class_sets.count].pack('n')
               sub_class_sets.encode_to(result) do |sub_class_set|
                 next [0] unless sub_class_set
+
                 [sub_class_set.placeholder]
               end
 
@@ -63,9 +66,9 @@ module TTFunk
           def parse!
             @format, @coverage_offset, @class_def_offset, count = read(8, 'n4')
 
-            @sub_class_sets = Sequence.from(io, count, 'n') do |sub_class_set_offset|
-              if sub_class_set_offset > 0  # can be nil
-                Gsub::SubClassSet.new(file, table_offset + sub_class_set_offset)
+            @sub_class_sets = Sequence.from(io, count, 'n') do |sc_set_offset|
+              if sc_set_offset > 0 # can be nil
+                Gsub::SubClassSet.new(file, table_offset + sc_set_offset)
               end
             end
 

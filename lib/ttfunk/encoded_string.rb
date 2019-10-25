@@ -88,7 +88,7 @@ module TTFunk
     end
 
     def tag_for(placeholder)
-      if tag = tags[placeholder.relative_to]
+      if (tag = tags[placeholder.relative_to])
         tag
       else
         raise MissingTagError,

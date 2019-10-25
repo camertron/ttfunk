@@ -1,12 +1,12 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     module Common
       class CoverageTable
-        FORMAT_MAP = {
-          1 => CoverageTable1, 2 => CoverageTable2
-        }
+        FORMAT_MAP = { 1 => CoverageTable1, 2 => CoverageTable2 }.freeze
 
-        def self.create(file, parent_table, offset)
+        def self.create(_file, parent_table, offset)
           format = parent_table.parse_from(offset) do
             parent_table.read(2, 'n').first
           end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -9,9 +11,10 @@ module TTFunk
           attr_reader :chain_sub_rule_sets
 
           def max_context
-            @max_context ||= chain_sub_rule_sets.flat_map do |chain_sub_rule_set|
-              chain_sub_rule_set.chain_sub_rules.map do |chain_sub_rule|
-                chain_sub_rule.input_glyph_ids.count + chain_sub_rule.lookahead_glyph_ids.count
+            @max_context ||= chain_sub_rule_sets.flat_map do |cs_rule_set|
+              cs_rule_set.chain_sub_rules.map do |cs_rule|
+                cs_rule.input_glyph_ids.count +
+                  cs_rule.lookahead_glyph_ids.count
               end
             end.max
           end
@@ -22,16 +25,16 @@ module TTFunk
               result << [format].pack('n')
               result << coverage_table.placeholder_relative_to(id)
               result << [chain_sub_rule_sets.count].pack('n')
-              result << chain_sub_rule_sets.encode_to(result) do |chain_sub_rule_set|
-                [chain_sub_rule_set.placeholder]
+              result << chain_sub_rule_sets.encode_to(result) do |cs_rule_set|
+                [cs_rule_set.placeholder]
               end
 
-              chain_sub_rule_sets.each do |chain_sub_rule_set|
+              chain_sub_rule_sets.each do |cs_rule_set|
                 result.resolve_placeholder(
-                  chain_sub_rule_set.id, [result.length].pack('n')
+                  cs_rule_set.id, [result.length].pack('n')
                 )
 
-                result << chain_sub_rule_set.encode
+                result << cs_rule_set.encode
               end
             end
           end
@@ -43,10 +46,10 @@ module TTFunk
           private
 
           def parse!
-            @format, @coverage_offset, count = read(6, 'nnn')
+            @format, @coverage_offset, cnt = read(6, 'nnn')
 
-            @chain_sub_rule_sets = Sequence.from(io, count, 'n') do |chain_sub_rule_set_offset|
-              Gsub::ChainSubRuleSet.new(file, table_offset + chain_sub_rule_set_offset)
+            @chain_sub_rule_sets = Sequence.from(io, cnt, 'n') do |csrs_offset|
+              Gsub::ChainSubRuleSet.new(file, table_offset + csrs_offset)
             end
 
             @length = 6 + chain_sub_rule_sets.length

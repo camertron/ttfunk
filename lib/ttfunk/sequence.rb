@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Sequence
     include Enumerable
@@ -23,11 +25,11 @@ module TTFunk
         values = Array(block_given? ? yield(element) : element)
 
         values.each_with_index do |value, idx|
-          if value.is_a?(Placeholder)
-            str << value
-          else
-            str << [value].pack(pack_segments[idx])
-          end
+          str << if value.is_a?(Placeholder)
+                   value
+                 else
+                   [value].pack(pack_segments[idx])
+                 end
         end
       end
     end
@@ -51,6 +53,7 @@ module TTFunk
 
     def each
       return to_enum(__method__) unless block_given?
+
       count.times { |i| yield self[i] }
     end
 

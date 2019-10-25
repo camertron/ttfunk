@@ -1,48 +1,53 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
       module Lookup
         class Chaining3 < Base
-          attr_reader :format, :backtrack_coverage_tables, :input_coverage_tables
-          attr_reader :lookahead_coverage_tables, :subst_lookup_tables
+          attr_reader :format
+
+          # backtrack coverage tables, input coverage tables,
+          # lookahead coverage tables, subst lookup tables
+          attr_reader :btc_tables, :ic_tables, :lac_tables, :sl_tables
 
           def max_context
-            input_coverage_tables.count + lookahead_coverage_tables.count
+            ic_tables.count + lac_tables.count
           end
 
           def dependent_coverage_tables
-            backtrack_coverage_tables.to_a +
-              input_coverage_tables.to_a +
-              lookahead_coverage_tables.to_a
+            btc_tables.to_a +
+              ic_tables.to_a +
+              lac_tables.to_a
           end
 
           def encode
             EncodedString.new do |result|
               result.tag_with(id)
-              result << [format, backtrack_coverage_tables.count].pack('nn')
+              result << [format, btc_tables.count].pack('nn')
 
-              backtrack_coverage_tables.encode_to(result) do |backtrack_coverage_table|
-                [backtrack_coverage_table.placeholder_relative_to(id)]
+              btc_tables.encode_to(result) do |btc_table|
+                [btc_table.placeholder_relative_to(id)]
               end
 
-              result << [input_coverage_tables.count].pack('n')
+              result << [ic_tables.count].pack('n')
 
-              input_coverage_tables.encode_to(result) do |input_coverage_table|
-                [input_coverage_table.placeholder_relative_to(id)]
+              ic_tables.encode_to(result) do |ic_table|
+                [ic_table.placeholder_relative_to(id)]
               end
 
-              result << [lookahead_coverage_tables.count].pack('n')
+              result << [lac_tables.count].pack('n')
 
-              lookahead_coverage_tables.encode_to(result) do |lookahead_coverage_table|
-                [lookahead_coverage_table.placeholder_relative_to(id)]
+              lac_tables.encode_to(result) do |lac_table|
+                [lac_table.placeholder_relative_to(id)]
               end
 
-              result << [subst_lookup_tables.count].pack('n')
+              result << [sl_tables.count].pack('n')
 
-              subst_lookup_tables.encode_to(result) do |subst_lookup_table|
+              sl_tables.encode_to(result) do |sl_table|
                 [
-                  subst_lookup_table.glyph_sequence_index,
-                  subst_lookup_table.lookup_list_index
+                  sl_table.glyph_sequence_index,
+                  sl_table.lookup_list_index
                 ]
               end
             end
@@ -50,38 +55,47 @@ module TTFunk
 
           def length
             @length +
-              sum(backtrack_coverage_tables, &:length) +
-              sum(input_coverage_tables, &:length) +
-              sum(lookahead_coverage_tables, &:length)
+              sum(btc_tables, &:length) +
+              sum(ic_tables, &:length) +
+              sum(lac_tables, &:length)
           end
 
           private
 
           def parse!
-            @format, backtrack_count = read(4, 'nn')
-            @backtrack_coverage_tables = Sequence.from(io, backtrack_count, 'n') do |coverage_table_offset|
-              Common::CoverageTable.create(file, self, table_offset + coverage_table_offset)
+            # format, backtrack count
+            @format, bt_count = read(4, 'nn')
+            @btc_tables = Sequence.from(io, bt_count, 'n') do |ct_offset|
+              Common::CoverageTable.create(
+                file, self, table_offset + ct_offset
+              )
             end
 
             input_count = read(2, 'n').first
-            @input_coverage_tables = Sequence.from(io, input_count, 'n') do |coverage_table_offset|
-              Common::CoverageTable.create(file, self, table_offset + coverage_table_offset)
+            @ic_tables = Sequence.from(io, input_count, 'n') do |ct_offset|
+              Common::CoverageTable.create(
+                file, self, table_offset + ct_offset
+              )
             end
 
-            lookahead_count = read(2, 'n').first
-            @lookahead_coverage_tables = Sequence.from(io, lookahead_count, 'n') do |coverage_table_offset|
-              Common::CoverageTable.create(file, self, table_offset + coverage_table_offset)
+            # lookahead count
+            la_count = read(2, 'n').first
+            @lac_tables = Sequence.from(io, la_count, 'n') do |ct_offset|
+              Common::CoverageTable.create(
+                file, self, table_offset + ct_offset
+              )
             end
 
             subst_count = read(2, 'n').first
-            @subst_lookup_tables = Sequence.from(io, subst_count, Gsub::SubstLookupTable::FORMAT) do |*args|
+            fmt = Gsub::SubstLookupTable::FORMAT
+            @sl_tables = Sequence.from(io, subst_count, fmt) do |*args|
               Gsub::SubstLookupTable.new(*args)
             end
 
-            @length = 10 + backtrack_coverage_tables.length +
-              input_coverage_tables.length +
-              lookahead_coverage_tables.length +
-              subst_lookup_tables.length
+            @length = 10 + btc_tables.length +
+              ic_tables.length +
+              lac_tables.length +
+              sl_tables.length
           end
         end
       end

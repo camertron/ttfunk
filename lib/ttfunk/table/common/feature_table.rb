@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     module Common
@@ -9,13 +11,17 @@ module TTFunk
           super(file, offset)
         end
 
-        def encode(old2new_lookups)
+        def encode(old_to_new_lookups)
           EncodedString.new do |result|
-            subset_lookup_indices = old2new_lookups.keys & lookup_indices.to_a
-            result << [feature_params_offset, subset_lookup_indices.count].pack('nn')
+            subset_lookup_indices = old_to_new_lookups.keys &
+              lookup_indices.to_a
+
+            result << [feature_params_offset, subset_lookup_indices.count]
+                      .pack('nn')
+
             result << subset_lookup_indices
-              .map { |lookup_index| old2new_lookups[lookup_index] }
-              .pack('n*')
+                      .map { |lookup_index| old_to_new_lookups[lookup_index] }
+                      .pack('n*')
           end
         end
 

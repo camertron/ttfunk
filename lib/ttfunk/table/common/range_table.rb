@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     module Common
@@ -6,7 +8,8 @@ module TTFunk
 
         def encode
           EncodedString.new do |result|
-            result << [start_glyph_id, end_glyph_id, start_coverage_index].pack('nnn')
+            result << [start_glyph_id, end_glyph_id, start_coverage_index]
+                      .pack('nnn')
           end
         end
 

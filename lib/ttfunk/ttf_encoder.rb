@@ -157,7 +157,7 @@ module TTFunk
 
     def gsub_table
       @gsub_table ||= TTFunk::Table::Gsub.encode(
-        original.glyph_substitution, new2old_glyph
+        original.glyph_substitution, new_to_old_glyph
       )
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     module Common
@@ -15,7 +17,14 @@ module TTFunk
         def encode
           EncodedString.new do |result|
             result.tag_with(id)
-            result << [lookup_table_class::EXTENSION_LOOKUP_TYPE, lookup_flag.value, sub_tables.count].pack('nnn')
+
+            header = [
+              lookup_table_class::EXTENSION_LOOKUP_TYPE,
+              lookup_flag.value,
+              sub_tables.count
+            ]
+
+            result << header.pack('nnn')
 
             sub_tables.encode_to(result) do |sub_table|
               [Placeholder.new(sub_table.id, length: 2, relative_to: id)]
@@ -31,8 +40,8 @@ module TTFunk
               [data.length - data.tag_for(placeholder).position].pack('n')
             end
 
-            # just wrap everything in a freaking extension table so we don't have to
-            # worry about super complicated overflow issues
+            # just wrap everything in a freaking extension table so we don't
+            # have to worry about super complicated overflow issues
             data << lookup_table_class::EXTENSION_CLASS.encode(sub_table)
           end
         end

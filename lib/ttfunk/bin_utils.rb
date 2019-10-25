@@ -47,7 +47,7 @@ module TTFunk
     def encode_f2dot14(value)
       # 16384 is a magic constant defined in the OTF spec for the f2dot14 format
       int = twos_comp(value.abs.to_i, 2) << 14
-      frac = ((value - value.to_i) * 16384.0).to_i
+      frac = ((value - value.to_i) * 16_384.0).to_i
       int | frac
     end
 
@@ -55,7 +55,7 @@ module TTFunk
     def decode_f2dot14(value)
       # 16384 is a magic constant defined in the OTF spec for the f2dot14 format
       int = twos_comp(value >> 14, 2)
-      frac = Rational(value & 0x3FFF, 16384.0)
+      frac = Rational(value & 0x3FFF, 16_384.0)
       int + frac
     end
   end

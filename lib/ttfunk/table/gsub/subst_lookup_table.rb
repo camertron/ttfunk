@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
       class SubstLookupTable
-        FORMAT = 'nn'  # used by SubClassRule
+        # used by SubClassRule
+        FORMAT = 'nn'
 
         attr_reader :glyph_sequence_index, :lookup_list_index
 

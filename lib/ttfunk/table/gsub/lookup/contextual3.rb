@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -21,7 +23,12 @@ module TTFunk
           def encode
             EncodedString.new do |result|
               result.tag_with(id)
-              result << [format, coverage_tables.count, subst_lookup_tables.count].pack('nnn')
+
+              header = [
+                format, coverage_tables.count, subst_lookup_tables.count
+              ]
+
+              result << header.pack('nnn')
 
               result << coverage_tables.encode do |coverage_table|
                 [coverage_table.placeholder_relative_to(id)]
@@ -39,13 +46,16 @@ module TTFunk
           private
 
           def parse!
-            @format, glyph_count, subst_count = read(6, 'nnn')
+            @format, glyph_cnt, subst_cnt = read(6, 'nnn')
 
-            @coverage_tables = Sequence.from(io, glyph_count, 'n') do |coverage_table_offset|
-              Common::CoverageTable.create(file, self, table_offset + coverage_table_offset)
+            @coverage_tables = Sequence.from(io, glyph_cnt, 'n') do |ct_offset|
+              Common::CoverageTable.create(
+                file, self, table_offset + ct_offset
+              )
             end
 
-            @subst_lookup_tables = Sequence.from(io, subst_count, Gsub::SubstLookupTable::FORMAT) do |*args|
+            fmt = Gsub::SubstLookupTable::FORMAT
+            @subst_lookup_tables = Sequence.from(io, subst_cnt, fmt) do |*args|
               Gsub::SubstLookupTable.new(*args)
             end
 

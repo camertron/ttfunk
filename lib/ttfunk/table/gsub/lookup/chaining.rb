@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     class Gsub
@@ -5,9 +7,9 @@ module TTFunk
         class Chaining
           FORMAT_MAP = {
             1 => Chaining1, 2 => Chaining2, 3 => Chaining3
-          }
+          }.freeze
 
-          def self.create(file, parent_table, offset, lookup_type)
+          def self.create(_file, parent_table, offset, lookup_type)
             format = parent_table.parse_from(offset) do
               parent_table.read(2, 'n').first
             end
@@ -19,4 +21,3 @@ module TTFunk
     end
   end
 end
-

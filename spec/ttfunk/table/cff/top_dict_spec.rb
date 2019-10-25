@@ -23,7 +23,7 @@ RSpec.describe TTFunk::Table::Cff::TopDict do
       encoded = top_dict.encode
       top_dict_length = encoded.length
       top_dict_hash = top_dict.to_h
-      placeholders = encoded.placeholders.dup
+      placeholder_map = encoded.placeholders.dup
       top_dict.finalize(encoded, new_to_old, old_to_new)
 
       file = TestFile.new(StringIO.new(encoded.string))
@@ -32,11 +32,11 @@ RSpec.describe TTFunk::Table::Cff::TopDict do
 
       # replace all the old offsets with the new ones so the dicts
       # (hopefully) match
-      placeholders.each do |name, placeholders|
+      placeholder_map.each do |name, placeholders|
         placeholders.each do |placeholder|
           start = placeholder.position + 1
           finish = placeholder.position + placeholder.length
-          offset = encoded.string[start...finish].unpack('N').first
+          offset = encoded.string[start...finish].unpack1('N')
           operator = described_class::POINTER_OPERATORS[name]
           top_dict_hash[operator][-1] = offset
         end

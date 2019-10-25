@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
     module Common
       class FeatureTableSubstitutionTable
-        attr_reader :file, :feature_table_index, :alternate_feature_table_offset
+        attr_reader :file
+        attr_reader :feature_table_index, :alternate_feature_table_offset
 
         def encode
           EncodedString.new do |result|
@@ -10,10 +13,10 @@ module TTFunk
           end
         end
 
-        def initialize(file, feature_table_index, alternate_feature_table_offset)
+        def initialize(file, ft_index, aft_offset)
           @file = file
-          @feature_table_index = feature_table_index
-          @alternate_feature_table_offset = alternate_feature_table_offset
+          @feature_table_index = ft_index
+          @alternate_feature_table_offset = aft_offset
         end
 
         def alternate_feature_table

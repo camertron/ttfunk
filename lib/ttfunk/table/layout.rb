@@ -1,17 +1,20 @@
+# frozen_string_literal: true
+
 module TTFunk
   class Table
-    class Layout < TTFunk::Table  # base class for Gsub and Gpos
+    # base class for Gsub and Gpos
+    class Layout < TTFunk::Table
       attr_reader :major_version, :minor_version
       attr_reader :script_list_offset, :feature_list_offset
       attr_reader :lookup_list_offset, :feature_variation_offset
 
-      def self.encode(table, new2old_glyph)
-        old2new_lookups = table.lookup_list.old2new_lookups_for(
-          new2old_glyph.values
+      def self.encode(table, new_to_old_glyph)
+        old_to_new_lookups = table.lookup_list.old_to_new_lookups_for(
+          new_to_old_glyph.values
         )
 
-        old2new_features = table.feature_list.old2new_features_for(
-          old2new_lookups
+        old_to_new_features = table.feature_list.old_to_new_features_for(
+          old_to_new_lookups
         )
 
         EncodedString.new do |result|
@@ -20,19 +23,36 @@ module TTFunk
           result << table.feature_list.placeholder
           result << table.lookup_list.placeholder
 
-          result.resolve_placeholder(table.script_list.id, [result.length].pack('n'))
-          result << table.script_list.encode(old2new_features)
+          result.resolve_placeholder(
+            table.script_list.id, [result.length].pack('n')
+          )
 
-          result.resolve_placeholder(table.feature_list.id, [result.length].pack('n'))
-          result << table.feature_list.encode(old2new_lookups, old2new_features)
+          result << table.script_list.encode(old_to_new_features)
 
-          result.resolve_placeholder(table.lookup_list.id, [result.length].pack('n'))
-          result << table.lookup_list.encode(new2old_glyph, old2new_lookups)
-          table.lookup_list.finalize(result, old2new_lookups)
+          result.resolve_placeholder(
+            table.feature_list.id, [result.length].pack('n')
+          )
+
+          result << table.feature_list.encode(
+            old_to_new_lookups, old_to_new_features
+          )
+
+          result.resolve_placeholder(
+            table.lookup_list.id, [result.length].pack('n')
+          )
+
+          result << table.lookup_list.encode(
+            new_to_old_glyph, old_to_new_lookups
+          )
+
+          table.lookup_list.finalize(result, old_to_new_lookups)
 
           # I can't find any examples of this in the wild...
           if table.feature_variation_list
-            result.resolve_placeholder(table.feature_variation_list.id, [result.length].pack('N'))
+            result.resolve_placeholder(
+              table.feature_variation_list.id, [result.length].pack('N')
+            )
+
             result << table.feature_variation_list.encode
           end
         end.string
@@ -57,29 +77,28 @@ module TTFunk
       end
 
       def feature_variation_list
-        @feature_variation_list ||= if feature_variation_offset
-          Common::FeatureVariationList.new(
-            file, offset + feature_variations_offset
-          )
-        end
+        @feature_variation_list ||=
+          if feature_variation_offset
+            Common::FeatureVariationList.new(
+              file, offset + feature_variations_offset
+            )
+          end
       end
 
       def max_context
         @max_context ||= feature_list.tables.flat_map do |feature|
           feature.lookup_indices.flat_map do |lookup_index|
-            lookup_list.tables[lookup_index].sub_tables.map do |sub_table|
-              sub_table.max_context
-            end
+            lookup_list.tables[lookup_index].sub_tables.map(&:max_context)
           end
         end.max
       end
 
-      def max_context_for(new2old_glyph)
-        old2new_lookups = lookup_list.old2new_lookups_for(
-          new2old_glyph.values
+      def max_context_for(new_to_old_glyph)
+        old_to_new_lookups = lookup_list.old_to_new_lookups_for(
+          new_to_old_glyph.values
         )
 
-        old2new_lookups.flat_map do |old_index, _|
+        old_to_new_lookups.flat_map do |old_index, _|
           lookup_list.tables[old_index].sub_tables.map(&:max_context)
         end.max
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TTFunk
   module PackFormat
     PACK_MAP = {
@@ -5,7 +7,7 @@ module TTFunk
       'C' => 1,
       'n' => 2,
       'N' => 4
-    }
+    }.freeze
 
     def length_of(pack_format)
       split(pack_format).inject(0) do |sum, part|
@@ -21,7 +23,8 @@ module TTFunk
         if PACK_MAP.include?(char)
           arr << char
         elsif char == '*'
-          raise ArgumentError, "unbounded quantifiers (i.e. '*') are not supported."
+          raise ArgumentError,
+            "unbounded quantifiers (i.e. '*') are not supported."
         else
           # must be a numeric quantifier
           arr[arr.length - 1] += char
