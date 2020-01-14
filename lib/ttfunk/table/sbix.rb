@@ -12,7 +12,44 @@ module TTFunk
 
       BitmapData = Struct.new(:x, :y, :type, :data, :ppem, :resolution)
 
+      def self.encode(sbix, old_to_new)
+        EncodedString.new do |table|
+          old_glyph_ids = old_to_new.keys.sort
+          table << [sbix.version, sbix.flags, sbix.num_strikes].pack('n2N')
+
+          sbix.strikes.each_index do |strike_index|
+            table << Placeholder.new("strike_#{strike_index}", length: 4)
+          end
+
+          sbix.strikes.each_with_index do |strike, strike_index|
+            table.resolve_placeholder("strike_#{strike_index}", table.length)
+            table << [strike[:ppem], strike[:resolution]].pack('n2')
+
+            old_glyph_ids.each do |old_glyph_id|
+              table << sbix.raw_bitmap_data_for(old_glyph_id, strike_index)
+            end
+          end
+        end
+      end
+
       def bitmap_data_for(glyph_id, strike_index)
+        if (bitmap_data = raw_bitmap_data_for(glyph_id, strike_index))
+          strike = strikes[strike_index]
+          x, y, type = bitmap_data.unpack('s2A4')
+          data = StringIO.new(bitmap_data[8..-1])
+          BitmapData.new(
+            x, y, type, data, strike[:ppem], strike[:resolution]
+          )
+        end
+      end
+
+      def all_bitmap_data_for(glyph_id)
+        strikes.each_index.map do |strike_index|
+          bitmap_data_for(glyph_id, strike_index)
+        end.compact
+      end
+
+      def raw_bitmap_data_for(glyph_id, strike_index)
         strike = strikes[strike_index]
         return if strike.nil?
 
@@ -21,22 +58,13 @@ module TTFunk
 
         if glyph_offset && next_glyph_offset
           bytes = next_glyph_offset - glyph_offset
+
           if bytes > 0
             parse_from(offset + strike[:offset] + glyph_offset) do
-              x, y, type = read(8, 's2A4')
-              data = StringIO.new(io.read(bytes - 8))
-              BitmapData.new(
-                x, y, type, data, strike[:ppem], strike[:resolution]
-              )
+              io.read(bytes)
             end
           end
         end
-      end
-
-      def all_bitmap_data_for(glyph_id)
-        strikes.each_index.map do |strike_index|
-          bitmap_data_for(glyph_id, strike_index)
-        end.compact
       end
 
       private

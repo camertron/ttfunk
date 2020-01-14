@@ -167,6 +167,12 @@ module TTFunk
       )
     end
 
+    def sbix_table
+      @sbix_table ||= TTFunk::Table::Sbix.encode(
+        original.sbix, old_to_new_glyph
+      )
+    end
+
     def tables
       @tables ||= {
         'cmap' => cmap_table[:table],
@@ -185,7 +191,8 @@ module TTFunk
         'cvt ' => cvt_table,
         'VORG' => vorg_table,
         'DSIG' => dsig_table,
-        'gasp' => gasp_table
+        'gasp' => gasp_table,
+        'sbix' => sbix_table,
       }.reject { |_tag, table| table.nil? }
     end
 
