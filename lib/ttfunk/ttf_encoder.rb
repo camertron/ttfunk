@@ -169,7 +169,7 @@ module TTFunk
 
     def sbix_table
       @sbix_table ||= TTFunk::Table::Sbix.encode(
-        original.sbix, old_to_new_glyph
+        original.sbix, new_to_old_glyph
       )
     end
 

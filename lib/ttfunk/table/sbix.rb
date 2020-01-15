@@ -12,9 +12,9 @@ module TTFunk
 
       BitmapData = Struct.new(:x, :y, :type, :data, :ppem, :resolution)
 
-      def self.encode(sbix, old_to_new)
+      def self.encode(sbix, new_to_old)
         EncodedString.new do |table|
-          old_glyph_ids = old_to_new.keys.sort
+          max_gid = new_to_old.keys.max
           table << [sbix.version, sbix.flags, sbix.num_strikes].pack('n2N')
 
           sbix.strikes.each_index do |strike_index|
@@ -22,12 +22,26 @@ module TTFunk
           end
 
           sbix.strikes.each_with_index do |strike, strike_index|
-            table.resolve_placeholder("strike_#{strike_index}", table.length)
+            table.resolve_placeholder("strike_#{strike_index}", [table.length].pack('N'))
             table << [strike[:ppem], strike[:resolution]].pack('n2')
+            data_offset = 4
 
-            old_glyph_ids.each do |old_glyph_id|
-              table << sbix.raw_bitmap_data_for(old_glyph_id, strike_index)
+            0.upto(max_gid + 1) do |new_gid|
+              table << Placeholder.new("bmp_#{new_gid}", length: 4)
+              data_offset += 4
             end
+
+            0.upto(max_gid) do |new_gid|
+              table.resolve_placeholder("bmp_#{new_gid}", [data_offset].pack('N'))
+              old_gid = new_to_old[new_gid]
+
+              if data = sbix.raw_bitmap_data_for(old_gid, strike_index)
+                table << data
+                data_offset += data.bytesize
+              end
+            end
+
+            table.resolve_placeholder("bmp_#{max_gid + 1}", [data_offset].pack('N'))
           end
         end
       end
